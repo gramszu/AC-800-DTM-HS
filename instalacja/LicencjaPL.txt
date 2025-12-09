@@ -1,0 +1,30 @@
+UMOWA LICENCYJNA
+
+Instaluj¹c lub rozpoczynaj¹c korzystanie z programu Bramster AC konfigurator, potwierdzam, ¿e przeczyta³em niniejsz¹ Umowê Licencyjn¹, rozumiem j¹ oraz zobowi¹zujê siê przestrzegaæ jej postanowieñ. Jestem œwiadomy, ¿e jeœli nie wyra¿am zgody na warunki Umowy Licencyjnej, muszê przerwaæ instalacjê programu Bramster AC i nie mogê go u¿ywaæ.
+
+1. Megaelektronik sp. z o.o. (Licencjodawca) udziela niniejszym bezterminowej, niewy³¹cznej licencji na korzystanie z programu Bramster AC, zwanego dalej Bramster AC, bêd¹cego integraln¹ czêœci¹ modu³u produkcji Megaelektronik sp. z o.o., na nastêpuj¹cym polu eksploatacji: u¿ywanie Bramster AC wy³¹cznie w celu konfigurowania i serwisowania modu³u Bramster AC zgodnie z instrukcj¹ obs³ugi i jego przeznaczeniem.
+
+2. Licencja jest udzielana ka¿dej osobie korzystaj¹cej z Bramster AC w celu wskazanym w pkt 1.
+
+3. Licencjobiorca oœwiadcza, ¿e jest przedsiêbiorc¹, zawiera niniejsz¹ Umowê w ramach prowadzonej dzia³alnoœci gospodarczej i posiada wystarczaj¹ce doœwiadczenie w obs³udze Bramster AC.
+
+4. Licencjobiorca nie ma prawa ¿¹daæ od Licencjodawcy tworzenia aktualizacji lub rozszerzeñ Bramster AC. Aktualizacje i rozszerzenia mog¹ byæ udostêpniane zgodnie z polityk¹ handlow¹ Licencjodawcy.
+
+5. Bramster AC jest dostarczany w formie plików wykonywalnych i tylko w tej formie mo¿e byæ u¿ywany. Z wyj¹tkiem przypadków dozwolonych przez bezwzglêdnie obowi¹zuj¹ce przepisy prawa, Licencjobiorcy zabrania siê:
+   a. deasemblacji, dekompilacji, t³umaczenia lub prób odtwarzania kodu Ÿród³owego Bramster AC, a tak¿e tworzenia dzie³ pochodnych Bramster AC lub jego czêœci, nawet w celu naprawy b³êdów;
+   b. usuwania, zmiany lub zakrywania informacji o prawach autorskich lub oznaczeñ praw w³asnoœci intelektualnej w Bramster AC;
+   c. tworzenia dzie³ zale¿nych, kopiowania, t³umaczenia, adaptacji, zmiany uk³adu, modyfikowania, udostêpniania osobom trzecim lub rozpowszechniania Bramster AC (w formie elektronicznej lub innej), w tym w celach serwisowych lub usuwania wad.
+
+6. Materia³y do³¹czone do Bramster AC w formie elektronicznej (np. pliki pomocy) s³u¿¹ wy³¹cznie u³atwieniu korzystania z programu. Licencjobiorca nie ma prawa u¿ywaæ, kopiowaæ, modyfikowaæ ani rozpowszechniaæ tych materia³ów w innym celu.
+
+7. Licencjodawca mo¿e stosowaæ œrodki ochrony praw do Bramster AC, które uniemo¿liwiaj¹ lub utrudniaj¹ naruszenie licencji.
+
+8. Licencjodawca nie ponosi odpowiedzialnoœci za wady Bramster AC i do³¹czonych materia³ów, w tym z tytu³u gwarancji i rêkojmi za wady fizyczne, z wyj¹tkiem rêkojmi za wady prawne. Licencjodawca nie odpowiada za szkody (bezpoœrednie, poœrednie, utratê zysku itp.) spowodowane przez Bramster AC. Licencjobiorca przyjmuje do wiadomoœci, ¿e Bramster AC, ze wzglêdu na swoj¹ z³o¿onoœæ, mo¿e nie byæ wolny od wad, a Licencjodawca nie gwarantuje jego nieprzerwanego i bezb³êdnego dzia³ania. Licencjobiorca uwzglêdni³ te ryzyka w swojej dzia³alnoœci. Licencjodawca nie zapewnia przydatnoœci Bramster AC do sprzeda¿y lub konkretnego celu.
+
+9. Niniejsza licencja nie przenosi w³asnoœci Bramster AC. Licencjobiorca nie nabywa praw w³asnoœci do Bramster AC ani zwi¹zanych z nim patentów, praw autorskich, znaków handlowych lub innych praw w³asnoœci intelektualnej, z wyj¹tkiem ograniczonego prawa u¿ytkowania wynikaj¹cego z tej licencji.
+
+10. Licencjodawca mo¿e rozwi¹zaæ niniejsz¹ Umowê z miesiêcznym okresem wypowiedzenia lub niezw³ocznie w przypadku naruszenia warunków licencji przez Licencjobiorcê. Po rozwi¹zaniu Umowy Licencjobiorca zobowi¹zany jest zaprzestaæ korzystania z Bramster AC.
+
+11. Licencjobiorca zosta³ poinformowany, ¿e Bramster AC jest chroniony prawem w³asnoœci intelektualnej i zawiera tajemnice przedsiêbiorstwa Licencjodawcy. Licencjobiorca do³o¿y wszelkich starañ, aby zapobiec naruszeniom praw Licencjodawcy.
+
+12. Umowa podlega prawu polskiemu. Wszelkie spory wynikaj¹ce z Umowy bêd¹ rozstrzygane przez S¹d w £odzi.

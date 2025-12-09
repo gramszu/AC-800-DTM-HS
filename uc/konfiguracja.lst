@@ -1,0 +1,945 @@
+   1               		.file	"konfiguracja.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__RAMPZ__ = 0x3b
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.text
+   9               	.Ltext0:
+  10               		.cfi_sections	.debug_frame
+  11               	.global	konwersja_znaku_telefonu
+  13               	konwersja_znaku_telefonu:
+  14               	.LFB5:
+  15               		.file 1 "konfiguracja.c"
+   1:konfiguracja.c **** 
+   2:konfiguracja.c **** #include "konfiguracja.h"
+   3:konfiguracja.c **** #include <avr/io.h>
+   4:konfiguracja.c **** #include <avr/pgmspace.h>
+   5:konfiguracja.c **** #include <string.h>
+   6:konfiguracja.c **** #include "zapiseeprom.h"
+   7:konfiguracja.c **** 
+   8:konfiguracja.c **** uchar konwersja_znaku_telefonu(const uchar znak)
+   9:konfiguracja.c **** {
+  16               		.loc 1 9 0
+  17               		.cfi_startproc
+  18               	.LVL0:
+  19               	/* prologue: function */
+  20               	/* frame size = 0 */
+  21               	/* stack size = 0 */
+  22               	.L__stack_usage = 0
+  10:konfiguracja.c **** 	switch ( znak )
+  23               		.loc 1 10 0
+  24 0000 8B32      		cpi r24,lo8(43)
+  25 0002 01F0      		breq .L8
+  26 0004 00F4      		brsh .L4
+  27 0006 8332      		cpi r24,lo8(35)
+  28 0008 01F0      		breq .L5
+  29 000a 8A32      		cpi r24,lo8(42)
+  30 000c 01F0      		breq .L6
+  31               	.LVL1:
+  32               	.L2:
+  11:konfiguracja.c **** 	{
+  12:konfiguracja.c **** 	case '0': case '1': case '2': case '3': case '4': 
+  13:konfiguracja.c **** 	case '5': case '6': case '7': case '8': case '9':
+  14:konfiguracja.c **** 		return znak - '0';
+  15:konfiguracja.c **** 	case '+': return ZNAK_NUMERU_TELEFONU_PLUS;
+  16:konfiguracja.c **** 	case '*': return ZNAK_NUMERU_TELEFONU_GWIAZDKA;
+  17:konfiguracja.c **** 	case '#': return ZNAK_NUMERU_TELEFONU_KRZYZ;
+  18:konfiguracja.c **** 	default: return ZNAK_NUMERU_TELEFONU_NIEZNANY;
+  33               		.loc 1 18 0
+  34 000e 8DE0      		ldi r24,lo8(13)
+  35 0010 0895      		ret
+  36               	.LVL2:
+  37               	.L4:
+  10:konfiguracja.c **** 	switch ( znak )
+  38               		.loc 1 10 0
+  39 0012 8053      		subi r24,lo8(-(-48))
+  40               	.LVL3:
+  41 0014 8A30      		cpi r24,lo8(10)
+  42 0016 00F4      		brsh .L2
+  43               	.LVL4:
+  44               	.L1:
+  45               	/* epilogue start */
+  19:konfiguracja.c **** 	}
+  20:konfiguracja.c **** }
+  46               		.loc 1 20 0
+  47 0018 0895      		ret
+  48               	.LVL5:
+  49               	.L6:
+  16:konfiguracja.c **** 	case '#': return ZNAK_NUMERU_TELEFONU_KRZYZ;
+  50               		.loc 1 16 0
+  51 001a 8BE0      		ldi r24,lo8(11)
+  52               	.LVL6:
+  53 001c 0895      		ret
+  54               	.LVL7:
+  55               	.L5:
+  17:konfiguracja.c **** 	default: return ZNAK_NUMERU_TELEFONU_NIEZNANY;
+  56               		.loc 1 17 0
+  57 001e 8CE0      		ldi r24,lo8(12)
+  58               	.LVL8:
+  59 0020 0895      		ret
+  60               	.LVL9:
+  61               	.L8:
+  15:konfiguracja.c **** 	case '*': return ZNAK_NUMERU_TELEFONU_GWIAZDKA;
+  62               		.loc 1 15 0
+  63 0022 8AE0      		ldi r24,lo8(10)
+  64               	.LVL10:
+  65 0024 00C0      		rjmp .L1
+  66               		.cfi_endproc
+  67               	.LFE5:
+  69               	.global	konwertuj_telefon_na_blok_eeprom
+  71               	konwertuj_telefon_na_blok_eeprom:
+  72               	.LFB6:
+  21:konfiguracja.c **** 
+  22:konfiguracja.c **** void konwertuj_telefon_na_blok_eeprom(const uchar* telefon_ptr_begin,
+  23:konfiguracja.c **** 	const uchar* telefon_ptr_end, uchar* blok_ptr)
+  24:konfiguracja.c **** {
+  73               		.loc 1 24 0
+  74               		.cfi_startproc
+  75               	.LVL11:
+  76 0026 AF92      		push r10
+  77               	.LCFI0:
+  78               		.cfi_def_cfa_offset 3
+  79               		.cfi_offset 10, -2
+  80 0028 BF92      		push r11
+  81               	.LCFI1:
+  82               		.cfi_def_cfa_offset 4
+  83               		.cfi_offset 11, -3
+  84 002a CF92      		push r12
+  85               	.LCFI2:
+  86               		.cfi_def_cfa_offset 5
+  87               		.cfi_offset 12, -4
+  88 002c DF92      		push r13
+  89               	.LCFI3:
+  90               		.cfi_def_cfa_offset 6
+  91               		.cfi_offset 13, -5
+  92 002e FF92      		push r15
+  93               	.LCFI4:
+  94               		.cfi_def_cfa_offset 7
+  95               		.cfi_offset 15, -6
+  96 0030 0F93      		push r16
+  97               	.LCFI5:
+  98               		.cfi_def_cfa_offset 8
+  99               		.cfi_offset 16, -7
+ 100 0032 1F93      		push r17
+ 101               	.LCFI6:
+ 102               		.cfi_def_cfa_offset 9
+ 103               		.cfi_offset 17, -8
+ 104 0034 CF93      		push r28
+ 105               	.LCFI7:
+ 106               		.cfi_def_cfa_offset 10
+ 107               		.cfi_offset 28, -9
+ 108 0036 DF93      		push r29
+ 109               	.LCFI8:
+ 110               		.cfi_def_cfa_offset 11
+ 111               		.cfi_offset 29, -10
+ 112               	/* prologue: function */
+ 113               	/* frame size = 0 */
+ 114               	/* stack size = 9 */
+ 115               	.L__stack_usage = 9
+ 116 0038 182F      		mov r17,r24
+ 117 003a EB01      		movw r28,r22
+ 118 003c 6A01      		movw r12,r20
+  25:konfiguracja.c **** 	memset(blok_ptr, 0xff, LICZBA_BAJTOW_NUMERU_TELEFONU_W_EEPROM);
+ 119               		.loc 1 25 0
+ 120 003e 45E0      		ldi r20,lo8(5)
+ 121 0040 50E0      		ldi r21,0
+ 122               	.LVL12:
+ 123 0042 6FEF      		ldi r22,lo8(-1)
+ 124 0044 70E0      		ldi r23,0
+ 125               	.LVL13:
+ 126 0046 C601      		movw r24,r12
+ 127               	.LVL14:
+ 128 0048 0E94 0000 		call memset
+ 129               	.LVL15:
+  26:konfiguracja.c **** 	uchar l = telefon_ptr_end - telefon_ptr_begin;
+ 130               		.loc 1 26 0
+ 131 004c 8C2F      		mov r24,r28
+ 132 004e 811B      		sub r24,r17
+ 133 0050 182F      		mov r17,r24
+ 134               	.LVL16:
+  27:konfiguracja.c **** 	if ( l < 2 )
+  28:konfiguracja.c **** 		return;
+  29:konfiguracja.c **** 	uchar pos_buf = 0;
+  30:konfiguracja.c **** 	telefon_ptr_end--;
+ 135               		.loc 1 30 0
+ 136 0052 2197      		sbiw r28,1
+ 137               	.LVL17:
+  29:konfiguracja.c **** 	telefon_ptr_end--;
+ 138               		.loc 1 29 0
+ 139 0054 00E0      		ldi r16,0
+  27:konfiguracja.c **** 	if ( l < 2 )
+ 140               		.loc 1 27 0
+ 141 0056 8230      		cpi r24,lo8(2)
+ 142 0058 00F4      		brsh .L14
+ 143               	.LVL18:
+ 144               	.L10:
+ 145               	/* epilogue start */
+  31:konfiguracja.c **** 	while ( l-- )
+  32:konfiguracja.c **** 	{
+  33:konfiguracja.c **** 		uchar s1 = konwersja_znaku_telefonu(*telefon_ptr_end--);
+  34:konfiguracja.c **** 		s1 <<= 4;
+  35:konfiguracja.c **** 		s1 |= konwersja_znaku_telefonu(*telefon_ptr_end);
+  36:konfiguracja.c **** 		if ( l == 0 )
+  37:konfiguracja.c **** 			s1 |= 0x0f;
+  38:konfiguracja.c **** 		else
+  39:konfiguracja.c **** 			--telefon_ptr_end, --l;
+  40:konfiguracja.c **** 		blok_ptr[pos_buf++] = s1;
+  41:konfiguracja.c **** 	}
+  42:konfiguracja.c **** }
+ 146               		.loc 1 42 0
+ 147 005a DF91      		pop r29
+ 148 005c CF91      		pop r28
+ 149               	.LVL19:
+ 150 005e 1F91      		pop r17
+ 151 0060 0F91      		pop r16
+ 152 0062 FF90      		pop r15
+ 153 0064 DF90      		pop r13
+ 154 0066 CF90      		pop r12
+ 155               	.LVL20:
+ 156 0068 BF90      		pop r11
+ 157 006a AF90      		pop r10
+ 158 006c 0895      		ret
+ 159               	.LVL21:
+ 160               	.L16:
+ 161               	.LBB12:
+  40:konfiguracja.c **** 	}
+ 162               		.loc 1 40 0
+ 163 006e 092F      		mov r16,r25
+ 164               	.LVL22:
+ 165               	.L14:
+  33:konfiguracja.c **** 		s1 <<= 4;
+ 166               		.loc 1 33 0
+ 167 0070 8881      		ld r24,Y
+ 168 0072 0E94 0000 		call konwersja_znaku_telefonu
+ 169               	.LVL23:
+  34:konfiguracja.c **** 		s1 |= konwersja_znaku_telefonu(*telefon_ptr_end);
+ 170               		.loc 1 34 0
+ 171 0076 F82E      		mov r15,r24
+ 172 0078 F294      		swap r15
+ 173 007a 80EF      		ldi r24,lo8(-16)
+ 174               	.LVL24:
+ 175 007c F822      		and r15,r24
+ 176               	.LVL25:
+  35:konfiguracja.c **** 		if ( l == 0 )
+ 177               		.loc 1 35 0
+ 178 007e FE01      		movw r30,r28
+ 179 0080 8291      		ld r24,-Z
+ 180               	.LVL26:
+ 181 0082 5F01      		movw r10,r30
+ 182 0084 0E94 0000 		call konwersja_znaku_telefonu
+ 183               	.LVL27:
+ 184 0088 8F29      		or r24,r15
+ 185               	.LVL28:
+  36:konfiguracja.c **** 			s1 |= 0x0f;
+ 186               		.loc 1 36 0
+ 187 008a 1130      		cpi r17,lo8(1)
+ 188 008c 01F4      		brne .L12
+  33:konfiguracja.c **** 		s1 <<= 4;
+ 189               		.loc 1 33 0
+ 190 008e E501      		movw r28,r10
+  37:konfiguracja.c **** 		else
+ 191               		.loc 1 37 0
+ 192 0090 8F60      		ori r24,lo8(15)
+ 193               	.LVL29:
+ 194               	.LBE12:
+  31:konfiguracja.c **** 	{
+ 195               		.loc 1 31 0
+ 196 0092 10E0      		ldi r17,0
+ 197               	.LVL30:
+ 198               	.L13:
+ 199               	.LBB13:
+  40:konfiguracja.c **** 	}
+ 200               		.loc 1 40 0
+ 201 0094 91E0      		ldi r25,lo8(1)
+ 202 0096 900F      		add r25,r16
+ 203               	.LVL31:
+ 204 0098 F601      		movw r30,r12
+ 205 009a E00F      		add r30,r16
+ 206 009c F11D      		adc r31,__zero_reg__
+ 207 009e 8083      		st Z,r24
+ 208               	.LVL32:
+ 209               	.LBE13:
+  31:konfiguracja.c **** 	{
+ 210               		.loc 1 31 0
+ 211 00a0 1111      		cpse r17,__zero_reg__
+ 212 00a2 00C0      		rjmp .L16
+ 213 00a4 00C0      		rjmp .L10
+ 214               	.LVL33:
+ 215               	.L12:
+ 216               	.LBB14:
+  39:konfiguracja.c **** 		blok_ptr[pos_buf++] = s1;
+ 217               		.loc 1 39 0
+ 218 00a6 2297      		sbiw r28,2
+ 219               	.LVL34:
+ 220 00a8 1250      		subi r17,lo8(-(-2))
+ 221               	.LVL35:
+ 222 00aa 00C0      		rjmp .L13
+ 223               	.LBE14:
+ 224               		.cfi_endproc
+ 225               	.LFE6:
+ 227               	.global	konwersja_znaku_telefonu_eeprom
+ 229               	konwersja_znaku_telefonu_eeprom:
+ 230               	.LFB7:
+  43:konfiguracja.c **** 
+  44:konfiguracja.c **** uchar konwersja_znaku_telefonu_eeprom(const uchar wartosc)
+  45:konfiguracja.c **** {
+ 231               		.loc 1 45 0
+ 232               		.cfi_startproc
+ 233               	.LVL36:
+ 234               	/* prologue: function */
+ 235               	/* frame size = 0 */
+ 236               	/* stack size = 0 */
+ 237               	.L__stack_usage = 0
+ 238               	.LBB15:
+  46:konfiguracja.c **** 	static const uchar znaki[16] PROGMEM = 
+  47:konfiguracja.c **** 	{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '*', '#', '!', '!', '\0' };
+  48:konfiguracja.c **** 	return pgm_read_byte(znaki + wartosc);
+ 239               		.loc 1 48 0
+ 240 00ac E82F      		mov r30,r24
+ 241 00ae F0E0      		ldi r31,0
+ 242 00b0 E050      		subi r30,lo8(-(znaki.2124))
+ 243 00b2 F040      		sbci r31,hi8(-(znaki.2124))
+ 244               	/* #APP */
+ 245               	 ;  48 "konfiguracja.c" 1
+ 246 00b4 8491      		lpm r24, Z
+ 247               		
+ 248               	 ;  0 "" 2
+ 249               	.LVL37:
+ 250               	/* epilogue start */
+ 251               	/* #NOAPP */
+ 252               	.LBE15:
+  49:konfiguracja.c **** }
+ 253               		.loc 1 49 0
+ 254 00b6 0895      		ret
+ 255               		.cfi_endproc
+ 256               	.LFE7:
+ 258               	.global	konwertuj_blok_eeprom_na_telefon
+ 260               	konwertuj_blok_eeprom_na_telefon:
+ 261               	.LFB8:
+  50:konfiguracja.c **** 
+  51:konfiguracja.c **** uchar konwertuj_blok_eeprom_na_telefon(const uchar* blok_ptr, uchar* telefon_ptr,
+  52:konfiguracja.c **** 	const uchar max_liczba_znakow)	// nie dzia³a dobrze dla nieparzystych max_liczba_znakow
+  53:konfiguracja.c **** {
+ 262               		.loc 1 53 0
+ 263               		.cfi_startproc
+ 264               	.LVL38:
+ 265 00b8 CF93      		push r28
+ 266               	.LCFI9:
+ 267               		.cfi_def_cfa_offset 3
+ 268               		.cfi_offset 28, -2
+ 269 00ba DF93      		push r29
+ 270               	.LCFI10:
+ 271               		.cfi_def_cfa_offset 4
+ 272               		.cfi_offset 29, -3
+ 273               	/* prologue: function */
+ 274               	/* frame size = 0 */
+ 275               	/* stack size = 2 */
+ 276               	.L__stack_usage = 2
+ 277 00bc 9C01      		movw r18,r24
+ 278 00be EB01      		movw r28,r22
+  54:konfiguracja.c **** 	*telefon_ptr = '\0';
+ 279               		.loc 1 54 0
+ 280 00c0 1882      		st Y,__zero_reg__
+ 281               	.LVL39:
+ 282 00c2 BC01      		movw r22,r24
+ 283               	.LVL40:
+  55:konfiguracja.c **** 	const uchar* ptr = blok_ptr;
+  56:konfiguracja.c **** 	uchar i = 0;
+ 284               		.loc 1 56 0
+ 285 00c4 80E0      		ldi r24,0
+ 286               	.LVL41:
+ 287               	.L19:
+ 288 00c6 DB01      		movw r26,r22
+ 289               	.LVL42:
+ 290 00c8 6F5F      		subi r22,-1
+ 291 00ca 7F4F      		sbci r23,-1
+  57:konfiguracja.c **** 	while ( *ptr != 0xff && i < LICZBA_BAJTOW_NUMERU_TELEFONU_W_EEPROM )
+ 292               		.loc 1 57 0
+ 293 00cc 9C91      		ld r25,X
+ 294 00ce 9F3F      		cpi r25,lo8(-1)
+ 295 00d0 01F0      		breq .L20
+ 296               		.loc 1 57 0 is_stmt 0 discriminator 1
+ 297 00d2 8530      		cpi r24,lo8(5)
+ 298 00d4 01F0      		breq .+2
+ 299 00d6 00C0      		rjmp .L21
+ 300               	.L20:
+  58:konfiguracja.c **** 		++ptr, ++i;
+  59:konfiguracja.c **** 	if ( ptr == blok_ptr )
+ 301               		.loc 1 59 0 is_stmt 1
+ 302 00d8 A217      		cp r26,r18
+ 303 00da B307      		cpc r27,r19
+ 304 00dc 01F4      		brne .+2
+ 305 00de 00C0      		rjmp .L30
+ 306               	.LVL43:
+  60:konfiguracja.c **** 		return 0;
+  61:konfiguracja.c **** 	--ptr;
+  62:konfiguracja.c **** 	if ( i * 2 > max_liczba_znakow )
+ 307               		.loc 1 62 0
+ 308 00e0 642F      		mov r22,r20
+ 309 00e2 70E0      		ldi r23,0
+ 310 00e4 90E0      		ldi r25,0
+ 311 00e6 880F      		lsl r24
+ 312 00e8 991F      		rol r25
+ 313               	.LVL44:
+  61:konfiguracja.c **** 	if ( i * 2 > max_liczba_znakow )
+ 314               		.loc 1 61 0
+ 315 00ea 1197      		sbiw r26,1
+ 316               	.LVL45:
+ 317               		.loc 1 62 0
+ 318 00ec 6817      		cp r22,r24
+ 319 00ee 7907      		cpc r23,r25
+ 320 00f0 04F4      		brge .L24
+  63:konfiguracja.c **** 		ptr = blok_ptr + (max_liczba_znakow - 1) / 2;
+ 321               		.loc 1 63 0
+ 322 00f2 DB01      		movw r26,r22
+ 323               	.LVL46:
+ 324 00f4 1197      		sbiw r26,1
+ 325 00f6 B7FD      		sbrc r27,7
+ 326 00f8 DB01      		movw r26,r22
+ 327               	.L25:
+ 328 00fa B595      		asr r27
+ 329 00fc A795      		ror r26
+ 330 00fe A20F      		add r26,r18
+ 331 0100 B31F      		adc r27,r19
+ 332               	.LVL47:
+ 333               	.L24:
+  64:konfiguracja.c **** 	i = 0;
+  65:konfiguracja.c **** 	if ( /*(max_liczba_znakow & 0x01) != 0 */ (*ptr & 0x0f) == 0x0f &&
+ 334               		.loc 1 65 0
+ 335 0102 EC91      		ld r30,X
+ 336 0104 8E2F      		mov r24,r30
+ 337 0106 8F70      		andi r24,lo8(15)
+ 338 0108 8F30      		cpi r24,lo8(15)
+ 339 010a 01F0      		breq .+2
+ 340 010c 00C0      		rjmp .L31
+ 341               	.LVL48:
+  66:konfiguracja.c **** 		(*telefon_ptr = konwersja_znaku_telefonu_eeprom((*ptr & 0xf0) >> 4)) != '\0' )
+ 342               		.loc 1 66 0 discriminator 1
+ 343 010e E295      		swap r30
+ 344               	.LVL49:
+ 345 0110 EF70      		andi r30,lo8(15)
+ 346               	.LBB16:
+ 347               	.LBB17:
+ 348               	.LBB18:
+  48:konfiguracja.c **** }
+ 349               		.loc 1 48 0 discriminator 1
+ 350 0112 F0E0      		ldi r31,0
+ 351 0114 E050      		subi r30,lo8(-(znaki.2124))
+ 352 0116 F040      		sbci r31,hi8(-(znaki.2124))
+ 353               	/* #APP */
+ 354               	 ;  48 "konfiguracja.c" 1
+ 355 0118 8491      		lpm r24, Z
+ 356               		
+ 357               	 ;  0 "" 2
+ 358               	.LVL50:
+ 359               	/* #NOAPP */
+ 360               	.LBE18:
+ 361               	.LBE17:
+ 362               	.LBE16:
+ 363               		.loc 1 66 0 discriminator 1
+ 364 011a 8883      		st Y,r24
+  65:konfiguracja.c **** 		(*telefon_ptr = konwersja_znaku_telefonu_eeprom((*ptr & 0xf0) >> 4)) != '\0' )
+ 365               		.loc 1 65 0 discriminator 1
+ 366 011c 8823      		tst r24
+ 367 011e 01F0      		breq .L29
+  67:konfiguracja.c **** 		telefon_ptr++, ++i, --ptr;
+ 368               		.loc 1 67 0
+ 369 0120 2196      		adiw r28,1
+ 370               	.LVL51:
+ 371 0122 1197      		sbiw r26,1
+ 372               	.LVL52:
+ 373 0124 81E0      		ldi r24,lo8(1)
+ 374               	.LVL53:
+ 375               	.L29:
+  68:konfiguracja.c **** 	do
+  69:konfiguracja.c **** 	{
+  70:konfiguracja.c **** 		if ( ptr < blok_ptr )
+ 376               		.loc 1 70 0
+ 377 0126 A217      		cp r26,r18
+ 378 0128 B307      		cpc r27,r19
+ 379 012a 00F0      		brlo .L27
+ 380               	.LVL54:
+  71:konfiguracja.c **** 			break;
+  72:konfiguracja.c **** 		if ( (*telefon_ptr = konwersja_znaku_telefonu_eeprom((*ptr & 0x0f))) != '\0' )
+ 381               		.loc 1 72 0
+ 382 012c EC91      		ld r30,X
+ 383 012e EF70      		andi r30,lo8(15)
+ 384               	.LVL55:
+ 385               	.LBB19:
+ 386               	.LBB20:
+ 387               	.LBB21:
+  48:konfiguracja.c **** }
+ 388               		.loc 1 48 0
+ 389 0130 F0E0      		ldi r31,0
+ 390 0132 E050      		subi r30,lo8(-(znaki.2124))
+ 391 0134 F040      		sbci r31,hi8(-(znaki.2124))
+ 392               	.LVL56:
+ 393               	/* #APP */
+ 394               	 ;  48 "konfiguracja.c" 1
+ 395 0136 E491      		lpm r30, Z
+ 396               		
+ 397               	 ;  0 "" 2
+ 398               	.LVL57:
+ 399               	/* #NOAPP */
+ 400               	.LBE21:
+ 401               	.LBE20:
+ 402               	.LBE19:
+ 403               		.loc 1 72 0
+ 404 0138 E883      		st Y,r30
+  73:konfiguracja.c **** 			++telefon_ptr, ++i;
+ 405               		.loc 1 73 0
+ 406 013a BE01      		movw r22,r28
+  72:konfiguracja.c **** 			++telefon_ptr, ++i;
+ 407               		.loc 1 72 0
+ 408 013c EE23      		tst r30
+ 409 013e 01F0      		breq .L28
+ 410               		.loc 1 73 0
+ 411 0140 6F5F      		subi r22,-1
+ 412 0142 7F4F      		sbci r23,-1
+ 413               	.LVL58:
+ 414 0144 8F5F      		subi r24,lo8(-(1))
+ 415               	.LVL59:
+ 416               	.L28:
+ 417 0146 EB01      		movw r28,r22
+  74:konfiguracja.c **** 		if ( i == max_liczba_znakow )
+ 418               		.loc 1 74 0
+ 419 0148 8417      		cp r24,r20
+ 420 014a 01F0      		breq .L27
+  75:konfiguracja.c **** 			break;
+  76:konfiguracja.c **** 		*telefon_ptr++ = konwersja_znaku_telefonu_eeprom((*ptr & 0xf0) >> 4);
+ 421               		.loc 1 76 0
+ 422 014c 2196      		adiw r28,1
+ 423               	.LVL60:
+ 424 014e EC91      		ld r30,X
+ 425 0150 E295      		swap r30
+ 426 0152 EF70      		andi r30,lo8(15)
+ 427               	.LBB22:
+ 428               	.LBB23:
+ 429               	.LBB24:
+  48:konfiguracja.c **** }
+ 430               		.loc 1 48 0
+ 431 0154 F0E0      		ldi r31,0
+ 432 0156 E050      		subi r30,lo8(-(znaki.2124))
+ 433 0158 F040      		sbci r31,hi8(-(znaki.2124))
+ 434               	/* #APP */
+ 435               	 ;  48 "konfiguracja.c" 1
+ 436 015a 9491      		lpm r25, Z
+ 437               		
+ 438               	 ;  0 "" 2
+ 439               	.LVL61:
+ 440               	/* #NOAPP */
+ 441               	.LBE24:
+ 442               	.LBE23:
+ 443               	.LBE22:
+ 444               		.loc 1 76 0
+ 445 015c FB01      		movw r30,r22
+ 446 015e 9083      		st Z,r25
+  77:konfiguracja.c **** 		if ( ++i == max_liczba_znakow )
+ 447               		.loc 1 77 0
+ 448 0160 8F5F      		subi r24,lo8(-(1))
+ 449               	.LVL62:
+ 450 0162 4817      		cp r20,r24
+ 451 0164 01F0      		breq .L27
+  78:konfiguracja.c **** 			break;
+  79:konfiguracja.c **** 	} while ( ptr-- != blok_ptr );
+ 452               		.loc 1 79 0
+ 453 0166 1197      		sbiw r26,1
+ 454               	.LVL63:
+ 455 0168 BD01      		movw r22,r26
+ 456 016a 6F5F      		subi r22,-1
+ 457 016c 7F4F      		sbci r23,-1
+ 458 016e 2617      		cp r18,r22
+ 459 0170 3707      		cpc r19,r23
+ 460 0172 01F4      		brne .L29
+ 461               	.L27:
+  80:konfiguracja.c **** 	*telefon_ptr = '\0';
+ 462               		.loc 1 80 0
+ 463 0174 1882      		st Y,__zero_reg__
+ 464               	.LVL64:
+ 465               	.L18:
+ 466               	/* epilogue start */
+  81:konfiguracja.c **** 	return i;
+  82:konfiguracja.c **** }
+ 467               		.loc 1 82 0
+ 468 0176 DF91      		pop r29
+ 469 0178 CF91      		pop r28
+ 470               	.LVL65:
+ 471 017a 0895      		ret
+ 472               	.LVL66:
+ 473               	.L21:
+  58:konfiguracja.c **** 	if ( ptr == blok_ptr )
+ 474               		.loc 1 58 0
+ 475 017c 8F5F      		subi r24,lo8(-(1))
+ 476               	.LVL67:
+ 477 017e 00C0      		rjmp .L19
+ 478               	.LVL68:
+ 479               	.L31:
+  64:konfiguracja.c **** 	if ( /*(max_liczba_znakow & 0x01) != 0 */ (*ptr & 0x0f) == 0x0f &&
+ 480               		.loc 1 64 0
+ 481 0180 80E0      		ldi r24,0
+ 482 0182 00C0      		rjmp .L29
+ 483               	.LVL69:
+ 484               	.L30:
+  60:konfiguracja.c **** 	--ptr;
+ 485               		.loc 1 60 0
+ 486 0184 80E0      		ldi r24,0
+ 487               	.LVL70:
+ 488 0186 00C0      		rjmp .L18
+ 489               		.cfi_endproc
+ 490               	.LFE8:
+ 492               	.global	kopiuj_blok_eeprom_na_telefon
+ 494               	kopiuj_blok_eeprom_na_telefon:
+ 495               	.LFB9:
+  83:konfiguracja.c **** 
+  84:konfiguracja.c **** uchar kopiuj_blok_eeprom_na_telefon(const void* eeprom_ptr, uchar* telefon_ptr,
+  85:konfiguracja.c **** 	const uchar max_liczba_znakow)	// nie dzia³a dobrze dla nieparzystych max_liczba_znakow
+  86:konfiguracja.c **** {
+ 496               		.loc 1 86 0
+ 497               		.cfi_startproc
+ 498               	.LVL71:
+ 499 0188 FF92      		push r15
+ 500               	.LCFI11:
+ 501               		.cfi_def_cfa_offset 3
+ 502               		.cfi_offset 15, -2
+ 503 018a 0F93      		push r16
+ 504               	.LCFI12:
+ 505               		.cfi_def_cfa_offset 4
+ 506               		.cfi_offset 16, -3
+ 507 018c 1F93      		push r17
+ 508               	.LCFI13:
+ 509               		.cfi_def_cfa_offset 5
+ 510               		.cfi_offset 17, -4
+ 511 018e CF93      		push r28
+ 512               	.LCFI14:
+ 513               		.cfi_def_cfa_offset 6
+ 514               		.cfi_offset 28, -5
+ 515 0190 DF93      		push r29
+ 516               	.LCFI15:
+ 517               		.cfi_def_cfa_offset 7
+ 518               		.cfi_offset 29, -6
+ 519 0192 00D0      		rcall .
+ 520 0194 00D0      		rcall .
+ 521 0196 1F92      		push __zero_reg__
+ 522               	.LCFI16:
+ 523               		.cfi_def_cfa_offset 12
+ 524 0198 CDB7      		in r28,__SP_L__
+ 525 019a DEB7      		in r29,__SP_H__
+ 526               	.LCFI17:
+ 527               		.cfi_def_cfa_register 28
+ 528               	/* prologue: function */
+ 529               	/* frame size = 5 */
+ 530               	/* stack size = 10 */
+ 531               	.L__stack_usage = 10
+ 532 019c 8B01      		movw r16,r22
+ 533 019e F42E      		mov r15,r20
+  87:konfiguracja.c **** 	uchar buf[LICZBA_BAJTOW_NUMERU_TELEFONU_W_EEPROM];
+  88:konfiguracja.c **** 	memcpy_E(buf, eeprom_ptr, LICZBA_BAJTOW_NUMERU_TELEFONU_W_EEPROM);
+ 534               		.loc 1 88 0
+ 535 01a0 45E0      		ldi r20,lo8(5)
+ 536 01a2 50E0      		ldi r21,0
+ 537               	.LVL72:
+ 538 01a4 BC01      		movw r22,r24
+ 539               	.LVL73:
+ 540 01a6 CE01      		movw r24,r28
+ 541               	.LVL74:
+ 542 01a8 0196      		adiw r24,1
+ 543 01aa 0E94 0000 		call eeprom_read_block
+ 544               	.LVL75:
+  89:konfiguracja.c **** 	return konwertuj_blok_eeprom_na_telefon(buf, telefon_ptr, max_liczba_znakow);
+ 545               		.loc 1 89 0
+ 546 01ae 4F2D      		mov r20,r15
+ 547 01b0 B801      		movw r22,r16
+ 548 01b2 CE01      		movw r24,r28
+ 549 01b4 0196      		adiw r24,1
+ 550 01b6 0E94 0000 		call konwertuj_blok_eeprom_na_telefon
+ 551               	.LVL76:
+ 552               	/* epilogue start */
+  90:konfiguracja.c **** }
+ 553               		.loc 1 90 0
+ 554 01ba 0F90      		pop __tmp_reg__
+ 555 01bc 0F90      		pop __tmp_reg__
+ 556 01be 0F90      		pop __tmp_reg__
+ 557 01c0 0F90      		pop __tmp_reg__
+ 558 01c2 0F90      		pop __tmp_reg__
+ 559 01c4 DF91      		pop r29
+ 560 01c6 CF91      		pop r28
+ 561 01c8 1F91      		pop r17
+ 562 01ca 0F91      		pop r16
+ 563               	.LVL77:
+ 564 01cc FF90      		pop r15
+ 565               	.LVL78:
+ 566 01ce 0895      		ret
+ 567               		.cfi_endproc
+ 568               	.LFE9:
+ 570               	.global	porownaj_numer_telefonu_blok
+ 572               	porownaj_numer_telefonu_blok:
+ 573               	.LFB10:
+  91:konfiguracja.c **** 
+  92:konfiguracja.c **** uchar porownaj_numer_telefonu_blok(const uchar* telefon_blok_ptr, const void* eeprom_ptr)
+  93:konfiguracja.c **** {
+ 574               		.loc 1 93 0
+ 575               		.cfi_startproc
+ 576               	.LVL79:
+ 577 01d0 0F93      		push r16
+ 578               	.LCFI18:
+ 579               		.cfi_def_cfa_offset 3
+ 580               		.cfi_offset 16, -2
+ 581 01d2 1F93      		push r17
+ 582               	.LCFI19:
+ 583               		.cfi_def_cfa_offset 4
+ 584               		.cfi_offset 17, -3
+ 585 01d4 CF93      		push r28
+ 586               	.LCFI20:
+ 587               		.cfi_def_cfa_offset 5
+ 588               		.cfi_offset 28, -4
+ 589 01d6 DF93      		push r29
+ 590               	.LCFI21:
+ 591               		.cfi_def_cfa_offset 6
+ 592               		.cfi_offset 29, -5
+ 593               	/* prologue: function */
+ 594               	/* frame size = 0 */
+ 595               	/* stack size = 4 */
+ 596               	.L__stack_usage = 4
+ 597 01d8 EC01      		movw r28,r24
+ 598 01da 8B01      		movw r16,r22
+  94:konfiguracja.c **** 	if ( telefon_blok_ptr[0] == 0xff || eeprom_read_byte(eeprom_ptr) == 0xff )
+ 599               		.loc 1 94 0
+ 600 01dc 8881      		ld r24,Y
+ 601               	.LVL80:
+ 602 01de 8F3F      		cpi r24,lo8(-1)
+ 603 01e0 01F0      		breq .L53
+ 604               	.LVL81:
+ 605               	.LBB28:
+ 606               	.LBB29:
+ 607 01e2 CB01      		movw r24,r22
+ 608 01e4 0E94 0000 		call eeprom_read_byte
+ 609               	.LVL82:
+ 610 01e8 8F3F      		cpi r24,lo8(-1)
+ 611 01ea 01F0      		breq .L53
+ 612               	.LVL83:
+ 613               	.L45:
+ 614               	.LBB30:
+  95:konfiguracja.c **** 		return FALSE;
+  96:konfiguracja.c **** 	while ( 1 )
+  97:konfiguracja.c **** 	{
+  98:konfiguracja.c **** 		const uchar b = eeprom_read_byte(eeprom_ptr);
+ 615               		.loc 1 98 0
+ 616 01ec C801      		movw r24,r16
+ 617 01ee 0E94 0000 		call eeprom_read_byte
+ 618               	.LVL84:
+  99:konfiguracja.c **** 		uchar a = 0xf0;
+ 100:konfiguracja.c **** 		uchar c = b & a;
+ 619               		.loc 1 100 0
+ 620 01f2 382F      		mov r19,r24
+ 621 01f4 307F      		andi r19,lo8(-16)
+ 622               	.LVL85:
+ 101:konfiguracja.c **** 		uchar d = *telefon_blok_ptr & a;
+ 623               		.loc 1 101 0
+ 624 01f6 9991      		ld r25,Y+
+ 625 01f8 292F      		mov r18,r25
+ 626 01fa 207F      		andi r18,lo8(-16)
+ 627               	.LVL86:
+ 102:konfiguracja.c **** 		if ( c == a || d == a )
+ 628               		.loc 1 102 0
+ 629 01fc 303F      		cpi r19,lo8(-16)
+ 630 01fe 01F0      		breq .L52
+ 631 0200 203F      		cpi r18,lo8(-16)
+ 632 0202 01F0      		breq .L52
+ 103:konfiguracja.c **** 			return TRUE;
+ 104:konfiguracja.c **** 		if ( c != d )
+ 633               		.loc 1 104 0
+ 634 0204 3213      		cpse r19,r18
+ 635 0206 00C0      		rjmp .L53
+ 636               	.LVL87:
+ 105:konfiguracja.c **** 			return FALSE;
+ 106:konfiguracja.c **** 		a = 0x0f;
+ 107:konfiguracja.c **** 		c = b & a;
+ 637               		.loc 1 107 0
+ 638 0208 8F70      		andi r24,lo8(15)
+ 639               	.LVL88:
+ 108:konfiguracja.c **** 		d = *telefon_blok_ptr & a;
+ 640               		.loc 1 108 0
+ 641 020a 9F70      		andi r25,lo8(15)
+ 642               	.LVL89:
+ 109:konfiguracja.c **** 		if ( c == a || d == a )
+ 643               		.loc 1 109 0
+ 644 020c 8F30      		cpi r24,lo8(15)
+ 645 020e 01F0      		breq .L52
+ 646 0210 9F30      		cpi r25,lo8(15)
+ 647 0212 01F0      		breq .L52
+ 110:konfiguracja.c **** 			return TRUE;
+ 111:konfiguracja.c **** 		if ( c != d )
+ 648               		.loc 1 111 0
+ 649 0214 8913      		cpse r24,r25
+ 650 0216 00C0      		rjmp .L53
+ 112:konfiguracja.c **** 			return FALSE;
+ 113:konfiguracja.c **** 		++eeprom_ptr;
+ 651               		.loc 1 113 0
+ 652 0218 0F5F      		subi r16,-1
+ 653 021a 1F4F      		sbci r17,-1
+ 654               	.LVL90:
+ 655 021c 00C0      		rjmp .L45
+ 656               	.LVL91:
+ 657               	.L52:
+ 103:konfiguracja.c **** 		if ( c != d )
+ 658               		.loc 1 103 0
+ 659 021e 8FEF      		ldi r24,lo8(-1)
+ 660               	.LVL92:
+ 661               	.L43:
+ 662               	/* epilogue start */
+ 663               	.LBE30:
+ 664               	.LBE29:
+ 665               	.LBE28:
+ 114:konfiguracja.c **** 		++telefon_blok_ptr;
+ 115:konfiguracja.c **** 	}
+ 116:konfiguracja.c **** }
+ 666               		.loc 1 116 0
+ 667 0220 DF91      		pop r29
+ 668 0222 CF91      		pop r28
+ 669 0224 1F91      		pop r17
+ 670 0226 0F91      		pop r16
+ 671 0228 0895      		ret
+ 672               	.L53:
+  95:konfiguracja.c **** 	while ( 1 )
+ 673               		.loc 1 95 0
+ 674 022a 80E0      		ldi r24,0
+ 675 022c 00C0      		rjmp .L43
+ 676               		.cfi_endproc
+ 677               	.LFE10:
+ 679               	.global	porownaj_numer_telefonu
+ 681               	porownaj_numer_telefonu:
+ 682               	.LFB11:
+ 117:konfiguracja.c **** 
+ 118:konfiguracja.c **** uchar porownaj_numer_telefonu(const uchar* telefon_ptr, const void* eeprom_ptr)
+ 119:konfiguracja.c **** {
+ 683               		.loc 1 119 0
+ 684               		.cfi_startproc
+ 685               	.LVL93:
+ 686 022e 0F93      		push r16
+ 687               	.LCFI22:
+ 688               		.cfi_def_cfa_offset 3
+ 689               		.cfi_offset 16, -2
+ 690 0230 1F93      		push r17
+ 691               	.LCFI23:
+ 692               		.cfi_def_cfa_offset 4
+ 693               		.cfi_offset 17, -3
+ 694 0232 CF93      		push r28
+ 695               	.LCFI24:
+ 696               		.cfi_def_cfa_offset 5
+ 697               		.cfi_offset 28, -4
+ 698 0234 DF93      		push r29
+ 699               	.LCFI25:
+ 700               		.cfi_def_cfa_offset 6
+ 701               		.cfi_offset 29, -5
+ 702 0236 00D0      		rcall .
+ 703 0238 00D0      		rcall .
+ 704 023a 1F92      		push __zero_reg__
+ 705               	.LCFI26:
+ 706               		.cfi_def_cfa_offset 11
+ 707 023c CDB7      		in r28,__SP_L__
+ 708 023e DEB7      		in r29,__SP_H__
+ 709               	.LCFI27:
+ 710               		.cfi_def_cfa_register 28
+ 711               	/* prologue: function */
+ 712               	/* frame size = 5 */
+ 713               	/* stack size = 9 */
+ 714               	.L__stack_usage = 9
+ 715 0240 8B01      		movw r16,r22
+ 120:konfiguracja.c **** 	uchar buf[LICZBA_BAJTOW_NUMERU_TELEFONU_W_EEPROM];
+ 121:konfiguracja.c **** 	uchar l = strlen(telefon_ptr);
+ 716               		.loc 1 121 0
+ 717 0242 FC01      		movw r30,r24
+ 718               		0:
+ 719 0244 0190      		ld __tmp_reg__,Z+
+ 720 0246 0020      		tst __tmp_reg__
+ 721 0248 01F4      		brne 0b
+ 722 024a 3197      		sbiw r30,1
+ 723 024c BF01      		movw r22,r30
+ 724               	.LVL94:
+ 725 024e 681B      		sub r22,r24
+ 726 0250 790B      		sbc r23,r25
+ 727               	.LVL95:
+ 122:konfiguracja.c **** 	konwertuj_telefon_na_blok_eeprom(telefon_ptr, telefon_ptr + l, buf);
+ 728               		.loc 1 122 0
+ 729 0252 680F      		add r22,r24
+ 730 0254 792F      		mov r23,r25
+ 731 0256 711D      		adc r23,__zero_reg__
+ 732               	.LVL96:
+ 733 0258 AE01      		movw r20,r28
+ 734 025a 4F5F      		subi r20,-1
+ 735 025c 5F4F      		sbci r21,-1
+ 736 025e 0E94 0000 		call konwertuj_telefon_na_blok_eeprom
+ 737               	.LVL97:
+ 123:konfiguracja.c **** 	return porownaj_numer_telefonu_blok(buf, eeprom_ptr);
+ 738               		.loc 1 123 0
+ 739 0262 B801      		movw r22,r16
+ 740 0264 CE01      		movw r24,r28
+ 741 0266 0196      		adiw r24,1
+ 742 0268 0E94 0000 		call porownaj_numer_telefonu_blok
+ 743               	.LVL98:
+ 744               	/* epilogue start */
+ 124:konfiguracja.c **** }
+ 745               		.loc 1 124 0
+ 746 026c 0F90      		pop __tmp_reg__
+ 747 026e 0F90      		pop __tmp_reg__
+ 748 0270 0F90      		pop __tmp_reg__
+ 749 0272 0F90      		pop __tmp_reg__
+ 750 0274 0F90      		pop __tmp_reg__
+ 751 0276 DF91      		pop r29
+ 752 0278 CF91      		pop r28
+ 753 027a 1F91      		pop r17
+ 754 027c 0F91      		pop r16
+ 755               	.LVL99:
+ 756 027e 0895      		ret
+ 757               		.cfi_endproc
+ 758               	.LFE11:
+ 760               		.section	.progmem.data,"a",@progbits
+ 763               	znaki.2124:
+ 764 0000 30        		.byte	48
+ 765 0001 31        		.byte	49
+ 766 0002 32        		.byte	50
+ 767 0003 33        		.byte	51
+ 768 0004 34        		.byte	52
+ 769 0005 35        		.byte	53
+ 770 0006 36        		.byte	54
+ 771 0007 37        		.byte	55
+ 772 0008 38        		.byte	56
+ 773 0009 39        		.byte	57
+ 774 000a 2B        		.byte	43
+ 775 000b 2A        		.byte	42
+ 776 000c 23        		.byte	35
+ 777 000d 21        		.byte	33
+ 778 000e 21        		.byte	33
+ 779 000f 00        		.byte	0
+ 780               		.text
+ 781               	.Letext0:
+ 782               		.file 2 "/usr/local/avr8-gnu-toolchain/avr/include/stdint.h"
+ 783               		.file 3 "/usr/local/avr8-gnu-toolchain/lib/gcc/avr/7.3.0/include/stddef.h"
+ 784               		.file 4 "narzedzia.h"
+ 785               		.file 5 "/usr/local/avr8-gnu-toolchain/avr/include/stdlib.h"
+ 786               		.file 6 "zapiseeprom.h"
+ 787               		.file 7 "/usr/local/avr8-gnu-toolchain/avr/include/avr/eeprom.h"
+ 788               		.file 8 "/usr/local/avr8-gnu-toolchain/avr/include/string.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 konfiguracja.c
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:13     .text:0000000000000000 konwersja_znaku_telefonu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:71     .text:0000000000000026 konwertuj_telefon_na_blok_eeprom
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:229    .text:00000000000000ac konwersja_znaku_telefonu_eeprom
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:763    .progmem.data:0000000000000000 znaki.2124
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:260    .text:00000000000000b8 konwertuj_blok_eeprom_na_telefon
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:494    .text:0000000000000188 kopiuj_blok_eeprom_na_telefon
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:572    .text:00000000000001d0 porownaj_numer_telefonu_blok
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:681    .text:000000000000022e porownaj_numer_telefonu
+
+UNDEFINED SYMBOLS
+memset
+eeprom_read_block
+eeprom_read_byte

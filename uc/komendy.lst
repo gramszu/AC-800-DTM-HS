@@ -1,0 +1,390 @@
+   1               		.file	"komendy.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__RAMPZ__ = 0x3b
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.text
+   9               	.Ltext0:
+  10               		.cfi_sections	.debug_frame
+  11               	.global	dodaj_komende
+  13               	dodaj_komende:
+  14               	.LFB0:
+  15               		.file 1 "komendy.c"
+   1:komendy.c     **** #include "komendy.h"
+   2:komendy.c     **** #include <string.h> // For memset
+   3:komendy.c     **** 
+   4:komendy.c     **** komenda_typ komendy_kolejka[LICZBA_KOMEND];
+   5:komendy.c     **** 
+   6:komendy.c     **** char rtc_czas[12] = "00:00:00";
+   7:komendy.c     **** char bufor_ustaw_czas[32];
+   8:komendy.c     **** 
+   9:komendy.c     **** // Inicjalizacja zmiennych blokady czasowej
+  10:komendy.c     **** uchar blokada_sterowania_czasowa = FALSE;
+  11:komendy.c     **** uchar czas_start_h = 0xFF, czas_start_m = 0xFF;
+  12:komendy.c     **** uchar czas_stop_h = 0xFF, czas_stop_m = 0xFF;
+  13:komendy.c     **** 
+  14:komendy.c     **** void dodaj_komende(komenda_typ komenda)
+  15:komendy.c     **** {
+  16               		.loc 1 15 0
+  17               		.cfi_startproc
+  18               	.LVL0:
+  19               	/* prologue: function */
+  20               	/* frame size = 0 */
+  21               	/* stack size = 0 */
+  22               	.L__stack_usage = 0
+  23 0000 E0E0      		ldi r30,lo8(komendy_kolejka)
+  24 0002 F0E0      		ldi r31,hi8(komendy_kolejka)
+  25               		.loc 1 15 0
+  26 0004 30E0      		ldi r19,0
+  27 0006 20E0      		ldi r18,0
+  28               	.LVL1:
+  29               	.L4:
+  30               	.LBB2:
+  16:komendy.c     **** 	for (uchar i = 0; i < LICZBA_KOMEND; ++i)
+  17:komendy.c     **** 	{
+  18:komendy.c     **** 		if ( komendy_kolejka[i] == KOMENDA_KOLEJKI_BRAK_KOMENDY )
+  31               		.loc 1 18 0
+  32 0008 9191      		ld r25,Z+
+  33 000a 9111      		cpse r25,__zero_reg__
+  34 000c 00C0      		rjmp .L2
+  19:komendy.c     **** 		{
+  20:komendy.c     **** 			komendy_kolejka[i] = komenda;
+  35               		.loc 1 20 0
+  36 000e 2050      		subi r18,lo8(-(komendy_kolejka))
+  37 0010 3040      		sbci r19,hi8(-(komendy_kolejka))
+  38               	.LVL2:
+  39 0012 F901      		movw r30,r18
+  40 0014 8083      		st Z,r24
+  21:komendy.c     **** 			return;
+  41               		.loc 1 21 0
+  42 0016 0895      		ret
+  43               	.LVL3:
+  44               	.L2:
+  45 0018 2F5F      		subi r18,-1
+  46 001a 3F4F      		sbci r19,-1
+  47               	.LVL4:
+  16:komendy.c     **** 	for (uchar i = 0; i < LICZBA_KOMEND; ++i)
+  48               		.loc 1 16 0 discriminator 2
+  49 001c 2E31      		cpi r18,30
+  50 001e 3105      		cpc r19,__zero_reg__
+  51 0020 01F4      		brne .L4
+  52               	/* epilogue start */
+  53               	.LBE2:
+  22:komendy.c     **** 		}
+  23:komendy.c     **** 	}
+  24:komendy.c     **** }
+  54               		.loc 1 24 0
+  55 0022 0895      		ret
+  56               		.cfi_endproc
+  57               	.LFE0:
+  59               	.global	filtruj_i_dodaj_komende
+  61               	filtruj_i_dodaj_komende:
+  62               	.LFB1:
+  25:komendy.c     **** 
+  26:komendy.c     **** void filtruj_i_dodaj_komende(komenda_typ komenda)
+  27:komendy.c     **** {
+  63               		.loc 1 27 0
+  64               		.cfi_startproc
+  65               	.LVL5:
+  66               	/* prologue: function */
+  67               	/* frame size = 0 */
+  68               	/* stack size = 0 */
+  69               	.L__stack_usage = 0
+  70 0024 E0E0      		ldi r30,lo8(komendy_kolejka)
+  71 0026 F0E0      		ldi r31,hi8(komendy_kolejka)
+  72               		.loc 1 27 0
+  73 0028 30E0      		ldi r19,0
+  74 002a 20E0      		ldi r18,0
+  75               	.LVL6:
+  76               	.L9:
+  77               	.LBB3:
+  28:komendy.c     **** 	for (uchar i = 0; i < LICZBA_KOMEND; ++i)
+  29:komendy.c     **** 	{
+  30:komendy.c     **** 		if ( komendy_kolejka[i] == komenda )
+  78               		.loc 1 30 0
+  79 002c 9191      		ld r25,Z+
+  80 002e 9817      		cp r25,r24
+  81 0030 01F0      		breq .L6
+  31:komendy.c     **** 			return;
+  32:komendy.c     **** 		if ( komendy_kolejka[i] == KOMENDA_KOLEJKI_BRAK_KOMENDY )
+  82               		.loc 1 32 0
+  83 0032 9111      		cpse r25,__zero_reg__
+  84 0034 00C0      		rjmp .L8
+  33:komendy.c     **** 		{
+  34:komendy.c     **** 			komendy_kolejka[i] = komenda;
+  85               		.loc 1 34 0
+  86 0036 2050      		subi r18,lo8(-(komendy_kolejka))
+  87 0038 3040      		sbci r19,hi8(-(komendy_kolejka))
+  88               	.LVL7:
+  89 003a F901      		movw r30,r18
+  90 003c 8083      		st Z,r24
+  35:komendy.c     **** 			return;
+  91               		.loc 1 35 0
+  92 003e 0895      		ret
+  93               	.LVL8:
+  94               	.L8:
+  95 0040 2F5F      		subi r18,-1
+  96 0042 3F4F      		sbci r19,-1
+  97               	.LVL9:
+  28:komendy.c     **** 	{
+  98               		.loc 1 28 0 discriminator 2
+  99 0044 2E31      		cpi r18,30
+ 100 0046 3105      		cpc r19,__zero_reg__
+ 101 0048 01F4      		brne .L9
+ 102               	.LVL10:
+ 103               	.L6:
+ 104               	/* epilogue start */
+ 105               	.LBE3:
+  36:komendy.c     **** 		}
+  37:komendy.c     **** 	}
+  38:komendy.c     **** }
+ 106               		.loc 1 38 0
+ 107 004a 0895      		ret
+ 108               		.cfi_endproc
+ 109               	.LFE1:
+ 111               	.global	filtruj_komendy_z_przedzialu
+ 113               	filtruj_komendy_z_przedzialu:
+ 114               	.LFB2:
+  39:komendy.c     **** 
+  40:komendy.c     **** void filtruj_komendy_z_przedzialu(komenda_typ start, komenda_typ end)
+  41:komendy.c     **** {
+ 115               		.loc 1 41 0
+ 116               		.cfi_startproc
+ 117               	.LVL11:
+ 118               	/* prologue: function */
+ 119               	/* frame size = 0 */
+ 120               	/* stack size = 0 */
+ 121               	.L__stack_usage = 0
+  42:komendy.c     **** 	uchar i = 0;
+ 122               		.loc 1 42 0
+ 123 004c 90E0      		ldi r25,0
+ 124               	.LVL12:
+ 125               	.L16:
+  43:komendy.c     **** 	while ( i < LICZBA_KOMEND )
+  44:komendy.c     **** 	{
+  45:komendy.c     **** 		if ( komendy_kolejka[i] >= start && komendy_kolejka[i] <= end )
+ 126               		.loc 1 45 0
+ 127 004e E92F      		mov r30,r25
+ 128 0050 F0E0      		ldi r31,0
+ 129 0052 E050      		subi r30,lo8(-(komendy_kolejka))
+ 130 0054 F040      		sbci r31,hi8(-(komendy_kolejka))
+ 131 0056 2081      		ld r18,Z
+ 132 0058 2817      		cp r18,r24
+ 133 005a 00F0      		brlo .L12
+ 134               		.loc 1 45 0 is_stmt 0 discriminator 1
+ 135 005c 6217      		cp r22,r18
+ 136 005e 00F0      		brlo .L12
+ 137               		.loc 1 45 0
+ 138 0060 292F      		mov r18,r25
+ 139               	.L13:
+ 140               	.LVL13:
+ 141               	.LBB4:
+  46:komendy.c     **** 		{
+  47:komendy.c     **** 			// Usun te komende (przesun reszte)
+  48:komendy.c     **** 			for (uchar j = i; j < LICZBA_KOMEND - 1; ++j)
+ 142               		.loc 1 48 0 is_stmt 1 discriminator 1
+ 143 0062 2D31      		cpi r18,lo8(29)
+ 144 0064 00F0      		brlo .L14
+ 145               	.LBE4:
+  49:komendy.c     **** 			{
+  50:komendy.c     **** 				komendy_kolejka[j] = komendy_kolejka[j+1];
+  51:komendy.c     **** 			}
+  52:komendy.c     **** 			komendy_kolejka[LICZBA_KOMEND - 1] = KOMENDA_KOLEJKI_BRAK_KOMENDY;
+ 146               		.loc 1 52 0
+ 147 0066 1092 0000 		sts komendy_kolejka+29,__zero_reg__
+ 148               	.LVL14:
+ 149               	.L15:
+  43:komendy.c     **** 	{
+ 150               		.loc 1 43 0
+ 151 006a 9E31      		cpi r25,lo8(30)
+ 152 006c 01F4      		brne .L16
+ 153               	/* epilogue start */
+  53:komendy.c     **** 			// Nie inkrementujemy i, bo na to miejsce weszla nowa komenda
+  54:komendy.c     **** 		}
+  55:komendy.c     **** 		else
+  56:komendy.c     **** 		{
+  57:komendy.c     **** 			++i;
+  58:komendy.c     **** 		}
+  59:komendy.c     **** 	}
+  60:komendy.c     **** }
+ 154               		.loc 1 60 0
+ 155 006e 0895      		ret
+ 156               	.LVL15:
+ 157               	.L14:
+ 158               	.LBB5:
+  50:komendy.c     **** 			}
+ 159               		.loc 1 50 0 discriminator 3
+ 160 0070 3181      		ldd r19,Z+1
+ 161 0072 3193      		st Z+,r19
+  48:komendy.c     **** 			{
+ 162               		.loc 1 48 0 discriminator 3
+ 163 0074 2F5F      		subi r18,lo8(-(1))
+ 164               	.LVL16:
+ 165 0076 00C0      		rjmp .L13
+ 166               	.LVL17:
+ 167               	.L12:
+ 168               	.LBE5:
+  57:komendy.c     **** 		}
+ 169               		.loc 1 57 0
+ 170 0078 9F5F      		subi r25,lo8(-(1))
+ 171               	.LVL18:
+ 172 007a 00C0      		rjmp .L15
+ 173               		.cfi_endproc
+ 174               	.LFE2:
+ 176               	.global	usun_komende
+ 178               	usun_komende:
+ 179               	.LFB3:
+  61:komendy.c     **** 
+  62:komendy.c     **** void usun_komende(void)
+  63:komendy.c     **** {
+ 180               		.loc 1 63 0
+ 181               		.cfi_startproc
+ 182               	/* prologue: function */
+ 183               	/* frame size = 0 */
+ 184               	/* stack size = 0 */
+ 185               	.L__stack_usage = 0
+ 186               	.LVL19:
+ 187 007c E0E0      		ldi r30,lo8(komendy_kolejka)
+ 188 007e F0E0      		ldi r31,hi8(komendy_kolejka)
+ 189               	.LVL20:
+ 190               	.L19:
+ 191               	.LBB6:
+  64:komendy.c     **** 	for (uchar i = 1; i < LICZBA_KOMEND; ++i)
+  65:komendy.c     **** 		komendy_kolejka[i-1] = komendy_kolejka[i];
+ 192               		.loc 1 65 0 discriminator 3
+ 193 0080 8181      		ldd r24,Z+1
+ 194 0082 8193      		st Z+,r24
+ 195               	.LVL21:
+  64:komendy.c     **** 	for (uchar i = 1; i < LICZBA_KOMEND; ++i)
+ 196               		.loc 1 64 0 discriminator 3
+ 197 0084 80E0      		ldi r24,hi8(komendy_kolejka+29)
+ 198 0086 E030      		cpi r30,lo8(komendy_kolejka+29)
+ 199 0088 F807      		cpc r31,r24
+ 200 008a 01F4      		brne .L19
+ 201               	.LBE6:
+  66:komendy.c     **** 	komendy_kolejka[LICZBA_KOMEND-1] = KOMENDA_KOLEJKI_BRAK_KOMENDY;
+ 202               		.loc 1 66 0
+ 203 008c 1092 0000 		sts komendy_kolejka+29,__zero_reg__
+ 204               	/* epilogue start */
+  67:komendy.c     **** }
+ 205               		.loc 1 67 0
+ 206 0090 0895      		ret
+ 207               		.cfi_endproc
+ 208               	.LFE3:
+ 210               	.global	czy_sa_komendy_z_przedzialu
+ 212               	czy_sa_komendy_z_przedzialu:
+ 213               	.LFB4:
+  68:komendy.c     **** 
+  69:komendy.c     **** uchar czy_sa_komendy_z_przedzialu(komenda_typ start, komenda_typ end)
+  70:komendy.c     **** {
+ 214               		.loc 1 70 0
+ 215               		.cfi_startproc
+ 216               	.LVL22:
+ 217               	/* prologue: function */
+ 218               	/* frame size = 0 */
+ 219               	/* stack size = 0 */
+ 220               	.L__stack_usage = 0
+ 221 0092 E0E0      		ldi r30,lo8(komendy_kolejka)
+ 222 0094 F0E0      		ldi r31,hi8(komendy_kolejka)
+ 223               	.LVL23:
+ 224               	.L24:
+ 225               	.LBB7:
+  71:komendy.c     **** 	for (uchar i = 0; i < LICZBA_KOMEND; ++i)
+  72:komendy.c     **** 	{
+  73:komendy.c     **** 		if ( komendy_kolejka[i] >= start && komendy_kolejka[i] <= end )
+ 226               		.loc 1 73 0
+ 227 0096 9191      		ld r25,Z+
+ 228               	.LVL24:
+ 229 0098 9817      		cp r25,r24
+ 230 009a 00F0      		brlo .L22
+ 231               		.loc 1 73 0 is_stmt 0 discriminator 1
+ 232 009c 6917      		cp r22,r25
+ 233 009e 00F4      		brsh .L25
+ 234               	.L22:
+ 235               	.LVL25:
+  71:komendy.c     **** 	for (uchar i = 0; i < LICZBA_KOMEND; ++i)
+ 236               		.loc 1 71 0 is_stmt 1 discriminator 2
+ 237 00a0 90E0      		ldi r25,hi8(komendy_kolejka+30)
+ 238 00a2 E030      		cpi r30,lo8(komendy_kolejka+30)
+ 239 00a4 F907      		cpc r31,r25
+ 240 00a6 01F4      		brne .L24
+ 241               	.LBE7:
+  74:komendy.c     **** 			return TRUE;
+  75:komendy.c     **** 	}
+  76:komendy.c     **** 	return FALSE;
+ 242               		.loc 1 76 0
+ 243 00a8 80E0      		ldi r24,0
+ 244               	.LVL26:
+ 245               	.LBB8:
+ 246 00aa 0895      		ret
+ 247               	.LVL27:
+ 248               	.L25:
+  74:komendy.c     **** 			return TRUE;
+ 249               		.loc 1 74 0
+ 250 00ac 8FEF      		ldi r24,lo8(-1)
+ 251               	.LVL28:
+ 252               	/* epilogue start */
+ 253               	.LBE8:
+  77:komendy.c     **** }
+ 254               		.loc 1 77 0
+ 255 00ae 0895      		ret
+ 256               		.cfi_endproc
+ 257               	.LFE4:
+ 259               	.global	czas_stop_m
+ 260               		.data
+ 263               	czas_stop_m:
+ 264 0000 FF        		.byte	-1
+ 265               	.global	czas_stop_h
+ 268               	czas_stop_h:
+ 269 0001 FF        		.byte	-1
+ 270               	.global	czas_start_m
+ 273               	czas_start_m:
+ 274 0002 FF        		.byte	-1
+ 275               	.global	czas_start_h
+ 278               	czas_start_h:
+ 279 0003 FF        		.byte	-1
+ 280               	.global	blokada_sterowania_czasowa
+ 281               		.section .bss
+ 284               	blokada_sterowania_czasowa:
+ 285 0000 00        		.zero	1
+ 286               		.comm	bufor_ustaw_czas,32,1
+ 287               	.global	rtc_czas
+ 288               		.data
+ 291               	rtc_czas:
+ 292 0004 3030 3A30 		.string	"00:00:00"
+ 292      303A 3030 
+ 292      00
+ 293 000d 0000 00   		.zero	3
+ 294               		.comm	komendy_kolejka,30,1
+ 295               		.text
+ 296               	.Letext0:
+ 297               		.file 2 "narzedzia.h"
+ 298               		.file 3 "enumkomendy.h"
+ 299               		.file 4 "komendy.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 komendy.c
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:13     .text:0000000000000000 dodaj_komende
+                            *COM*:000000000000001e komendy_kolejka
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:61     .text:0000000000000024 filtruj_i_dodaj_komende
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:113    .text:000000000000004c filtruj_komendy_z_przedzialu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:178    .text:000000000000007c usun_komende
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:212    .text:0000000000000092 czy_sa_komendy_z_przedzialu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:263    .data:0000000000000000 czas_stop_m
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:268    .data:0000000000000001 czas_stop_h
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:273    .data:0000000000000002 czas_start_m
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:278    .data:0000000000000003 czas_start_h
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:284    .bss:0000000000000000 blokada_sterowania_czasowa
+                            *COM*:0000000000000020 bufor_ustaw_czas
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc7pk36i.s:291    .data:0000000000000004 rtc_czas
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss

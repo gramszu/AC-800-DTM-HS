@@ -1,0 +1,1294 @@
+   1               		.file	"poleceniagsm.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__RAMPZ__ = 0x3b
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.text
+   9               	.Ltext0:
+  10               		.cfi_sections	.debug_frame
+  11               	.global	porownaj_znaki
+  13               	porownaj_znaki:
+  14               	.LFB5:
+  15               		.file 1 "poleceniagsm.c"
+   1:poleceniagsm.c **** 
+   2:poleceniagsm.c **** #include "sim900.h"
+   3:poleceniagsm.c **** #include "poleceniagsm.h"
+   4:poleceniagsm.c **** #include <stdlib.h>
+   5:poleceniagsm.c **** #include <avr/pgmspace.h>
+   6:poleceniagsm.c **** #include <string.h>
+   7:poleceniagsm.c **** //#include "bufpomoc.h"
+   8:poleceniagsm.c **** //#include "USB.h"
+   9:poleceniagsm.c **** 
+  10:poleceniagsm.c **** uchar bledny_PIN = FALSE;
+  11:poleceniagsm.c **** 
+  12:poleceniagsm.c **** uchar poziom_sieci_gsm = POZIOM_SIECI_BLAD;
+  13:poleceniagsm.c **** 
+  14:poleceniagsm.c **** uchar porownaj_znaki(PGM_P polecenie, const uint poczatek, 
+  15:poleceniagsm.c **** 	const uchar liczba_znakow, const uint odebrane)
+  16:poleceniagsm.c **** {
+  16               		.loc 1 16 0
+  17               		.cfi_startproc
+  18               	.LVL0:
+  19               	/* prologue: function */
+  20               	/* frame size = 0 */
+  21               	/* stack size = 0 */
+  22               	.L__stack_usage = 0
+  23 0000 FC01      		movw r30,r24
+  17:poleceniagsm.c **** 	if ( liczba_znakow <= odebrane )
+  24               		.loc 1 17 0
+  25 0002 4217      		cp r20,r18
+  26 0004 1306      		cpc __zero_reg__,r19
+  27 0006 01F0      		breq .+2
+  28 0008 00F4      		brsh .L8
+  29               	.LVL1:
+  30               	.LBB8:
+  31               	.LBB9:
+  18:poleceniagsm.c **** 	{
+  19:poleceniagsm.c **** 		uchar* w = &odebrany_blok_SIM900[poczatek];
+  32               		.loc 1 19 0
+  33 000a DB01      		movw r26,r22
+  34 000c A050      		subi r26,lo8(-(odebrany_blok_SIM900))
+  35 000e B040      		sbci r27,hi8(-(odebrany_blok_SIM900))
+  36               	.LVL2:
+  20:poleceniagsm.c **** 		uchar l = 0;
+  37               		.loc 1 20 0
+  38 0010 90E0      		ldi r25,0
+  39               	.LVL3:
+  40               	.L3:
+  21:poleceniagsm.c **** 		while ( l < liczba_znakow && *w == pgm_read_byte(polecenie) )
+  41               		.loc 1 21 0
+  42 0012 4913      		cpse r20,r25
+  43 0014 00C0      		rjmp .L4
+  44               	.LVL4:
+  45               	.L7:
+  22:poleceniagsm.c **** 			++w, ++polecenie, ++l;
+  23:poleceniagsm.c **** 		return l == liczba_znakow;
+  46               		.loc 1 23 0
+  47 0016 81E0      		ldi r24,lo8(1)
+  48 0018 4913      		cpse r20,r25
+  49               	.LVL5:
+  50               	.L8:
+  51               	.LBE9:
+  52               	.LBE8:
+  24:poleceniagsm.c **** 	}
+  25:poleceniagsm.c **** 	return FALSE;
+  53               		.loc 1 25 0
+  54 001a 80E0      		ldi r24,0
+  55               	.L1:
+  56               	/* epilogue start */
+  26:poleceniagsm.c **** }
+  57               		.loc 1 26 0
+  58 001c 0895      		ret
+  59               	.LVL6:
+  60               	.L4:
+  61               	.LBB12:
+  62               	.LBB11:
+  21:poleceniagsm.c **** 			++w, ++polecenie, ++l;
+  63               		.loc 1 21 0
+  64 001e 2D91      		ld r18,X+
+  65               	.LVL7:
+  66               	.LBB10:
+  67               	/* #APP */
+  68               	 ;  21 "poleceniagsm.c" 1
+  69 0020 8491      		lpm r24, Z
+  70               		
+  71               	 ;  0 "" 2
+  72               	.LVL8:
+  73               	/* #NOAPP */
+  74               	.LBE10:
+  75 0022 2813      		cpse r18,r24
+  76 0024 00C0      		rjmp .L7
+  77               	.LVL9:
+  22:poleceniagsm.c **** 		return l == liczba_znakow;
+  78               		.loc 1 22 0
+  79 0026 3196      		adiw r30,1
+  80               	.LVL10:
+  81 0028 9F5F      		subi r25,lo8(-(1))
+  82               	.LVL11:
+  83 002a 00C0      		rjmp .L3
+  84               	.LBE11:
+  85               	.LBE12:
+  86               		.cfi_endproc
+  87               	.LFE5:
+  89               	.global	resetuj_polecenie_konczace
+  91               	resetuj_polecenie_konczace:
+  92               	.LFB6:
+  27:poleceniagsm.c **** 
+  28:poleceniagsm.c **** void resetuj_polecenie_konczace(void)
+  29:poleceniagsm.c **** {
+  93               		.loc 1 29 0
+  94               		.cfi_startproc
+  95               	/* prologue: function */
+  96               	/* frame size = 0 */
+  97               	/* stack size = 0 */
+  98               	.L__stack_usage = 0
+  30:poleceniagsm.c **** 	const uchar sreg = SREG;
+  99               		.loc 1 30 0
+ 100 002c 8FB7      		in r24,__SREG__
+ 101               	.LVL12:
+  31:poleceniagsm.c **** 	cli();
+ 102               		.loc 1 31 0
+ 103               	/* #APP */
+ 104               	 ;  31 "poleceniagsm.c" 1
+ 105 002e F894      		cli
+ 106               	 ;  0 "" 2
+  32:poleceniagsm.c **** 	poczatek_polecenia_SIM900 = 0;
+ 107               		.loc 1 32 0
+ 108               	/* #NOAPP */
+ 109 0030 1092 0000 		sts poczatek_polecenia_SIM900+1,__zero_reg__
+ 110 0034 1092 0000 		sts poczatek_polecenia_SIM900,__zero_reg__
+  33:poleceniagsm.c **** 	zakonczenie_polecenia_SIM900 = 0;
+ 111               		.loc 1 33 0
+ 112 0038 1092 0000 		sts zakonczenie_polecenia_SIM900+1,__zero_reg__
+ 113 003c 1092 0000 		sts zakonczenie_polecenia_SIM900,__zero_reg__
+  34:poleceniagsm.c **** 	SREG = sreg;
+ 114               		.loc 1 34 0
+ 115 0040 8FBF      		out __SREG__,r24
+ 116               	/* epilogue start */
+  35:poleceniagsm.c **** 	return;
+  36:poleceniagsm.c **** }
+ 117               		.loc 1 36 0
+ 118 0042 0895      		ret
+ 119               		.cfi_endproc
+ 120               	.LFE6:
+ 122               	.global	polecenia_konczace_gsm
+ 124               	polecenia_konczace_gsm:
+ 125               	.LFB7:
+  37:poleceniagsm.c **** 
+  38:poleceniagsm.c **** uint numer_bledu_cme = 0;
+  39:poleceniagsm.c **** uint numer_bledu_cms = 0;
+  40:poleceniagsm.c **** 
+  41:poleceniagsm.c **** #define MAX_LICZBA_ZAREJESTROWANYCH_KOMEND_OD_SIM900	(2*LICZBA_POLOZEN_OTRZYMANYCH_KOMEND_SIM900)
+  42:poleceniagsm.c **** enum KomendySIM900 zarejestrowane_komendy_od_SIM900[MAX_LICZBA_ZAREJESTROWANYCH_KOMEND_OD_SIM900];
+  43:poleceniagsm.c **** uchar liczba_komend_w_kolejce_SIM900;
+  44:poleceniagsm.c **** 
+  45:poleceniagsm.c **** uchar polecenia_konczace_gsm(void)
+  46:poleceniagsm.c **** {
+ 126               		.loc 1 46 0
+ 127               		.cfi_startproc
+ 128 0044 2F92      		push r2
+ 129               	.LCFI0:
+ 130               		.cfi_def_cfa_offset 3
+ 131               		.cfi_offset 2, -2
+ 132 0046 3F92      		push r3
+ 133               	.LCFI1:
+ 134               		.cfi_def_cfa_offset 4
+ 135               		.cfi_offset 3, -3
+ 136 0048 4F92      		push r4
+ 137               	.LCFI2:
+ 138               		.cfi_def_cfa_offset 5
+ 139               		.cfi_offset 4, -4
+ 140 004a 5F92      		push r5
+ 141               	.LCFI3:
+ 142               		.cfi_def_cfa_offset 6
+ 143               		.cfi_offset 5, -5
+ 144 004c 6F92      		push r6
+ 145               	.LCFI4:
+ 146               		.cfi_def_cfa_offset 7
+ 147               		.cfi_offset 6, -6
+ 148 004e 7F92      		push r7
+ 149               	.LCFI5:
+ 150               		.cfi_def_cfa_offset 8
+ 151               		.cfi_offset 7, -7
+ 152 0050 8F92      		push r8
+ 153               	.LCFI6:
+ 154               		.cfi_def_cfa_offset 9
+ 155               		.cfi_offset 8, -8
+ 156 0052 9F92      		push r9
+ 157               	.LCFI7:
+ 158               		.cfi_def_cfa_offset 10
+ 159               		.cfi_offset 9, -9
+ 160 0054 AF92      		push r10
+ 161               	.LCFI8:
+ 162               		.cfi_def_cfa_offset 11
+ 163               		.cfi_offset 10, -10
+ 164 0056 BF92      		push r11
+ 165               	.LCFI9:
+ 166               		.cfi_def_cfa_offset 12
+ 167               		.cfi_offset 11, -11
+ 168 0058 CF92      		push r12
+ 169               	.LCFI10:
+ 170               		.cfi_def_cfa_offset 13
+ 171               		.cfi_offset 12, -12
+ 172 005a DF92      		push r13
+ 173               	.LCFI11:
+ 174               		.cfi_def_cfa_offset 14
+ 175               		.cfi_offset 13, -13
+ 176 005c EF92      		push r14
+ 177               	.LCFI12:
+ 178               		.cfi_def_cfa_offset 15
+ 179               		.cfi_offset 14, -14
+ 180 005e FF92      		push r15
+ 181               	.LCFI13:
+ 182               		.cfi_def_cfa_offset 16
+ 183               		.cfi_offset 15, -15
+ 184 0060 0F93      		push r16
+ 185               	.LCFI14:
+ 186               		.cfi_def_cfa_offset 17
+ 187               		.cfi_offset 16, -16
+ 188 0062 1F93      		push r17
+ 189               	.LCFI15:
+ 190               		.cfi_def_cfa_offset 18
+ 191               		.cfi_offset 17, -17
+ 192 0064 CF93      		push r28
+ 193               	.LCFI16:
+ 194               		.cfi_def_cfa_offset 19
+ 195               		.cfi_offset 28, -18
+ 196 0066 DF93      		push r29
+ 197               	.LCFI17:
+ 198               		.cfi_def_cfa_offset 20
+ 199               		.cfi_offset 29, -19
+ 200               	/* prologue: function */
+ 201               	/* frame size = 0 */
+ 202               	/* stack size = 18 */
+ 203               	.L__stack_usage = 18
+ 204               	.LVL13:
+ 205               		.loc 1 46 0
+ 206 0068 48E0      		ldi r20,lo8(8)
+ 207 006a B42E      		mov r11,r20
+ 208               	.LBB13:
+ 209               	.LBB14:
+  47:poleceniagsm.c **** 	for(uchar i = 8; i != 0; --i)
+  48:poleceniagsm.c **** 	{
+  49:poleceniagsm.c **** 		const uchar sreg = SREG;
+  50:poleceniagsm.c **** 		cli();
+  51:poleceniagsm.c **** 		uchar pom = czy_jest_nowe_polecenie_SIM900;
+  52:poleceniagsm.c **** 		if ( !pom )
+  53:poleceniagsm.c **** 		{
+  54:poleceniagsm.c **** 			SREG = sreg;
+  55:poleceniagsm.c **** 			if ( liczba_komend_w_kolejce_SIM900 != 0 )
+  56:poleceniagsm.c **** 			{
+  57:poleceniagsm.c **** 				komenda_SIM900 = zarejestrowane_komendy_od_SIM900[--liczba_komend_w_kolejce_SIM900];
+  58:poleceniagsm.c **** 				zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900] = BRAK_KOMENDY_SIM900;
+  59:poleceniagsm.c **** 				return komenda_SIM900;
+  60:poleceniagsm.c **** 			}
+  61:poleceniagsm.c **** 			return komenda_SIM900 = BRAK_KOMENDY_SIM900;
+  62:poleceniagsm.c **** 		}
+  63:poleceniagsm.c **** 		if ( pom >= LICZBA_POLOZEN_OTRZYMANYCH_KOMEND_SIM900 )
+  64:poleceniagsm.c **** 			pom = LICZBA_POLOZEN_OTRZYMANYCH_KOMEND_SIM900-1;
+  65:poleceniagsm.c **** 		const uint poczatek = polozenie_otrzymanych_komend_SIM900[pom];
+  66:poleceniagsm.c **** 		polozenie_otrzymanych_komend_SIM900[pom] = 0;
+  67:poleceniagsm.c **** 		const uint zakonczenie = polozenie_otrzymanych_komend_SIM900[--pom];
+  68:poleceniagsm.c **** 		//podglad(poczatek & 0xff);
+  69:poleceniagsm.c **** 		//podglad(zakonczenie & 0xff);
+  70:poleceniagsm.c **** 		czy_jest_nowe_polecenie_SIM900 = pom;
+  71:poleceniagsm.c **** 		SREG = sreg;
+  72:poleceniagsm.c **** 		if ( zakonczenie <= poczatek )
+  73:poleceniagsm.c **** 			continue;
+  74:poleceniagsm.c **** 		if ( liczba_komend_w_kolejce_SIM900 >= MAX_LICZBA_ZAREJESTROWANYCH_KOMEND_OD_SIM900 )
+  75:poleceniagsm.c **** 		{
+  76:poleceniagsm.c **** 			liczba_komend_w_kolejce_SIM900 = MAX_LICZBA_ZAREJESTROWANYCH_KOMEND_OD_SIM900 - 1;
+  77:poleceniagsm.c **** 		}
+  78:poleceniagsm.c **** 		const uint z = zakonczenie - poczatek - 4;
+  79:poleceniagsm.c **** 		const uint p = poczatek+2;
+  80:poleceniagsm.c **** #define czy_polecenie_sim(POL)	porownaj_znaki(POL, p, strlen_R(POL), z)
+  81:poleceniagsm.c **** #define czy_polecenie_sim_od_tylu(POL)	porownaj_znaki_od_tylu(POL, zakonczenie - 3, strlen_R(POL), 
+  82:poleceniagsm.c **** 		const uchar d0 = odebrany_blok_SIM900[zakonczenie-3];
+  83:poleceniagsm.c **** 		const uchar d1 = odebrany_blok_SIM900[zakonczenie-4];
+  84:poleceniagsm.c **** 		const uchar d2 = odebrany_blok_SIM900[zakonczenie-5];
+  85:poleceniagsm.c **** 		const uchar d5 = odebrany_blok_SIM900[poczatek+5];
+  86:poleceniagsm.c **** 	//	static const char polecenie_OK[] PROGMEM = "OK";
+  87:poleceniagsm.c **** 		if ( d0 == 'K' && d1 == 'O' && d2 != ' ' && zakonczenie > 5 )
+  88:poleceniagsm.c **** 		{
+  89:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = OK_KOMENDA_SIM900;
+  90:poleceniagsm.c **** 			continue;
+  91:poleceniagsm.c **** 		}
+  92:poleceniagsm.c **** 		static const char polecenie_CMGS[] PROGMEM = "+CMGS:";
+  93:poleceniagsm.c **** 		if ( d5 == 'G' && czy_polecenie_sim(polecenie_CMGS) )
+  94:poleceniagsm.c **** 		{
+  95:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = CMGS_KOMENDA_SIM900;
+  96:poleceniagsm.c **** 			continue;
+  97:poleceniagsm.c **** 		}
+  98:poleceniagsm.c **** 		static const char polecenie_ERROR[] PROGMEM = "ERROR";
+  99:poleceniagsm.c **** 		if ( d1 == 'O' && czy_polecenie_sim(polecenie_ERROR) )
+ 100:poleceniagsm.c **** 		{
+ 101:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = ERROR_KOMENDA_SIM900;
+ 102:poleceniagsm.c **** 			continue;
+ 103:poleceniagsm.c **** 		}
+ 104:poleceniagsm.c **** 		static const char polecenie_MO_RING[] PROGMEM = "MO RING";
+ 105:poleceniagsm.c **** 		if ( d0 == 'G' && czy_polecenie_sim(polecenie_MO_RING) )
+ 106:poleceniagsm.c **** 		{
+ 107:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = MO_RING_KOMENDA_SIM900;
+ 108:poleceniagsm.c **** 			continue;
+ 109:poleceniagsm.c **** 		}
+ 110:poleceniagsm.c **** 		static const char polecenie_MO_CONNECTED[] PROGMEM = "MO CONNECTED";
+ 111:poleceniagsm.c **** 		if ( d0 == 'D' && czy_polecenie_sim(polecenie_MO_CONNECTED) )
+ 112:poleceniagsm.c **** 		{
+ 113:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = MO_CONNECTED_KOMENDA_SIM900
+ 114:poleceniagsm.c **** 			continue;
+ 115:poleceniagsm.c **** 		}
+ 116:poleceniagsm.c **** 		//static const char polecenie_CONNECT[] PROGMEM = "CONNECT";
+ 117:poleceniagsm.c **** 		//if ( d0 == 'T' && czy_polecenie_sim(polecenie_CONNECT) )
+ 118:poleceniagsm.c **** 		//{
+ 119:poleceniagsm.c **** 		//	zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = CONNECT_KOMENDA_SIM900;
+ 120:poleceniagsm.c **** 		//	continue;
+ 121:poleceniagsm.c **** 		//}
+ 122:poleceniagsm.c **** 		static const char polecenie_CLIP[] PROGMEM = "+CLIP:";
+ 123:poleceniagsm.c **** 		if ( d5 == 'I' && czy_polecenie_sim(polecenie_CLIP) )
+ 124:poleceniagsm.c **** 		{
+ 125:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = CLIP_KOMENDA_SIM900;
+ 126:poleceniagsm.c **** 			continue;
+ 127:poleceniagsm.c **** 		}
+ 128:poleceniagsm.c **** 		static const char polecenie_DTMF[] PROGMEM = "+DTMF:";
+ 129:poleceniagsm.c **** 		if ( d5 == 'M' && czy_polecenie_sim(polecenie_DTMF) )
+ 130:poleceniagsm.c **** 		{
+ 131:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = DTMF_KOMENDA_SIM900;
+ 132:poleceniagsm.c **** 			continue;
+ 133:poleceniagsm.c **** 		}
+ 134:poleceniagsm.c **** 		static const char polecenie_CMTI[] PROGMEM = "+CMTI:";	// nowy SMS
+ 135:poleceniagsm.c **** 		if ( d5 == 'T' && czy_polecenie_sim(polecenie_CMTI) )
+ 136:poleceniagsm.c **** 		{
+ 137:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = CMTI_KOMENDA_SIM900;
+ 138:poleceniagsm.c **** 			continue;
+ 139:poleceniagsm.c **** 		}
+ 140:poleceniagsm.c **** 		static const char polecenie_NO_CARRIER[] PROGMEM = "NO CARRIER";
+ 141:poleceniagsm.c **** 		if ( d1 == 'E' && czy_polecenie_sim(polecenie_NO_CARRIER) )
+ 142:poleceniagsm.c **** 		{
+ 143:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = NO_CARRIER_KOMENDA_SIM900;
+ 144:poleceniagsm.c **** 			continue;
+ 145:poleceniagsm.c **** 		}
+ 146:poleceniagsm.c **** 		static const char polecenie_NO_DIALTONE[] PROGMEM = "NO DIALTONE";
+ 147:poleceniagsm.c **** 		if ( d0 == 'E' && czy_polecenie_sim(polecenie_NO_DIALTONE) )
+ 148:poleceniagsm.c **** 		{
+ 149:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = NO_DIALTONE_KOMENDA_SIM900;
+ 150:poleceniagsm.c **** 			continue;
+ 151:poleceniagsm.c **** 		}
+ 152:poleceniagsm.c **** 		static const char polecenie_BUSY[] PROGMEM = "BUSY";
+ 153:poleceniagsm.c **** 		if ( d0 == 'Y' && czy_polecenie_sim(polecenie_BUSY) )
+ 154:poleceniagsm.c **** 		{
+ 155:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = BUSY_KOMENDA_SIM900;
+ 210               		.loc 1 155 0
+ 211 006c 57E0      		ldi r21,lo8(7)
+ 212 006e 852E      		mov r8,r21
+ 149:poleceniagsm.c **** 			continue;
+ 213               		.loc 1 149 0
+ 214 0070 69E0      		ldi r22,lo8(9)
+ 215 0072 962E      		mov r9,r22
+ 143:poleceniagsm.c **** 			continue;
+ 216               		.loc 1 143 0
+ 217 0074 73E0      		ldi r23,lo8(3)
+ 218 0076 772E      		mov r7,r23
+ 137:poleceniagsm.c **** 			continue;
+ 219               		.loc 1 137 0
+ 220 0078 E8E0      		ldi r30,lo8(8)
+ 221 007a 6E2E      		mov r6,r30
+ 131:poleceniagsm.c **** 			continue;
+ 222               		.loc 1 131 0
+ 223 007c F5E1      		ldi r31,lo8(21)
+ 224 007e 5F2E      		mov r5,r31
+ 107:poleceniagsm.c **** 			continue;
+ 225               		.loc 1 107 0
+ 226 0080 A2E0      		ldi r26,lo8(2)
+ 227 0082 4A2E      		mov r4,r26
+  95:poleceniagsm.c **** 			continue;
+ 228               		.loc 1 95 0
+ 229 0084 BDE0      		ldi r27,lo8(13)
+ 230 0086 3B2E      		mov r3,r27
+  89:poleceniagsm.c **** 			continue;
+ 231               		.loc 1 89 0
+ 232 0088 2224      		clr r2
+ 233 008a 2394      		inc r2
+ 234               	.LVL14:
+ 235               	.L34:
+  49:poleceniagsm.c **** 		cli();
+ 236               		.loc 1 49 0
+ 237 008c 9FB7      		in r25,__SREG__
+ 238               	.LVL15:
+  50:poleceniagsm.c **** 		uchar pom = czy_jest_nowe_polecenie_SIM900;
+ 239               		.loc 1 50 0
+ 240               	/* #APP */
+ 241               	 ;  50 "poleceniagsm.c" 1
+ 242 008e F894      		cli
+ 243               	 ;  0 "" 2
+  51:poleceniagsm.c **** 		if ( !pom )
+ 244               		.loc 1 51 0
+ 245               	/* #NOAPP */
+ 246 0090 8091 0000 		lds r24,czy_jest_nowe_polecenie_SIM900
+ 247               	.LVL16:
+  52:poleceniagsm.c **** 		{
+ 248               		.loc 1 52 0
+ 249 0094 8111      		cpse r24,__zero_reg__
+ 250 0096 00C0      		rjmp .L11
+  54:poleceniagsm.c **** 			if ( liczba_komend_w_kolejce_SIM900 != 0 )
+ 251               		.loc 1 54 0
+ 252 0098 9FBF      		out __SREG__,r25
+  55:poleceniagsm.c **** 			{
+ 253               		.loc 1 55 0
+ 254 009a 8091 0000 		lds r24,liczba_komend_w_kolejce_SIM900
+ 255               	.LVL17:
+ 256 009e 8823      		tst r24
+ 257 00a0 01F0      		breq .L12
+  57:poleceniagsm.c **** 				zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900] = BRAK_KOMENDY_SIM900;
+ 258               		.loc 1 57 0
+ 259 00a2 8150      		subi r24,lo8(-(-1))
+ 260 00a4 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 261 00a8 E82F      		mov r30,r24
+ 262 00aa F0E0      		ldi r31,0
+ 263 00ac E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 264 00ae F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 265 00b0 8081      		ld r24,Z
+ 266 00b2 8093 0000 		sts komenda_SIM900,r24
+  58:poleceniagsm.c **** 				return komenda_SIM900;
+ 267               		.loc 1 58 0
+ 268 00b6 1082      		st Z,__zero_reg__
+  59:poleceniagsm.c **** 			}
+ 269               		.loc 1 59 0
+ 270 00b8 8091 0000 		lds r24,komenda_SIM900
+ 271               	.LVL18:
+ 272               	.L10:
+ 273               	/* epilogue start */
+ 274               	.LBE14:
+ 275               	.LBE13:
+ 156:poleceniagsm.c **** 			continue;
+ 157:poleceniagsm.c **** 		}
+ 158:poleceniagsm.c **** 		static const char polecenie_CMEERROR[] PROGMEM = "+CME ERROR:";
+ 159:poleceniagsm.c **** 		if ( d5 == 'E' && czy_polecenie_sim(polecenie_CMEERROR) )
+ 160:poleceniagsm.c **** 		{
+ 161:poleceniagsm.c **** 			numer_bledu_cme = (uint) 
+ 162:poleceniagsm.c **** 				strtoul(&odebrany_blok_SIM900[p+strlen_R(polecenie_CMEERROR)+1], NULL, 10);
+ 163:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = CME_ERROR_KOMENDA_SIM900;
+ 164:poleceniagsm.c **** 			continue;
+ 165:poleceniagsm.c **** 		}
+ 166:poleceniagsm.c **** 		static const char polecenie_CMSERROR[] PROGMEM = "+CMS ERROR:";
+ 167:poleceniagsm.c **** 		if ( d5 == 'S' && czy_polecenie_sim(polecenie_CMSERROR) )
+ 168:poleceniagsm.c **** 		{
+ 169:poleceniagsm.c **** 			numer_bledu_cms = (uint) 
+ 170:poleceniagsm.c **** 				strtoul(&odebrany_blok_SIM900[p+strlen_R(polecenie_CMSERROR)+1], NULL, 10);
+ 171:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = CMS_ERROR_KOMENDA_SIM900;
+ 172:poleceniagsm.c **** 			continue;
+ 173:poleceniagsm.c **** 		}
+ 174:poleceniagsm.c **** 		static const char polecenie_CUSD[] PROGMEM = "+CUSD:";	// nowy Report 
+ 175:poleceniagsm.c **** 		if ( d5 == 'S' && czy_polecenie_sim(polecenie_CUSD) )
+ 176:poleceniagsm.c **** 		{
+ 177:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = CUSD_KOMENDA_SIM900;
+ 178:poleceniagsm.c **** 			continue;
+ 179:poleceniagsm.c **** 		}
+ 180:poleceniagsm.c **** 	}
+ 181:poleceniagsm.c **** 	return BRAK_KOMENDY_SIM900;
+ 182:poleceniagsm.c **** }
+ 276               		.loc 1 182 0
+ 277 00bc DF91      		pop r29
+ 278 00be CF91      		pop r28
+ 279 00c0 1F91      		pop r17
+ 280 00c2 0F91      		pop r16
+ 281 00c4 FF90      		pop r15
+ 282 00c6 EF90      		pop r14
+ 283 00c8 DF90      		pop r13
+ 284 00ca CF90      		pop r12
+ 285 00cc BF90      		pop r11
+ 286 00ce AF90      		pop r10
+ 287 00d0 9F90      		pop r9
+ 288 00d2 8F90      		pop r8
+ 289 00d4 7F90      		pop r7
+ 290 00d6 6F90      		pop r6
+ 291 00d8 5F90      		pop r5
+ 292 00da 4F90      		pop r4
+ 293 00dc 3F90      		pop r3
+ 294 00de 2F90      		pop r2
+ 295 00e0 0895      		ret
+ 296               	.LVL19:
+ 297               	.L12:
+ 298               	.LBB17:
+ 299               	.LBB15:
+  61:poleceniagsm.c **** 		}
+ 300               		.loc 1 61 0
+ 301 00e2 1092 0000 		sts komenda_SIM900,__zero_reg__
+ 302 00e6 00C0      		rjmp .L10
+ 303               	.LVL20:
+ 304               	.L11:
+ 305 00e8 8530      		cpi r24,lo8(5)
+ 306 00ea 00F0      		brlo .L14
+ 307 00ec 84E0      		ldi r24,lo8(4)
+ 308               	.LVL21:
+ 309               	.L14:
+  65:poleceniagsm.c **** 		polozenie_otrzymanych_komend_SIM900[pom] = 0;
+ 310               		.loc 1 65 0
+ 311 00ee E82F      		mov r30,r24
+ 312 00f0 F0E0      		ldi r31,0
+ 313 00f2 EE0F      		lsl r30
+ 314 00f4 FF1F      		rol r31
+ 315 00f6 E050      		subi r30,lo8(-(polozenie_otrzymanych_komend_SIM900))
+ 316 00f8 F040      		sbci r31,hi8(-(polozenie_otrzymanych_komend_SIM900))
+ 317 00fa C080      		ld r12,Z
+ 318 00fc D180      		ldd r13,Z+1
+ 319               	.LVL22:
+  66:poleceniagsm.c **** 		const uint zakonczenie = polozenie_otrzymanych_komend_SIM900[--pom];
+ 320               		.loc 1 66 0
+ 321 00fe 1182      		std Z+1,__zero_reg__
+ 322 0100 1082      		st Z,__zero_reg__
+  67:poleceniagsm.c **** 		//podglad(poczatek & 0xff);
+ 323               		.loc 1 67 0
+ 324 0102 8150      		subi r24,lo8(-(-1))
+ 325               	.LVL23:
+ 326 0104 E82F      		mov r30,r24
+ 327 0106 F0E0      		ldi r31,0
+ 328 0108 EE0F      		lsl r30
+ 329 010a FF1F      		rol r31
+ 330 010c E050      		subi r30,lo8(-(polozenie_otrzymanych_komend_SIM900))
+ 331 010e F040      		sbci r31,hi8(-(polozenie_otrzymanych_komend_SIM900))
+ 332 0110 2081      		ld r18,Z
+ 333 0112 3181      		ldd r19,Z+1
+ 334               	.LVL24:
+  70:poleceniagsm.c **** 		SREG = sreg;
+ 335               		.loc 1 70 0
+ 336 0114 8093 0000 		sts czy_jest_nowe_polecenie_SIM900,r24
+  71:poleceniagsm.c **** 		if ( zakonczenie <= poczatek )
+ 337               		.loc 1 71 0
+ 338 0118 9FBF      		out __SREG__,r25
+  72:poleceniagsm.c **** 			continue;
+ 339               		.loc 1 72 0
+ 340 011a C216      		cp r12,r18
+ 341 011c D306      		cpc r13,r19
+ 342 011e 00F4      		brsh .L16
+  74:poleceniagsm.c **** 		{
+ 343               		.loc 1 74 0
+ 344 0120 8091 0000 		lds r24,liczba_komend_w_kolejce_SIM900
+ 345               	.LVL25:
+ 346 0124 8A30      		cpi r24,lo8(10)
+ 347 0126 00F0      		brlo .L17
+  76:poleceniagsm.c **** 		}
+ 348               		.loc 1 76 0
+ 349 0128 9092 0000 		sts liczba_komend_w_kolejce_SIM900,r9
+ 350               	.L17:
+  78:poleceniagsm.c **** 		const uint p = poczatek+2;
+ 351               		.loc 1 78 0
+ 352 012c E901      		movw r28,r18
+ 353 012e CC19      		sub r28,r12
+ 354 0130 DD09      		sbc r29,r13
+ 355 0132 2497      		sbiw r28,4
+ 356               	.LVL26:
+  79:poleceniagsm.c **** #define czy_polecenie_sim(POL)	porownaj_znaki(POL, p, strlen_R(POL), z)
+ 357               		.loc 1 79 0
+ 358 0134 8601      		movw r16,r12
+ 359 0136 0E5F      		subi r16,-2
+ 360 0138 1F4F      		sbci r17,-1
+ 361               	.LVL27:
+  82:poleceniagsm.c **** 		const uchar d1 = odebrany_blok_SIM900[zakonczenie-4];
+ 362               		.loc 1 82 0
+ 363 013a C901      		movw r24,r18
+ 364 013c 8050      		subi r24,lo8(-(odebrany_blok_SIM900))
+ 365 013e 9040      		sbci r25,hi8(-(odebrany_blok_SIM900))
+ 366 0140 FC01      		movw r30,r24
+ 367 0142 3397      		sbiw r30,3
+ 368 0144 E080      		ld r14,Z
+ 369               	.LVL28:
+  83:poleceniagsm.c **** 		const uchar d2 = odebrany_blok_SIM900[zakonczenie-5];
+ 370               		.loc 1 83 0
+ 371 0146 3197      		sbiw r30,1
+ 372 0148 A080      		ld r10,Z
+ 373               	.LVL29:
+  85:poleceniagsm.c **** 	//	static const char polecenie_OK[] PROGMEM = "OK";
+ 374               		.loc 1 85 0
+ 375 014a F601      		movw r30,r12
+ 376 014c E050      		subi r30,lo8(-(odebrany_blok_SIM900))
+ 377 014e F040      		sbci r31,hi8(-(odebrany_blok_SIM900))
+ 378 0150 F580      		ldd r15,Z+5
+ 379               	.LVL30:
+  87:poleceniagsm.c **** 		{
+ 380               		.loc 1 87 0
+ 381 0152 4BE4      		ldi r20,lo8(75)
+ 382 0154 E412      		cpse r14,r20
+ 383 0156 00C0      		rjmp .L18
+  87:poleceniagsm.c **** 		{
+ 384               		.loc 1 87 0 is_stmt 0 discriminator 1
+ 385 0158 EFE4      		ldi r30,lo8(79)
+ 386 015a AE12      		cpse r10,r30
+ 387 015c 00C0      		rjmp .L19
+  84:poleceniagsm.c **** 		const uchar d5 = odebrany_blok_SIM900[poczatek+5];
+ 388               		.loc 1 84 0 is_stmt 1 discriminator 2
+ 389 015e 0597      		sbiw r24,5
+  87:poleceniagsm.c **** 		{
+ 390               		.loc 1 87 0 discriminator 2
+ 391 0160 FC01      		movw r30,r24
+ 392 0162 8081      		ld r24,Z
+ 393 0164 8032      		cpi r24,lo8(32)
+ 394 0166 01F4      		brne .+2
+ 395 0168 00C0      		rjmp .L20
+  87:poleceniagsm.c **** 		{
+ 396               		.loc 1 87 0 is_stmt 0 discriminator 3
+ 397 016a 2630      		cpi r18,6
+ 398 016c 3105      		cpc r19,__zero_reg__
+ 399 016e 00F4      		brsh .+2
+ 400 0170 00C0      		rjmp .L20
+  89:poleceniagsm.c **** 			continue;
+ 401               		.loc 1 89 0 is_stmt 1
+ 402 0172 E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 403 0176 81E0      		ldi r24,lo8(1)
+ 404 0178 8E0F      		add r24,r30
+ 405 017a 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 406 017e F0E0      		ldi r31,0
+ 407 0180 E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 408 0182 F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 409 0184 2082      		st Z,r2
+ 410               	.LVL31:
+ 411               	.L16:
+ 412 0186 BA94      		dec r11
+ 413               	.LVL32:
+ 414               	.LBE15:
+  47:poleceniagsm.c **** 	{
+ 415               		.loc 1 47 0 discriminator 2
+ 416 0188 B110      		cpse r11,__zero_reg__
+ 417 018a 00C0      		rjmp .L34
+ 418               	.LBE17:
+ 181:poleceniagsm.c **** }
+ 419               		.loc 1 181 0
+ 420 018c 80E0      		ldi r24,0
+ 421 018e 00C0      		rjmp .L10
+ 422               	.LVL33:
+ 423               	.L18:
+ 424               	.LBB18:
+ 425               	.LBB16:
+  93:poleceniagsm.c **** 		{
+ 426               		.loc 1 93 0
+ 427 0190 F7E4      		ldi r31,lo8(71)
+ 428 0192 FF12      		cpse r15,r31
+ 429 0194 00C0      		rjmp .L21
+ 430               	.L36:
+  93:poleceniagsm.c **** 		{
+ 431               		.loc 1 93 0 is_stmt 0 discriminator 1
+ 432 0196 9E01      		movw r18,r28
+ 433               	.LVL34:
+ 434 0198 46E0      		ldi r20,lo8(6)
+ 435 019a B801      		movw r22,r16
+ 436 019c 80E0      		ldi r24,lo8(polecenie_CMGS.2086)
+ 437 019e 90E0      		ldi r25,hi8(polecenie_CMGS.2086)
+ 438 01a0 0E94 0000 		call porownaj_znaki
+ 439               	.LVL35:
+ 440 01a4 8823      		tst r24
+ 441 01a6 01F0      		breq .L21
+  95:poleceniagsm.c **** 			continue;
+ 442               		.loc 1 95 0 is_stmt 1
+ 443 01a8 E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 444 01ac 81E0      		ldi r24,lo8(1)
+ 445 01ae 8E0F      		add r24,r30
+ 446 01b0 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 447 01b4 F0E0      		ldi r31,0
+ 448 01b6 E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 449 01b8 F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 450 01ba 3082      		st Z,r3
+  96:poleceniagsm.c **** 		}
+ 451               		.loc 1 96 0
+ 452 01bc 00C0      		rjmp .L16
+ 453               	.L21:
+  99:poleceniagsm.c **** 		{
+ 454               		.loc 1 99 0
+ 455 01be 4FE4      		ldi r20,lo8(79)
+ 456 01c0 A412      		cpse r10,r20
+ 457 01c2 00C0      		rjmp .L22
+ 458               	.L37:
+ 459 01c4 9E01      		movw r18,r28
+ 460 01c6 45E0      		ldi r20,lo8(5)
+ 461 01c8 B801      		movw r22,r16
+ 462 01ca 80E0      		ldi r24,lo8(polecenie_ERROR.2087)
+ 463 01cc 90E0      		ldi r25,hi8(polecenie_ERROR.2087)
+ 464 01ce 0E94 0000 		call porownaj_znaki
+ 465               	.LVL36:
+ 466 01d2 8823      		tst r24
+ 467 01d4 01F0      		breq .L22
+ 101:poleceniagsm.c **** 			continue;
+ 468               		.loc 1 101 0
+ 469 01d6 E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 470 01da 81E0      		ldi r24,lo8(1)
+ 471 01dc 8E0F      		add r24,r30
+ 472 01de 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 473 01e2 F0E0      		ldi r31,0
+ 474 01e4 E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 475 01e6 F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 476 01e8 84E0      		ldi r24,lo8(4)
+ 477               	.L81:
+ 113:poleceniagsm.c **** 			continue;
+ 478               		.loc 1 113 0
+ 479 01ea 8083      		st Z,r24
+ 114:poleceniagsm.c **** 		}
+ 480               		.loc 1 114 0
+ 481 01ec 00C0      		rjmp .L16
+ 482               	.L22:
+ 105:poleceniagsm.c **** 		{
+ 483               		.loc 1 105 0
+ 484 01ee E7E4      		ldi r30,lo8(71)
+ 485 01f0 EE12      		cpse r14,r30
+ 486 01f2 00C0      		rjmp .L23
+ 105:poleceniagsm.c **** 		{
+ 487               		.loc 1 105 0 is_stmt 0 discriminator 1
+ 488 01f4 9E01      		movw r18,r28
+ 489 01f6 47E0      		ldi r20,lo8(7)
+ 490 01f8 B801      		movw r22,r16
+ 491 01fa 80E0      		ldi r24,lo8(polecenie_MO_RING.2088)
+ 492 01fc 90E0      		ldi r25,hi8(polecenie_MO_RING.2088)
+ 493 01fe 0E94 0000 		call porownaj_znaki
+ 494               	.LVL37:
+ 495 0202 8823      		tst r24
+ 496 0204 01F4      		brne .+2
+ 497 0206 00C0      		rjmp .L24
+ 107:poleceniagsm.c **** 			continue;
+ 498               		.loc 1 107 0 is_stmt 1
+ 499 0208 E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 500 020c 81E0      		ldi r24,lo8(1)
+ 501 020e 8E0F      		add r24,r30
+ 502 0210 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 503 0214 F0E0      		ldi r31,0
+ 504 0216 E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 505 0218 F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 506 021a 4082      		st Z,r4
+ 108:poleceniagsm.c **** 		}
+ 507               		.loc 1 108 0
+ 508 021c 00C0      		rjmp .L16
+ 509               	.L23:
+ 111:poleceniagsm.c **** 		{
+ 510               		.loc 1 111 0
+ 511 021e F4E4      		ldi r31,lo8(68)
+ 512 0220 EF12      		cpse r14,r31
+ 513 0222 00C0      		rjmp .L24
+ 111:poleceniagsm.c **** 		{
+ 514               		.loc 1 111 0 is_stmt 0 discriminator 1
+ 515 0224 9E01      		movw r18,r28
+ 516 0226 4CE0      		ldi r20,lo8(12)
+ 517 0228 B801      		movw r22,r16
+ 518 022a 80E0      		ldi r24,lo8(polecenie_MO_CONNECTED.2089)
+ 519 022c 90E0      		ldi r25,hi8(polecenie_MO_CONNECTED.2089)
+ 520 022e 0E94 0000 		call porownaj_znaki
+ 521               	.LVL38:
+ 522 0232 8823      		tst r24
+ 523 0234 01F4      		brne .+2
+ 524 0236 00C0      		rjmp .L24
+ 113:poleceniagsm.c **** 			continue;
+ 525               		.loc 1 113 0 is_stmt 1
+ 526 0238 E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 527 023c 81E0      		ldi r24,lo8(1)
+ 528 023e 8E0F      		add r24,r30
+ 529 0240 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 530 0244 F0E0      		ldi r31,0
+ 531 0246 E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 532 0248 F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 533 024a 8CE0      		ldi r24,lo8(12)
+ 534 024c 00C0      		rjmp .L81
+ 535               	.L25:
+ 129:poleceniagsm.c **** 		{
+ 536               		.loc 1 129 0
+ 537 024e 8DE4      		ldi r24,lo8(77)
+ 538 0250 F812      		cpse r15,r24
+ 539 0252 00C0      		rjmp .L27
+ 129:poleceniagsm.c **** 		{
+ 540               		.loc 1 129 0 is_stmt 0 discriminator 1
+ 541 0254 9E01      		movw r18,r28
+ 542 0256 46E0      		ldi r20,lo8(6)
+ 543 0258 B801      		movw r22,r16
+ 544 025a 80E0      		ldi r24,lo8(polecenie_DTMF.2091)
+ 545 025c 90E0      		ldi r25,hi8(polecenie_DTMF.2091)
+ 546 025e 0E94 0000 		call porownaj_znaki
+ 547               	.LVL39:
+ 548 0262 8823      		tst r24
+ 549 0264 01F0      		breq .L26
+ 131:poleceniagsm.c **** 			continue;
+ 550               		.loc 1 131 0 is_stmt 1
+ 551 0266 E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 552 026a 81E0      		ldi r24,lo8(1)
+ 553 026c 8E0F      		add r24,r30
+ 554 026e 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 555 0272 F0E0      		ldi r31,0
+ 556 0274 E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 557 0276 F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 558 0278 5082      		st Z,r5
+ 132:poleceniagsm.c **** 		}
+ 559               		.loc 1 132 0
+ 560 027a 00C0      		rjmp .L16
+ 561               	.L27:
+ 135:poleceniagsm.c **** 		{
+ 562               		.loc 1 135 0
+ 563 027c E4E5      		ldi r30,lo8(84)
+ 564 027e FE12      		cpse r15,r30
+ 565 0280 00C0      		rjmp .L26
+ 135:poleceniagsm.c **** 		{
+ 566               		.loc 1 135 0 is_stmt 0 discriminator 1
+ 567 0282 9E01      		movw r18,r28
+ 568 0284 46E0      		ldi r20,lo8(6)
+ 569 0286 B801      		movw r22,r16
+ 570 0288 80E0      		ldi r24,lo8(polecenie_CMTI.2092)
+ 571 028a 90E0      		ldi r25,hi8(polecenie_CMTI.2092)
+ 572 028c 0E94 0000 		call porownaj_znaki
+ 573               	.LVL40:
+ 574 0290 8823      		tst r24
+ 575 0292 01F0      		breq .L26
+ 137:poleceniagsm.c **** 			continue;
+ 576               		.loc 1 137 0 is_stmt 1
+ 577 0294 E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 578 0298 81E0      		ldi r24,lo8(1)
+ 579 029a 8E0F      		add r24,r30
+ 580 029c 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 581 02a0 F0E0      		ldi r31,0
+ 582 02a2 E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 583 02a4 F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 584 02a6 6082      		st Z,r6
+ 138:poleceniagsm.c **** 		}
+ 585               		.loc 1 138 0
+ 586 02a8 00C0      		rjmp .L16
+ 587               	.L26:
+ 141:poleceniagsm.c **** 		{
+ 588               		.loc 1 141 0
+ 589 02aa F5E4      		ldi r31,lo8(69)
+ 590 02ac AF12      		cpse r10,r31
+ 591 02ae 00C0      		rjmp .L28
+ 141:poleceniagsm.c **** 		{
+ 592               		.loc 1 141 0 is_stmt 0 discriminator 1
+ 593 02b0 9E01      		movw r18,r28
+ 594 02b2 4AE0      		ldi r20,lo8(10)
+ 595 02b4 B801      		movw r22,r16
+ 596 02b6 80E0      		ldi r24,lo8(polecenie_NO_CARRIER.2093)
+ 597 02b8 90E0      		ldi r25,hi8(polecenie_NO_CARRIER.2093)
+ 598 02ba 0E94 0000 		call porownaj_znaki
+ 599               	.LVL41:
+ 600 02be 8823      		tst r24
+ 601 02c0 01F0      		breq .L28
+ 143:poleceniagsm.c **** 			continue;
+ 602               		.loc 1 143 0 is_stmt 1
+ 603 02c2 E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 604 02c6 81E0      		ldi r24,lo8(1)
+ 605 02c8 8E0F      		add r24,r30
+ 606 02ca 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 607 02ce F0E0      		ldi r31,0
+ 608 02d0 E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 609 02d2 F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 610 02d4 7082      		st Z,r7
+ 144:poleceniagsm.c **** 		}
+ 611               		.loc 1 144 0
+ 612 02d6 00C0      		rjmp .L16
+ 613               	.L28:
+ 147:poleceniagsm.c **** 		{
+ 614               		.loc 1 147 0
+ 615 02d8 45E4      		ldi r20,lo8(69)
+ 616 02da E412      		cpse r14,r20
+ 617 02dc 00C0      		rjmp .L29
+ 147:poleceniagsm.c **** 		{
+ 618               		.loc 1 147 0 is_stmt 0 discriminator 1
+ 619 02de 9E01      		movw r18,r28
+ 620 02e0 4BE0      		ldi r20,lo8(11)
+ 621 02e2 B801      		movw r22,r16
+ 622 02e4 80E0      		ldi r24,lo8(polecenie_NO_DIALTONE.2094)
+ 623 02e6 90E0      		ldi r25,hi8(polecenie_NO_DIALTONE.2094)
+ 624 02e8 0E94 0000 		call porownaj_znaki
+ 625               	.LVL42:
+ 626 02ec 8823      		tst r24
+ 627 02ee 01F0      		breq .L30
+ 149:poleceniagsm.c **** 			continue;
+ 628               		.loc 1 149 0 is_stmt 1
+ 629 02f0 E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 630 02f4 81E0      		ldi r24,lo8(1)
+ 631 02f6 8E0F      		add r24,r30
+ 632 02f8 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 633 02fc F0E0      		ldi r31,0
+ 634 02fe E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 635 0300 F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 636 0302 9082      		st Z,r9
+ 150:poleceniagsm.c **** 		}
+ 637               		.loc 1 150 0
+ 638 0304 00C0      		rjmp .L16
+ 639               	.L29:
+ 153:poleceniagsm.c **** 		{
+ 640               		.loc 1 153 0
+ 641 0306 89E5      		ldi r24,lo8(89)
+ 642 0308 E812      		cpse r14,r24
+ 643 030a 00C0      		rjmp .L30
+ 153:poleceniagsm.c **** 		{
+ 644               		.loc 1 153 0 is_stmt 0 discriminator 1
+ 645 030c 9E01      		movw r18,r28
+ 646 030e 44E0      		ldi r20,lo8(4)
+ 647 0310 B801      		movw r22,r16
+ 648 0312 80E0      		ldi r24,lo8(polecenie_BUSY.2095)
+ 649 0314 90E0      		ldi r25,hi8(polecenie_BUSY.2095)
+ 650 0316 0E94 0000 		call porownaj_znaki
+ 651               	.LVL43:
+ 652 031a 8823      		tst r24
+ 653 031c 01F0      		breq .L30
+ 155:poleceniagsm.c **** 			continue;
+ 654               		.loc 1 155 0 is_stmt 1
+ 655 031e E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 656 0322 81E0      		ldi r24,lo8(1)
+ 657 0324 8E0F      		add r24,r30
+ 658 0326 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 659 032a F0E0      		ldi r31,0
+ 660 032c E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 661 032e F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 662 0330 8082      		st Z,r8
+ 156:poleceniagsm.c **** 		}
+ 663               		.loc 1 156 0
+ 664 0332 00C0      		rjmp .L16
+ 665               	.L30:
+ 159:poleceniagsm.c **** 		{
+ 666               		.loc 1 159 0
+ 667 0334 E5E4      		ldi r30,lo8(69)
+ 668 0336 FE12      		cpse r15,r30
+ 669 0338 00C0      		rjmp .L31
+ 159:poleceniagsm.c **** 		{
+ 670               		.loc 1 159 0 is_stmt 0 discriminator 1
+ 671 033a 9E01      		movw r18,r28
+ 672 033c 4BE0      		ldi r20,lo8(11)
+ 673 033e B801      		movw r22,r16
+ 674 0340 80E0      		ldi r24,lo8(polecenie_CMEERROR.2096)
+ 675 0342 90E0      		ldi r25,hi8(polecenie_CMEERROR.2096)
+ 676 0344 0E94 0000 		call porownaj_znaki
+ 677               	.LVL44:
+ 678 0348 8823      		tst r24
+ 679 034a 01F4      		brne .+2
+ 680 034c 00C0      		rjmp .L16
+ 162:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = CME_ERROR_KOMENDA_SIM900;
+ 681               		.loc 1 162 0 is_stmt 1
+ 682 034e 4AE0      		ldi r20,lo8(10)
+ 683 0350 50E0      		ldi r21,0
+ 684 0352 70E0      		ldi r23,0
+ 685 0354 60E0      		ldi r22,0
+ 686 0356 C601      		movw r24,r12
+ 687 0358 8050      		subi r24,lo8(-(odebrany_blok_SIM900+14))
+ 688 035a 9040      		sbci r25,hi8(-(odebrany_blok_SIM900+14))
+ 689 035c 0E94 0000 		call strtoul
+ 690               	.LVL45:
+ 161:poleceniagsm.c **** 				strtoul(&odebrany_blok_SIM900[p+strlen_R(polecenie_CMEERROR)+1], NULL, 10);
+ 691               		.loc 1 161 0
+ 692 0360 7093 0000 		sts numer_bledu_cme+1,r23
+ 693 0364 6093 0000 		sts numer_bledu_cme,r22
+ 163:poleceniagsm.c **** 			continue;
+ 694               		.loc 1 163 0
+ 695 0368 E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 696 036c 81E0      		ldi r24,lo8(1)
+ 697 036e 8E0F      		add r24,r30
+ 698 0370 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 699 0374 F0E0      		ldi r31,0
+ 700 0376 E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 701 0378 F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 702 037a 45E0      		ldi r20,lo8(5)
+ 703               	.L82:
+ 177:poleceniagsm.c **** 			continue;
+ 704               		.loc 1 177 0
+ 705 037c 4083      		st Z,r20
+ 178:poleceniagsm.c **** 		}
+ 706               		.loc 1 178 0
+ 707 037e 00C0      		rjmp .L16
+ 708               	.L31:
+ 167:poleceniagsm.c **** 		{
+ 709               		.loc 1 167 0
+ 710 0380 83E5      		ldi r24,lo8(83)
+ 711 0382 F812      		cpse r15,r24
+ 712 0384 00C0      		rjmp .L16
+ 167:poleceniagsm.c **** 		{
+ 713               		.loc 1 167 0 is_stmt 0 discriminator 1
+ 714 0386 9E01      		movw r18,r28
+ 715 0388 4BE0      		ldi r20,lo8(11)
+ 716 038a B801      		movw r22,r16
+ 717 038c 80E0      		ldi r24,lo8(polecenie_CMSERROR.2097)
+ 718 038e 90E0      		ldi r25,hi8(polecenie_CMSERROR.2097)
+ 719 0390 0E94 0000 		call porownaj_znaki
+ 720               	.LVL46:
+ 721 0394 8823      		tst r24
+ 722 0396 01F0      		breq .L33
+ 170:poleceniagsm.c **** 			zarejestrowane_komendy_od_SIM900[liczba_komend_w_kolejce_SIM900++] = CMS_ERROR_KOMENDA_SIM900;
+ 723               		.loc 1 170 0 is_stmt 1
+ 724 0398 4AE0      		ldi r20,lo8(10)
+ 725 039a 50E0      		ldi r21,0
+ 726 039c 70E0      		ldi r23,0
+ 727 039e 60E0      		ldi r22,0
+ 728 03a0 C601      		movw r24,r12
+ 729 03a2 8050      		subi r24,lo8(-(odebrany_blok_SIM900+14))
+ 730 03a4 9040      		sbci r25,hi8(-(odebrany_blok_SIM900+14))
+ 731 03a6 0E94 0000 		call strtoul
+ 732               	.LVL47:
+ 169:poleceniagsm.c **** 				strtoul(&odebrany_blok_SIM900[p+strlen_R(polecenie_CMSERROR)+1], NULL, 10);
+ 733               		.loc 1 169 0
+ 734 03aa 7093 0000 		sts numer_bledu_cms+1,r23
+ 735 03ae 6093 0000 		sts numer_bledu_cms,r22
+ 171:poleceniagsm.c **** 			continue;
+ 736               		.loc 1 171 0
+ 737 03b2 E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 738 03b6 81E0      		ldi r24,lo8(1)
+ 739 03b8 8E0F      		add r24,r30
+ 740 03ba 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 741 03be F0E0      		ldi r31,0
+ 742 03c0 E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 743 03c2 F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 744 03c4 86E0      		ldi r24,lo8(6)
+ 745 03c6 00C0      		rjmp .L81
+ 746               	.L33:
+ 175:poleceniagsm.c **** 		{
+ 747               		.loc 1 175 0
+ 748 03c8 9E01      		movw r18,r28
+ 749 03ca 46E0      		ldi r20,lo8(6)
+ 750 03cc B801      		movw r22,r16
+ 751 03ce 80E0      		ldi r24,lo8(polecenie_CUSD.2098)
+ 752 03d0 90E0      		ldi r25,hi8(polecenie_CUSD.2098)
+ 753 03d2 0E94 0000 		call porownaj_znaki
+ 754               	.LVL48:
+ 755 03d6 8823      		tst r24
+ 756 03d8 01F4      		brne .+2
+ 757 03da 00C0      		rjmp .L16
+ 177:poleceniagsm.c **** 			continue;
+ 758               		.loc 1 177 0
+ 759 03dc E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 760 03e0 81E0      		ldi r24,lo8(1)
+ 761 03e2 8E0F      		add r24,r30
+ 762 03e4 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 763 03e8 F0E0      		ldi r31,0
+ 764 03ea E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 765 03ec F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 766 03ee 4EE0      		ldi r20,lo8(14)
+ 767 03f0 00C0      		rjmp .L82
+ 768               	.LVL49:
+ 769               	.L19:
+  93:poleceniagsm.c **** 		{
+ 770               		.loc 1 93 0
+ 771 03f2 87E4      		ldi r24,lo8(71)
+ 772 03f4 F816      		cp r15,r24
+ 773 03f6 01F4      		brne .+2
+ 774 03f8 00C0      		rjmp .L36
+ 775               	.LVL50:
+ 776               	.L24:
+ 123:poleceniagsm.c **** 		{
+ 777               		.loc 1 123 0
+ 778 03fa 49E4      		ldi r20,lo8(73)
+ 779 03fc F412      		cpse r15,r20
+ 780 03fe 00C0      		rjmp .L25
+ 123:poleceniagsm.c **** 		{
+ 781               		.loc 1 123 0 is_stmt 0 discriminator 1
+ 782 0400 9E01      		movw r18,r28
+ 783 0402 46E0      		ldi r20,lo8(6)
+ 784 0404 B801      		movw r22,r16
+ 785 0406 80E0      		ldi r24,lo8(polecenie_CLIP.2090)
+ 786 0408 90E0      		ldi r25,hi8(polecenie_CLIP.2090)
+ 787 040a 0E94 0000 		call porownaj_znaki
+ 788               	.LVL51:
+ 789 040e 8823      		tst r24
+ 790 0410 01F4      		brne .+2
+ 791 0412 00C0      		rjmp .L26
+ 125:poleceniagsm.c **** 			continue;
+ 792               		.loc 1 125 0 is_stmt 1
+ 793 0414 E091 0000 		lds r30,liczba_komend_w_kolejce_SIM900
+ 794 0418 81E0      		ldi r24,lo8(1)
+ 795 041a 8E0F      		add r24,r30
+ 796 041c 8093 0000 		sts liczba_komend_w_kolejce_SIM900,r24
+ 797 0420 F0E0      		ldi r31,0
+ 798 0422 E050      		subi r30,lo8(-(zarejestrowane_komendy_od_SIM900))
+ 799 0424 F040      		sbci r31,hi8(-(zarejestrowane_komendy_od_SIM900))
+ 800 0426 8AE0      		ldi r24,lo8(10)
+ 801 0428 00C0      		rjmp .L81
+ 802               	.LVL52:
+ 803               	.L20:
+  93:poleceniagsm.c **** 		{
+ 804               		.loc 1 93 0
+ 805 042a E7E4      		ldi r30,lo8(71)
+ 806 042c FE12      		cpse r15,r30
+ 807 042e 00C0      		rjmp .L37
+ 808 0430 00C0      		rjmp .L36
+ 809               	.LBE16:
+ 810               	.LBE18:
+ 811               		.cfi_endproc
+ 812               	.LFE7:
+ 814               	.global	czy_jest_nowa_komenda_SIM900
+ 816               	czy_jest_nowa_komenda_SIM900:
+ 817               	.LFB8:
+ 183:poleceniagsm.c **** 
+ 184:poleceniagsm.c **** uchar czy_jest_nowa_komenda_SIM900(void)
+ 185:poleceniagsm.c **** {
+ 818               		.loc 1 185 0
+ 819               		.cfi_startproc
+ 820 0432 CF93      		push r28
+ 821               	.LCFI18:
+ 822               		.cfi_def_cfa_offset 3
+ 823               		.cfi_offset 28, -2
+ 824               	/* prologue: function */
+ 825               	/* frame size = 0 */
+ 826               	/* stack size = 1 */
+ 827               	.L__stack_usage = 1
+ 186:poleceniagsm.c **** 	if ( polecenia_konczace_gsm() )
+ 828               		.loc 1 186 0
+ 829 0434 0E94 0000 		call polecenia_konczace_gsm
+ 830               	.LVL53:
+ 831 0438 8823      		tst r24
+ 832 043a 01F0      		breq .L83
+ 187:poleceniagsm.c **** 	{
+ 188:poleceniagsm.c **** 		switch ( komenda_SIM900 )
+ 833               		.loc 1 188 0
+ 834 043c 8091 0000 		lds r24,komenda_SIM900
+ 835 0440 8430      		cpi r24,lo8(4)
+ 836 0442 01F0      		breq .L86
+ 837 0444 8331      		cpi r24,lo8(19)
+ 838 0446 01F0      		breq .L86
+ 839 0448 8130      		cpi r24,lo8(1)
+ 840 044a 01F4      		brne .L85
+ 841               	.L86:
+ 842               	.LBB19:
+ 189:poleceniagsm.c **** 		{
+ 190:poleceniagsm.c **** 		case OK_KOMENDA_SIM900:
+ 191:poleceniagsm.c **** 		case ERROR_KOMENDA_SIM900:
+ 192:poleceniagsm.c **** 		case DANE_ZE_STRONY_INTERNETOWEJ_KOMENDA_SIM900:
+ 193:poleceniagsm.c **** 		{
+ 194:poleceniagsm.c **** 			const uchar sreg = SREG;
+ 843               		.loc 1 194 0
+ 844 044c CFB7      		in r28,__SREG__
+ 845               	.LVL54:
+ 195:poleceniagsm.c **** 			cli();
+ 846               		.loc 1 195 0
+ 847               	/* #APP */
+ 848               	 ;  195 "poleceniagsm.c" 1
+ 849 044e F894      		cli
+ 850               	 ;  0 "" 2
+ 196:poleceniagsm.c **** 			resetuj_polecenie_konczace();
+ 851               		.loc 1 196 0
+ 852               	/* #NOAPP */
+ 853 0450 0E94 0000 		call resetuj_polecenie_konczace
+ 854               	.LVL55:
+ 197:poleceniagsm.c **** 			zakoncz_odbieranie_SIM900();
+ 855               		.loc 1 197 0
+ 856 0454 459A      		sbi 0x8,5
+ 857               	/* #APP */
+ 858               	 ;  197 "poleceniagsm.c" 1
+ 859 0456 F894      		cli
+ 860               	 ;  0 "" 2
+ 861               	/* #NOAPP */
+ 862 0458 8091 C100 		lds r24,193
+ 863 045c 8F77      		andi r24,lo8(127)
+ 864 045e 8093 C100 		sts 193,r24
+ 865 0462 80B7      		in r24,0x30
+ 866 0464 8D7F      		andi r24,lo8(-3)
+ 867 0466 80BF      		out 0x30,r24
+ 868               	/* #APP */
+ 869               	 ;  197 "poleceniagsm.c" 1
+ 870 0468 7894      		sei
+ 871               	 ;  0 "" 2
+ 872               	 ;  197 "poleceniagsm.c" 1
+ 873 046a 0000      		nop
+ 874               	 ;  0 "" 2
+ 198:poleceniagsm.c **** 			SREG = sreg;
+ 875               		.loc 1 198 0
+ 876               	/* #NOAPP */
+ 877 046c CFBF      		out __SREG__,r28
+ 878               	.LVL56:
+ 879               	.L85:
+ 880               	.LBE19:
+ 199:poleceniagsm.c **** 		}
+ 200:poleceniagsm.c **** 		}
+ 201:poleceniagsm.c **** 		return komenda_SIM900;
+ 881               		.loc 1 201 0
+ 882 046e 8091 0000 		lds r24,komenda_SIM900
+ 883               	.L83:
+ 884               	/* epilogue start */
+ 202:poleceniagsm.c **** 	}
+ 203:poleceniagsm.c **** 	return BRAK_KOMENDY_SIM900;
+ 204:poleceniagsm.c **** }
+ 885               		.loc 1 204 0
+ 886 0472 CF91      		pop r28
+ 887 0474 0895      		ret
+ 888               		.cfi_endproc
+ 889               	.LFE8:
+ 891               		.section	.progmem.data,"a",@progbits
+ 894               	polecenie_CUSD.2098:
+ 895 0000 2B43 5553 		.string	"+CUSD:"
+ 895      443A 00
+ 898               	polecenie_CMSERROR.2097:
+ 899 0007 2B43 4D53 		.string	"+CMS ERROR:"
+ 899      2045 5252 
+ 899      4F52 3A00 
+ 902               	polecenie_CMEERROR.2096:
+ 903 0013 2B43 4D45 		.string	"+CME ERROR:"
+ 903      2045 5252 
+ 903      4F52 3A00 
+ 906               	polecenie_BUSY.2095:
+ 907 001f 4255 5359 		.string	"BUSY"
+ 907      00
+ 910               	polecenie_NO_DIALTONE.2094:
+ 911 0024 4E4F 2044 		.string	"NO DIALTONE"
+ 911      4941 4C54 
+ 911      4F4E 4500 
+ 914               	polecenie_NO_CARRIER.2093:
+ 915 0030 4E4F 2043 		.string	"NO CARRIER"
+ 915      4152 5249 
+ 915      4552 00
+ 918               	polecenie_CMTI.2092:
+ 919 003b 2B43 4D54 		.string	"+CMTI:"
+ 919      493A 00
+ 922               	polecenie_DTMF.2091:
+ 923 0042 2B44 544D 		.string	"+DTMF:"
+ 923      463A 00
+ 926               	polecenie_CLIP.2090:
+ 927 0049 2B43 4C49 		.string	"+CLIP:"
+ 927      503A 00
+ 930               	polecenie_MO_CONNECTED.2089:
+ 931 0050 4D4F 2043 		.string	"MO CONNECTED"
+ 931      4F4E 4E45 
+ 931      4354 4544 
+ 931      00
+ 934               	polecenie_MO_RING.2088:
+ 935 005d 4D4F 2052 		.string	"MO RING"
+ 935      494E 4700 
+ 938               	polecenie_ERROR.2087:
+ 939 0065 4552 524F 		.string	"ERROR"
+ 939      5200 
+ 942               	polecenie_CMGS.2086:
+ 943 006b 2B43 4D47 		.string	"+CMGS:"
+ 943      533A 00
+ 944               		.comm	liczba_komend_w_kolejce_SIM900,1,1
+ 945               		.comm	zarejestrowane_komendy_od_SIM900,10,1
+ 946               	.global	numer_bledu_cms
+ 947               		.section .bss
+ 950               	numer_bledu_cms:
+ 951 0000 0000      		.zero	2
+ 952               	.global	numer_bledu_cme
+ 955               	numer_bledu_cme:
+ 956 0002 0000      		.zero	2
+ 957               	.global	poziom_sieci_gsm
+ 958               		.data
+ 961               	poziom_sieci_gsm:
+ 962 0000 63        		.byte	99
+ 963               	.global	bledny_PIN
+ 964               		.section .bss
+ 967               	bledny_PIN:
+ 968 0004 00        		.zero	1
+ 969               		.text
+ 970               	.Letext0:
+ 971               		.file 2 "narzedzia.h"
+ 972               		.file 3 "/usr/local/avr8-gnu-toolchain/avr/include/stdint.h"
+ 973               		.file 4 "/usr/local/avr8-gnu-toolchain/lib/gcc/avr/7.3.0/include/stddef.h"
+ 974               		.file 5 "poleceniagsm.h"
+ 975               		.file 6 "pamiec_ram.h"
+ 976               		.file 7 "sim900.h"
+ 977               		.file 8 "/usr/local/avr8-gnu-toolchain/avr/include/stdlib.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 poleceniagsm.c
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:13     .text:0000000000000000 porownaj_znaki
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:91     .text:000000000000002c resetuj_polecenie_konczace
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:124    .text:0000000000000044 polecenia_konczace_gsm
+                            *COM*:0000000000000001 liczba_komend_w_kolejce_SIM900
+                            *COM*:000000000000000a zarejestrowane_komendy_od_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:942    .progmem.data:000000000000006b polecenie_CMGS.2086
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:938    .progmem.data:0000000000000065 polecenie_ERROR.2087
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:934    .progmem.data:000000000000005d polecenie_MO_RING.2088
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:930    .progmem.data:0000000000000050 polecenie_MO_CONNECTED.2089
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:922    .progmem.data:0000000000000042 polecenie_DTMF.2091
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:918    .progmem.data:000000000000003b polecenie_CMTI.2092
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:914    .progmem.data:0000000000000030 polecenie_NO_CARRIER.2093
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:910    .progmem.data:0000000000000024 polecenie_NO_DIALTONE.2094
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:906    .progmem.data:000000000000001f polecenie_BUSY.2095
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:902    .progmem.data:0000000000000013 polecenie_CMEERROR.2096
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:955    .bss:0000000000000002 numer_bledu_cme
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:898    .progmem.data:0000000000000007 polecenie_CMSERROR.2097
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:950    .bss:0000000000000000 numer_bledu_cms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:894    .progmem.data:0000000000000000 polecenie_CUSD.2098
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:926    .progmem.data:0000000000000049 polecenie_CLIP.2090
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:816    .text:0000000000000432 czy_jest_nowa_komenda_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:961    .data:0000000000000000 poziom_sieci_gsm
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccKGr8bL.s:967    .bss:0000000000000004 bledny_PIN
+
+UNDEFINED SYMBOLS
+odebrany_blok_SIM900
+poczatek_polecenia_SIM900
+zakonczenie_polecenia_SIM900
+czy_jest_nowe_polecenie_SIM900
+komenda_SIM900
+polozenie_otrzymanych_komend_SIM900
+strtoul
+__do_copy_data
+__do_clear_bss

@@ -1,0 +1,1360 @@
+   1               		.file	"sim900.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__RAMPZ__ = 0x3b
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.text
+   9               	.Ltext0:
+  10               		.cfi_sections	.debug_frame
+  11               	.global	wyslij_znaki_SIM900
+  13               	wyslij_znaki_SIM900:
+  14               	.LFB1:
+  15               		.file 1 "sim900.c"
+   1:sim900.c      **** #include <avr/io.h>
+   2:sim900.c      **** #include <avr/interrupt.h>
+   3:sim900.c      **** #include "pin_ATmega328.h" // Dodano
+   4:sim900.c      **** #include "sim900.h"
+   5:sim900.c      **** #include <string.h>
+   6:sim900.c      **** 
+   7:sim900.c      **** #define FCPU_SIM900 F_CPU
+   8:sim900.c      **** #define FABRYCZNA_PREDKOSC_STARTOWA_SIM900 115200
+   9:sim900.c      **** #define VUBRR_SIM900(VUART) (FCPU_SIM900 / (VUART*16L) - 1)
+  10:sim900.c      **** #define VUBRR_FABRYCZNA_PREDKOSC_STARTOWA_SIM900 VUBRR_SIM900(FABRYCZNA_PREDKOSC_STARTOWA_SIM900)
+  11:sim900.c      **** 
+  12:sim900.c      **** uchar odebrany_blok_SIM900[MAX_LICZBA_ODBIERANYCH_ZNAKOW_SIM900+1];
+  13:sim900.c      **** volatile uint liczba_odebranych_znakow_SIM900;
+  14:sim900.c      **** volatile uchar licznik_opoznienie_oczekiwania_na_bajt_SIM900;
+  15:sim900.c      **** 
+  16:sim900.c      **** volatile uint nr_wyslanego_znaku_SIM900;
+  17:sim900.c      **** volatile uchar sprawdzaj_wejscie_CTS_SIM900 = FALSE;
+  18:sim900.c      **** volatile uint liczba_wysylanych_znakow_SIM900;
+  19:sim900.c      **** 
+  20:sim900.c      **** volatile uchar komenda_SIM900 = BRAK_KOMENDY_SIM900;
+  21:sim900.c      **** uchar podlaczony_modul_gsm_SIM900 = FALSE;
+  22:sim900.c      **** uchar podlaczona_karta_SIM_SIM900 = FALSE;
+  23:sim900.c      **** uchar wykonywanie_rozmowy_telefonicznej;
+  24:sim900.c      **** 
+  25:sim900.c      **** volatile uint liczba_znakow_pdu_do_odebrania;
+  26:sim900.c      **** 
+  27:sim900.c      **** volatile uint zakonczenie_polecenia_SIM900;
+  28:sim900.c      **** volatile uint poczatek_polecenia_SIM900;
+  29:sim900.c      **** volatile uchar czy_jest_nowe_polecenie_SIM900;
+  30:sim900.c      **** volatile uchar czekanie_na_odebranie_zachety;
+  31:sim900.c      **** volatile uchar flaga_odebrany_znak_zachety;
+  32:sim900.c      **** volatile uint polozenie_otrzymanych_komend_SIM900[LICZBA_POLOZEN_OTRZYMANYCH_KOMEND_SIM900];
+  33:sim900.c      **** 
+  34:sim900.c      **** void wyslij_znaki_SIM900(const uint liczba_znakow)
+  35:sim900.c      **** {
+  16               		.loc 1 35 0
+  17               		.cfi_startproc
+  18               	.LVL0:
+  19               	/* prologue: function */
+  20               	/* frame size = 0 */
+  21               	/* stack size = 0 */
+  22               	.L__stack_usage = 0
+  36:sim900.c      ****     liczba_wysylanych_znakow_SIM900 = liczba_znakow;
+  23               		.loc 1 36 0
+  24 0000 9093 0000 		sts liczba_wysylanych_znakow_SIM900+1,r25
+  25 0004 8093 0000 		sts liczba_wysylanych_znakow_SIM900,r24
+  37:sim900.c      ****     nr_wyslanego_znaku_SIM900 = 0;
+  26               		.loc 1 37 0
+  27 0008 1092 0000 		sts nr_wyslanego_znaku_SIM900+1,__zero_reg__
+  28 000c 1092 0000 		sts nr_wyslanego_znaku_SIM900,__zero_reg__
+  38:sim900.c      ****     UCSRA_SIM900 |= BIT(TXC);
+  29               		.loc 1 38 0
+  30 0010 E0EC      		ldi r30,lo8(-64)
+  31 0012 F0E0      		ldi r31,0
+  32 0014 8081      		ld r24,Z
+  33               	.LVL1:
+  34 0016 8064      		ori r24,lo8(64)
+  35 0018 8083      		st Z,r24
+  39:sim900.c      ****     WYKONAJ_CLI_SEI(WLACZ_PRZERWANIE_WYSYLANIA_DANYCH_SIM900());
+  36               		.loc 1 39 0
+  37               	/* #APP */
+  38               	 ;  39 "sim900.c" 1
+  39 001a F894      		cli
+  40               	 ;  0 "" 2
+  41               	/* #NOAPP */
+  42 001c E1EC      		ldi r30,lo8(-63)
+  43 001e F0E0      		ldi r31,0
+  44 0020 8081      		ld r24,Z
+  45 0022 8064      		ori r24,lo8(64)
+  46 0024 8083      		st Z,r24
+  47               	/* #APP */
+  48               	 ;  39 "sim900.c" 1
+  49 0026 7894      		sei
+  50               	 ;  0 "" 2
+  51               	 ;  39 "sim900.c" 1
+  52 0028 0000      		nop
+  53               	 ;  0 "" 2
+  40:sim900.c      ****     sprawdzaj_wejscie_CTS_SIM900 = TRUE;
+  54               		.loc 1 40 0
+  55               	/* #NOAPP */
+  56 002a 8FEF      		ldi r24,lo8(-1)
+  57 002c 8093 0000 		sts sprawdzaj_wejscie_CTS_SIM900,r24
+  58               	/* epilogue start */
+  41:sim900.c      **** }
+  59               		.loc 1 41 0
+  60 0030 0895      		ret
+  61               		.cfi_endproc
+  62               	.LFE1:
+  64               	.global	wyslij_polecenie_ROM_SIM900
+  66               	wyslij_polecenie_ROM_SIM900:
+  67               	.LFB2:
+  42:sim900.c      **** 
+  43:sim900.c      **** void wyslij_polecenie_ROM_SIM900(PGM_P polecenie)
+  44:sim900.c      **** {
+  68               		.loc 1 44 0
+  69               		.cfi_startproc
+  70               	.LVL2:
+  71 0032 CF93      		push r28
+  72               	.LCFI0:
+  73               		.cfi_def_cfa_offset 3
+  74               		.cfi_offset 28, -2
+  75 0034 DF93      		push r29
+  76               	.LCFI1:
+  77               		.cfi_def_cfa_offset 4
+  78               		.cfi_offset 29, -3
+  79               	/* prologue: function */
+  80               	/* frame size = 0 */
+  81               	/* stack size = 2 */
+  82               	.L__stack_usage = 2
+  83 0036 FC01      		movw r30,r24
+  45:sim900.c      ****     wysylany_blok_SIM900[0] = 'A';
+  84               		.loc 1 45 0
+  85 0038 81E4      		ldi r24,lo8(65)
+  86               	.LVL3:
+  87 003a 8093 0000 		sts wysylany_blok_SIM900,r24
+  46:sim900.c      ****     wysylany_blok_SIM900[1] = 'T';
+  88               		.loc 1 46 0
+  89 003e 84E5      		ldi r24,lo8(84)
+  90 0040 8093 0000 		sts wysylany_blok_SIM900+1,r24
+  91               	.LVL4:
+  92 0044 A0E0      		ldi r26,lo8(wysylany_blok_SIM900+2)
+  93 0046 B0E0      		ldi r27,hi8(wysylany_blok_SIM900+2)
+  94               	.LVL5:
+  47:sim900.c      ****     uchar* w = &wysylany_blok_SIM900[2];
+  48:sim900.c      ****     uchar l = 3;
+  95               		.loc 1 48 0
+  96 0048 93E0      		ldi r25,lo8(3)
+  97               	.LVL6:
+  98               	.L3:
+  99 004a ED01      		movw r28,r26
+ 100               	.LVL7:
+ 101               	.LBB2:
+  49:sim900.c      ****     while ( (*w = pgm_read_byte(polecenie)) )
+ 102               		.loc 1 49 0
+ 103               	/* #APP */
+ 104               	 ;  49 "sim900.c" 1
+ 105 004c 8491      		lpm r24, Z
+ 106               		
+ 107               	 ;  0 "" 2
+ 108               	.LVL8:
+ 109               	/* #NOAPP */
+ 110               	.LBE2:
+ 111 004e 8D93      		st X+,r24
+ 112 0050 8111      		cpse r24,__zero_reg__
+ 113 0052 00C0      		rjmp .L4
+  50:sim900.c      ****         ++w, ++polecenie, ++l;
+  51:sim900.c      ****     *w = ZNAK_KONCA_WYSYLANIA_ZNAKOW_CR;
+ 114               		.loc 1 51 0
+ 115 0054 8DE0      		ldi r24,lo8(13)
+ 116               	.LVL9:
+ 117 0056 8883      		st Y,r24
+ 118               	.LVL10:
+  52:sim900.c      ****     wyslij_znaki_SIM900(l);
+ 119               		.loc 1 52 0
+ 120 0058 892F      		mov r24,r25
+ 121 005a 90E0      		ldi r25,0
+ 122               	.LVL11:
+ 123               	/* epilogue start */
+  53:sim900.c      **** }
+ 124               		.loc 1 53 0
+ 125 005c DF91      		pop r29
+ 126 005e CF91      		pop r28
+ 127               	.LVL12:
+  52:sim900.c      ****     wyslij_znaki_SIM900(l);
+ 128               		.loc 1 52 0
+ 129 0060 0C94 0000 		jmp wyslij_znaki_SIM900
+ 130               	.LVL13:
+ 131               	.L4:
+  50:sim900.c      ****         ++w, ++polecenie, ++l;
+ 132               		.loc 1 50 0
+ 133 0064 3196      		adiw r30,1
+ 134               	.LVL14:
+ 135 0066 9F5F      		subi r25,lo8(-(1))
+ 136               	.LVL15:
+ 137 0068 00C0      		rjmp .L3
+ 138               		.cfi_endproc
+ 139               	.LFE2:
+ 141               	.global	wyslij_polecenie_RAM_SIM900
+ 143               	wyslij_polecenie_RAM_SIM900:
+ 144               	.LFB3:
+  54:sim900.c      **** 
+  55:sim900.c      **** void wyslij_polecenie_RAM_SIM900(void)
+  56:sim900.c      **** {
+ 145               		.loc 1 56 0
+ 146               		.cfi_startproc
+ 147               	/* prologue: function */
+ 148               	/* frame size = 0 */
+ 149               	/* stack size = 0 */
+ 150               	.L__stack_usage = 0
+  57:sim900.c      ****     wysylany_blok_SIM900[0] = 'A';
+ 151               		.loc 1 57 0
+ 152 006a E0E0      		ldi r30,lo8(wysylany_blok_SIM900)
+ 153 006c F0E0      		ldi r31,hi8(wysylany_blok_SIM900)
+ 154 006e 81E4      		ldi r24,lo8(65)
+ 155 0070 8083      		st Z,r24
+  58:sim900.c      ****     wysylany_blok_SIM900[1] = 'T';
+ 156               		.loc 1 58 0
+ 157 0072 84E5      		ldi r24,lo8(84)
+ 158 0074 8183      		std Z+1,r24
+  59:sim900.c      ****     const uchar l = strlen(wysylany_blok_SIM900);
+ 159               		.loc 1 59 0
+ 160               		0:
+ 161 0076 0190      		ld __tmp_reg__,Z+
+ 162 0078 0020      		tst __tmp_reg__
+ 163 007a 01F4      		brne 0b
+ 164 007c CF01      		movw r24,r30
+ 165 007e 8050      		subi r24,lo8(wysylany_blok_SIM900+1)
+ 166 0080 9040      		sbci r25,hi8(wysylany_blok_SIM900+1)
+ 167               	.LVL16:
+  60:sim900.c      ****     wysylany_blok_SIM900[l] = ZNAK_KONCA_WYSYLANIA_ZNAKOW_CR;
+ 168               		.loc 1 60 0
+ 169 0082 9927      		clr r25
+ 170               	.LVL17:
+ 171 0084 FC01      		movw r30,r24
+ 172               	.LVL18:
+ 173 0086 E050      		subi r30,lo8(-(wysylany_blok_SIM900))
+ 174 0088 F040      		sbci r31,hi8(-(wysylany_blok_SIM900))
+ 175 008a 2DE0      		ldi r18,lo8(13)
+ 176 008c 2083      		st Z,r18
+  61:sim900.c      ****     wyslij_znaki_SIM900(l+1);
+ 177               		.loc 1 61 0
+ 178 008e 0196      		adiw r24,1
+ 179 0090 0C94 0000 		jmp wyslij_znaki_SIM900
+ 180               	.LVL19:
+ 181               		.cfi_endproc
+ 182               	.LFE3:
+ 184               	.global	__vector_22
+ 186               	__vector_22:
+ 187               	.LFB4:
+  62:sim900.c      **** }
+  63:sim900.c      **** 
+  64:sim900.c      **** ISR(USART_TX_vect_SIM900, ISR_NOBLOCK)
+  65:sim900.c      **** {
+ 188               		.loc 1 65 0
+ 189               		.cfi_startproc
+ 190 0094 7894      		sei
+ 191 0096 1F92      		push r1
+ 192               	.LCFI2:
+ 193               		.cfi_def_cfa_offset 3
+ 194               		.cfi_offset 1, -2
+ 195 0098 0F92      		push r0
+ 196               	.LCFI3:
+ 197               		.cfi_def_cfa_offset 4
+ 198               		.cfi_offset 0, -3
+ 199 009a 0FB6      		in r0,__SREG__
+ 200 009c 0F92      		push r0
+ 201 009e 1124      		clr __zero_reg__
+ 202 00a0 0BB6      		in r0,__RAMPZ__
+ 203 00a2 0F92      		push r0
+ 204 00a4 2F93      		push r18
+ 205               	.LCFI4:
+ 206               		.cfi_def_cfa_offset 5
+ 207               		.cfi_offset 18, -4
+ 208 00a6 3F93      		push r19
+ 209               	.LCFI5:
+ 210               		.cfi_def_cfa_offset 6
+ 211               		.cfi_offset 19, -5
+ 212 00a8 8F93      		push r24
+ 213               	.LCFI6:
+ 214               		.cfi_def_cfa_offset 7
+ 215               		.cfi_offset 24, -6
+ 216 00aa 9F93      		push r25
+ 217               	.LCFI7:
+ 218               		.cfi_def_cfa_offset 8
+ 219               		.cfi_offset 25, -7
+ 220 00ac EF93      		push r30
+ 221               	.LCFI8:
+ 222               		.cfi_def_cfa_offset 9
+ 223               		.cfi_offset 30, -8
+ 224 00ae FF93      		push r31
+ 225               	.LCFI9:
+ 226               		.cfi_def_cfa_offset 10
+ 227               		.cfi_offset 31, -9
+ 228               	/* prologue: Interrupt */
+ 229               	/* frame size = 0 */
+ 230               	/* stack size = 10 */
+ 231               	.L__stack_usage = 10
+  66:sim900.c      ****     if ( nr_wyslanego_znaku_SIM900 >= liczba_wysylanych_znakow_SIM900 )
+ 232               		.loc 1 66 0
+ 233 00b0 2091 0000 		lds r18,nr_wyslanego_znaku_SIM900
+ 234 00b4 3091 0000 		lds r19,nr_wyslanego_znaku_SIM900+1
+ 235 00b8 8091 0000 		lds r24,liczba_wysylanych_znakow_SIM900
+ 236 00bc 9091 0000 		lds r25,liczba_wysylanych_znakow_SIM900+1
+ 237 00c0 2817      		cp r18,r24
+ 238 00c2 3907      		cpc r19,r25
+ 239 00c4 00F0      		brlo .L7
+  67:sim900.c      ****     {
+  68:sim900.c      ****         zakoncz_wysylanie_SIM900();
+ 240               		.loc 1 68 0
+ 241               	/* #APP */
+ 242               	 ;  68 "sim900.c" 1
+ 243 00c6 F894      		cli
+ 244               	 ;  0 "" 2
+ 245               	/* #NOAPP */
+ 246 00c8 8091 C100 		lds r24,193
+ 247 00cc 8F7B      		andi r24,lo8(-65)
+ 248 00ce 8093 C100 		sts 193,r24
+ 249               	/* #APP */
+ 250               	 ;  68 "sim900.c" 1
+ 251 00d2 7894      		sei
+ 252               	 ;  0 "" 2
+ 253               	 ;  68 "sim900.c" 1
+ 254 00d4 0000      		nop
+ 255               	 ;  0 "" 2
+ 256               	/* #NOAPP */
+ 257               	.L6:
+ 258               	/* epilogue start */
+  69:sim900.c      ****         return;
+  70:sim900.c      ****     }
+  71:sim900.c      ****     if ( CZY_HANDSHAKING_CTS_ZEZWALA_NA_TRANSMISJE_SIM900() )
+  72:sim900.c      ****     {
+  73:sim900.c      ****         WSTAW_ZNAK_DO_BUFORA_SIM900();
+  74:sim900.c      ****     }
+  75:sim900.c      ****     else
+  76:sim900.c      ****         sprawdzaj_wejscie_CTS_SIM900 = TRUE;
+  77:sim900.c      **** }
+ 259               		.loc 1 77 0
+ 260 00d6 FF91      		pop r31
+ 261 00d8 EF91      		pop r30
+ 262 00da 9F91      		pop r25
+ 263 00dc 8F91      		pop r24
+ 264 00de 3F91      		pop r19
+ 265 00e0 2F91      		pop r18
+ 266 00e2 0F90      		pop r0
+ 267 00e4 0BBE      		out __RAMPZ__,r0
+ 268 00e6 0F90      		pop r0
+ 269 00e8 0FBE      		out __SREG__,r0
+ 270 00ea 0F90      		pop r0
+ 271 00ec 1F90      		pop r1
+ 272 00ee 1895      		reti
+ 273               	.L7:
+  71:sim900.c      ****     {
+ 274               		.loc 1 71 0
+ 275 00f0 3499      		sbic 0x6,4
+ 276 00f2 00C0      		rjmp .L9
+ 277               	.LBB3:
+  73:sim900.c      ****     }
+ 278               		.loc 1 73 0
+ 279 00f4 8091 0000 		lds r24,nr_wyslanego_znaku_SIM900
+ 280 00f8 9091 0000 		lds r25,nr_wyslanego_znaku_SIM900+1
+ 281               	.LVL20:
+ 282 00fc FC01      		movw r30,r24
+ 283 00fe E050      		subi r30,lo8(-(wysylany_blok_SIM900))
+ 284 0100 F040      		sbci r31,hi8(-(wysylany_blok_SIM900))
+ 285 0102 2081      		ld r18,Z
+ 286               	.LVL21:
+ 287 0104 0196      		adiw r24,1
+ 288               	.LVL22:
+ 289 0106 9093 0000 		sts nr_wyslanego_znaku_SIM900+1,r25
+ 290 010a 8093 0000 		sts nr_wyslanego_znaku_SIM900,r24
+ 291 010e 2093 C600 		sts 198,r18
+ 292               	.LBE3:
+ 293 0112 00C0      		rjmp .L6
+ 294               	.LVL23:
+ 295               	.L9:
+  76:sim900.c      **** }
+ 296               		.loc 1 76 0
+ 297 0114 8FEF      		ldi r24,lo8(-1)
+ 298 0116 8093 0000 		sts sprawdzaj_wejscie_CTS_SIM900,r24
+ 299 011a 00C0      		rjmp .L6
+ 300               		.cfi_endproc
+ 301               	.LFE4:
+ 303               	.global	__vector_20
+ 305               	__vector_20:
+ 306               	.LFB5:
+  78:sim900.c      **** 
+  79:sim900.c      **** #ifdef WLACZ_PODGLAD_TRANSMISJI_ODBIORU_SIMCOM_NA_USB
+  80:sim900.c      **** #warning "GSM: Wlaczony podglad odbioru danych SIM900 po USB"
+  81:sim900.c      **** #endif
+  82:sim900.c      **** 
+  83:sim900.c      **** #ifdef WLACZ_PODGLAD_TRANSMISJI_WYSYLANIA_SIMCOM_NA_USB
+  84:sim900.c      **** #warning "GSM: Wlaczony podglad transmisji danych SIM900 po USB"
+  85:sim900.c      **** #endif
+  86:sim900.c      **** 
+  87:sim900.c      **** ISR(USART_RX_vect_SIM900, ISR_NAKED)
+  88:sim900.c      **** {
+ 307               		.loc 1 88 0
+ 308               		.cfi_startproc
+ 309               	/* prologue: naked */
+ 310               	/* frame size = 0 */
+ 311               	/* stack size = 0 */
+ 312               	.L__stack_usage = 0
+  89:sim900.c      ****     volatile register uchar tmp asm("r24");
+  90:sim900.c      ****     register uchar znak_UDR asm("r20");
+  91:sim900.c      ****     register uint l asm ("r18");
+  92:sim900.c      ****     register uchar* ptr asm ("r30");
+  93:sim900.c      ****     PUSH(tmp);
+ 313               		.loc 1 93 0
+ 314               	/* #APP */
+ 315               	 ;  93 "sim900.c" 1
+ 316 011c 8F93      		push r24
+ 317               		
+ 318               	 ;  0 "" 2
+  94:sim900.c      ****     tmp = SREG;
+ 319               		.loc 1 94 0
+ 320               	/* #NOAPP */
+ 321 011e 8FB7      		in r24,__SREG__
+  95:sim900.c      ****     PUSH(tmp);
+ 322               		.loc 1 95 0
+ 323               	/* #APP */
+ 324               	 ;  95 "sim900.c" 1
+ 325 0120 8F93      		push r24
+ 326               		
+ 327               	 ;  0 "" 2
+  96:sim900.c      ****     WYLACZ_PRZERWANIE_ODBIORU_DANYCH_SIM900();
+ 328               		.loc 1 96 0
+ 329               	/* #NOAPP */
+ 330 0122 8091 C100 		lds r24,193
+ 331 0126 8F77      		andi r24,lo8(127)
+ 332 0128 8093 C100 		sts 193,r24
+  97:sim900.c      ****     sei();
+ 333               		.loc 1 97 0
+ 334               	/* #APP */
+ 335               	 ;  97 "sim900.c" 1
+ 336 012c 7894      		sei
+ 337               	 ;  0 "" 2
+  98:sim900.c      **** #ifdef RAMPZ
+  99:sim900.c      ****     tmp = RAMPZ;
+ 338               		.loc 1 99 0
+ 339               	/* #NOAPP */
+ 340 012e 8BB7      		in r24,__RAMPZ__
+ 100:sim900.c      ****     PUSH(tmp);
+ 341               		.loc 1 100 0
+ 342               	/* #APP */
+ 343               	 ;  100 "sim900.c" 1
+ 344 0130 8F93      		push r24
+ 345               		
+ 346               	 ;  0 "" 2
+ 101:sim900.c      **** #endif
+ 102:sim900.c      ****     asm volatile ("lds %0, " ADRES_UDR_SIM900 " " : "=r" (tmp) : );
+ 347               		.loc 1 102 0
+ 348               	 ;  102 "sim900.c" 1
+ 349 0132 8091 C600 		lds r24, 0x00C6 
+ 350               	 ;  0 "" 2
+ 103:sim900.c      **** #ifdef WLACZ_PODGLAD_TRANSMISJI_ODBIORU_SIMCOM_NA_USB
+ 104:sim900.c      ****     asm volatile ("sts " ADRES_UDR_USB ", %0 " : "=r" (tmp) : );
+ 105:sim900.c      **** #endif
+ 106:sim900.c      ****     PUSH_TXT("r0");
+ 351               		.loc 1 106 0
+ 352               	 ;  106 "sim900.c" 1
+ 353 0136 0F92      		push r0
+ 354               		
+ 355               	 ;  0 "" 2
+ 107:sim900.c      ****     PUSH(znak_UDR);
+ 356               		.loc 1 107 0
+ 357               	 ;  107 "sim900.c" 1
+ 358 0138 4F93      		push r20
+ 359               		
+ 360               	 ;  0 "" 2
+ 108:sim900.c      ****     znak_UDR = tmp;
+ 109:sim900.c      ****     PUSH_TXT("__zero_reg__");
+ 361               		.loc 1 109 0
+ 362               	 ;  109 "sim900.c" 1
+ 363 013a 1F92      		push __zero_reg__
+ 364               		
+ 365               	 ;  0 "" 2
+ 110:sim900.c      ****     CLEAR_TXT("__zero_reg__");
+ 366               		.loc 1 110 0
+ 367               	 ;  110 "sim900.c" 1
+ 368 013c 1124      		eor __zero_reg__ , __zero_reg__
+ 369               		
+ 370               	 ;  0 "" 2
+ 111:sim900.c      ****     PUSH_TXT("r18");
+ 371               		.loc 1 111 0
+ 372               	 ;  111 "sim900.c" 1
+ 373 013e 2F93      		push r18
+ 374               		
+ 375               	 ;  0 "" 2
+ 112:sim900.c      ****     PUSH_TXT("r19");
+ 376               		.loc 1 112 0
+ 377               	 ;  112 "sim900.c" 1
+ 378 0140 3F93      		push r19
+ 379               		
+ 380               	 ;  0 "" 2
+ 113:sim900.c      ****     PUSH_TXT("r30");
+ 381               		.loc 1 113 0
+ 382               	 ;  113 "sim900.c" 1
+ 383 0142 EF93      		push r30
+ 384               		
+ 385               	 ;  0 "" 2
+ 114:sim900.c      ****     PUSH_TXT("r31");
+ 386               		.loc 1 114 0
+ 387               	 ;  114 "sim900.c" 1
+ 388 0144 FF93      		push r31
+ 389               		
+ 390               	 ;  0 "" 2
+ 115:sim900.c      ****     PUSH_TXT("r26");
+ 391               		.loc 1 115 0
+ 392               	 ;  115 "sim900.c" 1
+ 393 0146 AF93      		push r26
+ 394               		
+ 395               	 ;  0 "" 2
+ 116:sim900.c      ****     PUSH_TXT("r27");
+ 396               		.loc 1 116 0
+ 397               	 ;  116 "sim900.c" 1
+ 398 0148 BF93      		push r27
+ 399               		
+ 400               	 ;  0 "" 2
+ 117:sim900.c      ****     PUSH_TXT("r25");
+ 401               		.loc 1 117 0
+ 402               	 ;  117 "sim900.c" 1
+ 403 014a 9F93      		push r25
+ 404               		
+ 405               	 ;  0 "" 2
+ 118:sim900.c      ****     l = liczba_odebranych_znakow_SIM900;
+ 406               		.loc 1 118 0
+ 407               	/* #NOAPP */
+ 408 014c 2091 0000 		lds r18,liczba_odebranych_znakow_SIM900
+ 409 0150 3091 0000 		lds r19,liczba_odebranych_znakow_SIM900+1
+ 119:sim900.c      ****     if ( tmp != 0xFF )
+ 410               		.loc 1 119 0
+ 411 0154 8F3F      		cpi r24,lo8(-1)
+ 412 0156 01F4      		brne .+2
+ 413 0158 00C0      		rjmp .L11
+ 120:sim900.c      ****     {
+ 121:sim900.c      ****         ptr = odebrany_blok_SIM900;
+ 414               		.loc 1 121 0
+ 415 015a E0E0      		ldi r30,lo8(odebrany_blok_SIM900)
+ 416 015c F0E0      		ldi r31,hi8(odebrany_blok_SIM900)
+ 122:sim900.c      ****         if ( l < MAX_LICZBA_ODBIERANYCH_ZNAKOW_SIM900 )
+ 417               		.loc 1 122 0
+ 418 015e A901      		movw r20,r18
+ 419 0160 2039      		cpi r18,-112
+ 420 0162 91E0      		ldi r25,1
+ 421 0164 3907      		cpc r19,r25
+ 422 0166 00F0      		brlo .+2
+ 423 0168 00C0      		rjmp .L12
+ 123:sim900.c      ****         {
+ 124:sim900.c      ****             if ( l != 0 )
+ 424               		.loc 1 124 0
+ 425 016a 2115      		cp r18,__zero_reg__
+ 426 016c 3105      		cpc r19,__zero_reg__
+ 427 016e 01F0      		breq .L13
+ 125:sim900.c      ****             {
+ 126:sim900.c      ****                 tmp = *ptr;
+ 428               		.loc 1 126 0
+ 429 0170 9091 0000 		lds r25,odebrany_blok_SIM900
+ 127:sim900.c      ****                 if ( znak_UDR == ZNAK_KONCA_WYSYLANIA_ZNAKOW_CR 
+ 430               		.loc 1 127 0
+ 431 0174 8D30      		cpi r24,lo8(13)
+ 432 0176 01F4      		brne .L14
+ 128:sim900.c      ****                      && tmp != ZNAK_KONCA_WYSYLANIA_ZNAKOW_CR
+ 433               		.loc 1 128 0
+ 434 0178 9D30      		cpi r25,lo8(13)
+ 435 017a 01F0      		breq .L14
+ 129:sim900.c      ****                      && tmp != ZNAK_KONCA_ODBIERANIA_ZNAKOW_LF )
+ 436               		.loc 1 129 0
+ 437 017c 9A30      		cpi r25,lo8(10)
+ 438 017e 01F0      		breq .L14
+ 130:sim900.c      ****                 {
+ 131:sim900.c      ****                     if ( !czy_jest_nowe_polecenie_SIM900 )
+ 439               		.loc 1 131 0
+ 440 0180 9091 0000 		lds r25,czy_jest_nowe_polecenie_SIM900
+ 441 0184 9111      		cpse r25,__zero_reg__
+ 442 0186 00C0      		rjmp .L14
+ 132:sim900.c      ****                     {
+ 133:sim900.c      ****                         komenda_SIM900 = KOMENDA_SIM900_WYSLANE_POLECENIE;
+ 443               		.loc 1 133 0
+ 444 0188 91E8      		ldi r25,lo8(-127)
+ 445 018a 9093 0000 		sts komenda_SIM900,r25
+ 134:sim900.c      ****                         zakoncz_odbieranie_SIM900();
+ 446               		.loc 1 134 0
+ 447 018e 459A      		sbi 0x8,5
+ 448               	/* #APP */
+ 449               	 ;  134 "sim900.c" 1
+ 450 0190 F894      		cli
+ 451               	 ;  0 "" 2
+ 452               	/* #NOAPP */
+ 453 0192 9091 C100 		lds r25,193
+ 454 0196 9F77      		andi r25,lo8(127)
+ 455 0198 9093 C100 		sts 193,r25
+ 456 019c 90B7      		in r25,0x30
+ 457 019e 9D7F      		andi r25,lo8(-3)
+ 458 01a0 90BF      		out 0x30,r25
+ 459               	/* #APP */
+ 460               	 ;  134 "sim900.c" 1
+ 461 01a2 7894      		sei
+ 462               	 ;  0 "" 2
+ 463               	 ;  134 "sim900.c" 1
+ 464 01a4 0000      		nop
+ 465               	 ;  0 "" 2
+ 135:sim900.c      ****                         poczatek_polecenia_SIM900 = 0;
+ 466               		.loc 1 135 0
+ 467               	/* #NOAPP */
+ 468 01a6 1092 0000 		sts poczatek_polecenia_SIM900+1,__zero_reg__
+ 469 01aa 1092 0000 		sts poczatek_polecenia_SIM900,__zero_reg__
+ 136:sim900.c      ****                         zakonczenie_polecenia_SIM900 = 0;
+ 470               		.loc 1 136 0
+ 471 01ae 1092 0000 		sts zakonczenie_polecenia_SIM900+1,__zero_reg__
+ 472 01b2 1092 0000 		sts zakonczenie_polecenia_SIM900,__zero_reg__
+ 137:sim900.c      ****                         czy_jest_nowe_polecenie_SIM900 = FALSE;
+ 473               		.loc 1 137 0
+ 474 01b6 1092 0000 		sts czy_jest_nowe_polecenie_SIM900,__zero_reg__
+ 475               	.L14:
+ 138:sim900.c      ****                     }
+ 139:sim900.c      ****                 }
+ 140:sim900.c      ****             }
+ 141:sim900.c      ****             if ( (l == 0 || ptr[0] != ZNAK_KONCA_WYSYLANIA_ZNAKOW_CR )
+ 476               		.loc 1 141 0
+ 477 01ba 2115      		cp r18,__zero_reg__
+ 478 01bc 3105      		cpc r19,__zero_reg__
+ 479 01be 01F0      		breq .L13
+ 480               		.loc 1 141 0 is_stmt 0 discriminator 1
+ 481 01c0 9081      		ld r25,Z
+ 482 01c2 9D30      		cpi r25,lo8(13)
+ 483 01c4 01F0      		breq .L15
+ 484               	.L13:
+ 142:sim900.c      ****                  && znak_UDR == ZNAK_KONCA_ODBIERANIA_ZNAKOW_LF )
+ 485               		.loc 1 142 0 is_stmt 1
+ 486 01c6 8A30      		cpi r24,lo8(10)
+ 487 01c8 01F4      		brne .L15
+ 143:sim900.c      ****             {
+ 144:sim900.c      ****                 if ( !czy_jest_nowe_polecenie_SIM900 )
+ 488               		.loc 1 144 0
+ 489 01ca 9091 0000 		lds r25,czy_jest_nowe_polecenie_SIM900
+ 490 01ce 9111      		cpse r25,__zero_reg__
+ 491 01d0 00C0      		rjmp .L15
+ 145:sim900.c      ****                 {
+ 146:sim900.c      ****                     komenda_SIM900 = KOMENDA_SIM900_WYSLANE_POLECENIE;
+ 492               		.loc 1 146 0
+ 493 01d2 91E8      		ldi r25,lo8(-127)
+ 494 01d4 9093 0000 		sts komenda_SIM900,r25
+ 147:sim900.c      ****                     zakoncz_odbieranie_SIM900();
+ 495               		.loc 1 147 0
+ 496 01d8 459A      		sbi 0x8,5
+ 497               	/* #APP */
+ 498               	 ;  147 "sim900.c" 1
+ 499 01da F894      		cli
+ 500               	 ;  0 "" 2
+ 501               	/* #NOAPP */
+ 502 01dc 9091 C100 		lds r25,193
+ 503 01e0 9F77      		andi r25,lo8(127)
+ 504 01e2 9093 C100 		sts 193,r25
+ 505 01e6 90B7      		in r25,0x30
+ 506 01e8 9D7F      		andi r25,lo8(-3)
+ 507 01ea 90BF      		out 0x30,r25
+ 508               	/* #APP */
+ 509               	 ;  147 "sim900.c" 1
+ 510 01ec 7894      		sei
+ 511               	 ;  0 "" 2
+ 512               	 ;  147 "sim900.c" 1
+ 513 01ee 0000      		nop
+ 514               	 ;  0 "" 2
+ 148:sim900.c      ****                     poczatek_polecenia_SIM900 = 0;
+ 515               		.loc 1 148 0
+ 516               	/* #NOAPP */
+ 517 01f0 1092 0000 		sts poczatek_polecenia_SIM900+1,__zero_reg__
+ 518 01f4 1092 0000 		sts poczatek_polecenia_SIM900,__zero_reg__
+ 149:sim900.c      ****                     zakonczenie_polecenia_SIM900 = 0;
+ 519               		.loc 1 149 0
+ 520 01f8 1092 0000 		sts zakonczenie_polecenia_SIM900+1,__zero_reg__
+ 521 01fc 1092 0000 		sts zakonczenie_polecenia_SIM900,__zero_reg__
+ 150:sim900.c      ****                     czy_jest_nowe_polecenie_SIM900 = FALSE;
+ 522               		.loc 1 150 0
+ 523 0200 1092 0000 		sts czy_jest_nowe_polecenie_SIM900,__zero_reg__
+ 524               	.L15:
+ 525 0204 8F01      		movw r16,r30
+ 526 0206 A901      		movw r20,r18
+ 527 0208 4F5F      		subi r20,-1
+ 528 020a 5F4F      		sbci r21,-1
+ 529 020c DF01      		movw r26,r30
+ 530 020e A20F      		add r26,r18
+ 531 0210 B31F      		adc r27,r19
+ 151:sim900.c      ****                 }
+ 152:sim900.c      ****             }
+ 153:sim900.c      ****             if ( CZY_ODBIERANIE_DANYCH_SIM900() && l > 3 
+ 532               		.loc 1 153 0
+ 533 0212 00B6      		in __tmp_reg__,0x30
+ 534 0214 01FE      		sbrs __tmp_reg__,1
+ 535 0216 00C0      		rjmp .L16
+ 536               		.loc 1 153 0 is_stmt 0 discriminator 1
+ 537 0218 2430      		cpi r18,4
+ 538 021a 3105      		cpc r19,__zero_reg__
+ 539 021c 00F4      		brsh .+2
+ 540 021e 00C0      		rjmp .L16
+ 154:sim900.c      ****                  && znak_UDR == ZNAK_KONCA_ODBIERANIA_ZNAKOW_LF 
+ 541               		.loc 1 154 0 is_stmt 1
+ 542 0220 8A30      		cpi r24,lo8(10)
+ 543 0222 01F0      		breq .+2
+ 544 0224 00C0      		rjmp .L16
+ 155:sim900.c      ****                  && ptr[l-1] == ZNAK_KONCA_WYSYLANIA_ZNAKOW_CR
+ 545               		.loc 1 155 0
+ 546 0226 BD01      		movw r22,r26
+ 547 0228 6150      		subi r22,1
+ 548 022a 7109      		sbc r23,__zero_reg__
+ 549 022c EB01      		movw r28,r22
+ 550 022e 9881      		ld r25,Y
+ 551 0230 9D30      		cpi r25,lo8(13)
+ 552 0232 01F0      		breq .+2
+ 553 0234 00C0      		rjmp .L16
+ 156:sim900.c      ****                  && ptr[l-2] != ZNAK_KONCA_ODBIERANIA_ZNAKOW_LF 
+ 554               		.loc 1 156 0
+ 555 0236 6150      		subi r22,1
+ 556 0238 7109      		sbc r23,__zero_reg__
+ 557 023a EB01      		movw r28,r22
+ 558 023c 9881      		ld r25,Y
+ 559 023e 9A30      		cpi r25,lo8(10)
+ 560 0240 01F4      		brne .+2
+ 561 0242 00C0      		rjmp .L16
+ 157:sim900.c      ****                  && ptr[l-3] != ZNAK_KONCA_WYSYLANIA_ZNAKOW_CR
+ 562               		.loc 1 157 0
+ 563 0244 6150      		subi r22,1
+ 564 0246 7109      		sbc r23,__zero_reg__
+ 565 0248 EB01      		movw r28,r22
+ 566 024a 9881      		ld r25,Y
+ 567 024c 9D30      		cpi r25,lo8(13)
+ 568 024e 01F4      		brne .+2
+ 569 0250 00C0      		rjmp .L16
+ 158:sim900.c      ****                  && ptr[1] == ZNAK_KONCA_ODBIERANIA_ZNAKOW_LF
+ 570               		.loc 1 158 0
+ 571 0252 EF01      		movw r28,r30
+ 572 0254 9181      		ldd r25,Z+1
+ 573 0256 9A30      		cpi r25,lo8(10)
+ 574 0258 01F4      		brne .L16
+ 159:sim900.c      ****                  && ptr[0] == ZNAK_KONCA_WYSYLANIA_ZNAKOW_CR )
+ 575               		.loc 1 159 0
+ 576 025a 9081      		ld r25,Z
+ 577 025c 9D30      		cpi r25,lo8(13)
+ 578 025e 01F4      		brne .L16
+ 160:sim900.c      ****             {
+ 161:sim900.c      ****                 poczatek_polecenia_SIM900 = zakonczenie_polecenia_SIM900;
+ 579               		.loc 1 161 0
+ 580 0260 6091 0000 		lds r22,zakonczenie_polecenia_SIM900
+ 581 0264 7091 0000 		lds r23,zakonczenie_polecenia_SIM900+1
+ 582 0268 7093 0000 		sts poczatek_polecenia_SIM900+1,r23
+ 583 026c 6093 0000 		sts poczatek_polecenia_SIM900,r22
+ 162:sim900.c      ****                 zakonczenie_polecenia_SIM900 = l+1;
+ 584               		.loc 1 162 0
+ 585 0270 5093 0000 		sts zakonczenie_polecenia_SIM900+1,r21
+ 586 0274 4093 0000 		sts zakonczenie_polecenia_SIM900,r20
+ 163:sim900.c      ****                 ++czy_jest_nowe_polecenie_SIM900;
+ 587               		.loc 1 163 0
+ 588 0278 9091 0000 		lds r25,czy_jest_nowe_polecenie_SIM900
+ 589 027c 9F5F      		subi r25,lo8(-(1))
+ 590 027e 9093 0000 		sts czy_jest_nowe_polecenie_SIM900,r25
+ 164:sim900.c      ****                 polozenie_otrzymanych_komend_SIM900[4] = polozenie_otrzymanych_komend_SIM900[3];
+ 591               		.loc 1 164 0
+ 592 0282 6091 0000 		lds r22,polozenie_otrzymanych_komend_SIM900+6
+ 593 0286 7091 0000 		lds r23,polozenie_otrzymanych_komend_SIM900+6+1
+ 594 028a 7093 0000 		sts polozenie_otrzymanych_komend_SIM900+8+1,r23
+ 595 028e 6093 0000 		sts polozenie_otrzymanych_komend_SIM900+8,r22
+ 165:sim900.c      ****                 polozenie_otrzymanych_komend_SIM900[3] = polozenie_otrzymanych_komend_SIM900[2];
+ 596               		.loc 1 165 0
+ 597 0292 6091 0000 		lds r22,polozenie_otrzymanych_komend_SIM900+4
+ 598 0296 7091 0000 		lds r23,polozenie_otrzymanych_komend_SIM900+4+1
+ 599 029a 7093 0000 		sts polozenie_otrzymanych_komend_SIM900+6+1,r23
+ 600 029e 6093 0000 		sts polozenie_otrzymanych_komend_SIM900+6,r22
+ 166:sim900.c      ****                 polozenie_otrzymanych_komend_SIM900[2] = polozenie_otrzymanych_komend_SIM900[1];
+ 601               		.loc 1 166 0
+ 602 02a2 6091 0000 		lds r22,polozenie_otrzymanych_komend_SIM900+2
+ 603 02a6 7091 0000 		lds r23,polozenie_otrzymanych_komend_SIM900+2+1
+ 604 02aa 7093 0000 		sts polozenie_otrzymanych_komend_SIM900+4+1,r23
+ 605 02ae 6093 0000 		sts polozenie_otrzymanych_komend_SIM900+4,r22
+ 167:sim900.c      ****                 polozenie_otrzymanych_komend_SIM900[1] = poczatek_polecenia_SIM900;
+ 606               		.loc 1 167 0
+ 607 02b2 6091 0000 		lds r22,poczatek_polecenia_SIM900
+ 608 02b6 7091 0000 		lds r23,poczatek_polecenia_SIM900+1
+ 609 02ba 7093 0000 		sts polozenie_otrzymanych_komend_SIM900+2+1,r23
+ 610 02be 6093 0000 		sts polozenie_otrzymanych_komend_SIM900+2,r22
+ 168:sim900.c      ****                 polozenie_otrzymanych_komend_SIM900[0] = zakonczenie_polecenia_SIM900;
+ 611               		.loc 1 168 0
+ 612 02c2 6091 0000 		lds r22,zakonczenie_polecenia_SIM900
+ 613 02c6 7091 0000 		lds r23,zakonczenie_polecenia_SIM900+1
+ 614 02ca 7093 0000 		sts polozenie_otrzymanych_komend_SIM900+1,r23
+ 615 02ce 6093 0000 		sts polozenie_otrzymanych_komend_SIM900,r22
+ 616               	.L16:
+ 169:sim900.c      ****             }
+ 170:sim900.c      ****             if ( czekanie_na_odebranie_zachety != FALSE 
+ 617               		.loc 1 170 0
+ 618 02d2 9091 0000 		lds r25,czekanie_na_odebranie_zachety
+ 619 02d6 9923      		tst r25
+ 620 02d8 01F0      		breq .L17
+ 171:sim900.c      ****                  && l == 3 && znak_UDR == ' ' && odebrany_blok_SIM900[2] == '>' )
+ 621               		.loc 1 171 0
+ 622 02da 2330      		cpi r18,3
+ 623 02dc 3105      		cpc r19,__zero_reg__
+ 624 02de 01F4      		brne .L17
+ 625               		.loc 1 171 0 is_stmt 0 discriminator 1
+ 626 02e0 8032      		cpi r24,lo8(32)
+ 627 02e2 01F4      		brne .L17
+ 628               		.loc 1 171 0 discriminator 2
+ 629 02e4 9091 0000 		lds r25,odebrany_blok_SIM900+2
+ 630 02e8 9E33      		cpi r25,lo8(62)
+ 631 02ea 01F4      		brne .L17
+ 172:sim900.c      ****             {
+ 173:sim900.c      ****                 flaga_odebrany_znak_zachety = TRUE;
+ 632               		.loc 1 173 0 is_stmt 1
+ 633 02ec 9FEF      		ldi r25,lo8(-1)
+ 634 02ee 9093 0000 		sts flaga_odebrany_znak_zachety,r25
+ 635               	.L17:
+ 174:sim900.c      ****             }
+ 175:sim900.c      ****             ptr[l] = znak_UDR;
+ 636               		.loc 1 175 0
+ 637 02f2 8C93      		st X,r24
+ 176:sim900.c      ****             l = l + 1;
+ 638               		.loc 1 176 0
+ 639 02f4 9A01      		movw r18,r20
+ 177:sim900.c      ****             ptr[l] = '\0';
+ 640               		.loc 1 177 0
+ 641 02f6 E40F      		add r30,r20
+ 642 02f8 F51F      		adc r31,r21
+ 643 02fa 1082      		st Z,__zero_reg__
+ 644 02fc 00C0      		rjmp .L18
+ 645               	.L12:
+ 178:sim900.c      ****         }
+ 179:sim900.c      ****         else
+ 180:sim900.c      ****         {
+ 181:sim900.c      ****             l = 0;
+ 646               		.loc 1 181 0
+ 647 02fe 30E0      		ldi r19,0
+ 648 0300 20E0      		ldi r18,0
+ 182:sim900.c      ****             komenda_SIM900 = BLAD_SIM900;
+ 649               		.loc 1 182 0
+ 650 0302 80E8      		ldi r24,lo8(-128)
+ 651 0304 8093 0000 		sts komenda_SIM900,r24
+ 183:sim900.c      ****             poczatek_polecenia_SIM900 = 0;
+ 652               		.loc 1 183 0
+ 653 0308 1092 0000 		sts poczatek_polecenia_SIM900+1,__zero_reg__
+ 654 030c 1092 0000 		sts poczatek_polecenia_SIM900,__zero_reg__
+ 184:sim900.c      ****             zakonczenie_polecenia_SIM900 = 0;
+ 655               		.loc 1 184 0
+ 656 0310 1092 0000 		sts zakonczenie_polecenia_SIM900+1,__zero_reg__
+ 657 0314 1092 0000 		sts zakonczenie_polecenia_SIM900,__zero_reg__
+ 185:sim900.c      ****             czy_jest_nowe_polecenie_SIM900 = FALSE;
+ 658               		.loc 1 185 0
+ 659 0318 1092 0000 		sts czy_jest_nowe_polecenie_SIM900,__zero_reg__
+ 660               	.L18:
+ 186:sim900.c      ****         }
+ 187:sim900.c      ****         liczba_odebranych_znakow_SIM900 = l;
+ 661               		.loc 1 187 0
+ 662 031c 3093 0000 		sts liczba_odebranych_znakow_SIM900+1,r19
+ 663 0320 2093 0000 		sts liczba_odebranych_znakow_SIM900,r18
+ 664               	.L11:
+ 188:sim900.c      ****     }
+ 189:sim900.c      ****     licznik_opoznienie_oczekiwania_na_bajt_SIM900 = 0;
+ 665               		.loc 1 189 0
+ 666 0324 1092 0000 		sts licznik_opoznienie_oczekiwania_na_bajt_SIM900,__zero_reg__
+ 190:sim900.c      ****     POP_TXT("r25");
+ 667               		.loc 1 190 0
+ 668               	/* #APP */
+ 669               	 ;  190 "sim900.c" 1
+ 670 0328 9F91      		pop r25
+ 671               		
+ 672               	 ;  0 "" 2
+ 191:sim900.c      ****     POP_TXT("r27");
+ 673               		.loc 1 191 0
+ 674               	 ;  191 "sim900.c" 1
+ 675 032a BF91      		pop r27
+ 676               		
+ 677               	 ;  0 "" 2
+ 192:sim900.c      ****     POP_TXT("r26");
+ 678               		.loc 1 192 0
+ 679               	 ;  192 "sim900.c" 1
+ 680 032c AF91      		pop r26
+ 681               		
+ 682               	 ;  0 "" 2
+ 193:sim900.c      ****     POP_TXT("r31");
+ 683               		.loc 1 193 0
+ 684               	 ;  193 "sim900.c" 1
+ 685 032e FF91      		pop r31
+ 686               		
+ 687               	 ;  0 "" 2
+ 194:sim900.c      ****     POP_TXT("r30");
+ 688               		.loc 1 194 0
+ 689               	 ;  194 "sim900.c" 1
+ 690 0330 EF91      		pop r30
+ 691               		
+ 692               	 ;  0 "" 2
+ 195:sim900.c      ****     POP_TXT("r19");
+ 693               		.loc 1 195 0
+ 694               	 ;  195 "sim900.c" 1
+ 695 0332 3F91      		pop r19
+ 696               		
+ 697               	 ;  0 "" 2
+ 196:sim900.c      ****     POP_TXT("r18");
+ 698               		.loc 1 196 0
+ 699               	 ;  196 "sim900.c" 1
+ 700 0334 2F91      		pop r18
+ 701               		
+ 702               	 ;  0 "" 2
+ 197:sim900.c      ****     POP_TXT("__zero_reg__");
+ 703               		.loc 1 197 0
+ 704               	 ;  197 "sim900.c" 1
+ 705 0336 1F90      		pop __zero_reg__
+ 706               		
+ 707               	 ;  0 "" 2
+ 198:sim900.c      ****     POP(znak_UDR);
+ 708               		.loc 1 198 0
+ 709               	 ;  198 "sim900.c" 1
+ 710 0338 4F91      		pop r20
+ 711               		
+ 712               	 ;  0 "" 2
+ 199:sim900.c      ****     if ( IS_HI(ACSR_SIM900, ACIS1) )
+ 713               		.loc 1 199 0
+ 714               	/* #NOAPP */
+ 715 033a 00B6      		in __tmp_reg__,0x30
+ 716 033c 01FE      		sbrs __tmp_reg__,1
+ 717 033e 00C0      		rjmp .L19
+ 200:sim900.c      ****     {
+ 201:sim900.c      ****         cli();
+ 718               		.loc 1 201 0
+ 719               	/* #APP */
+ 720               	 ;  201 "sim900.c" 1
+ 721 0340 F894      		cli
+ 722               	 ;  0 "" 2
+ 202:sim900.c      ****         LDS(tmp, ADRES_UCSRB_SIM900);
+ 723               		.loc 1 202 0
+ 724               	 ;  202 "sim900.c" 1
+ 725 0342 8091 C100 		lds r24, 0x00C1
+ 726               		
+ 727               	 ;  0 "" 2
+ 203:sim900.c      ****         ORI(tmp, BIT(RXCIE));
+ 728               		.loc 1 203 0
+ 729               	 ;  203 "sim900.c" 1
+ 730 0346 8068      		ori r24, 128
+ 731               		
+ 732               	 ;  0 "" 2
+ 204:sim900.c      ****         STS(tmp, ADRES_UCSRB_SIM900);
+ 733               		.loc 1 204 0
+ 734               	 ;  204 "sim900.c" 1
+ 735 0348 8093 C100 		sts 0x00C1, r24
+ 736               		
+ 737               	 ;  0 "" 2
+ 205:sim900.c      ****         sei();
+ 738               		.loc 1 205 0
+ 739               	 ;  205 "sim900.c" 1
+ 740 034c 7894      		sei
+ 741               	 ;  0 "" 2
+ 206:sim900.c      ****         NOP();
+ 742               		.loc 1 206 0
+ 743               	 ;  206 "sim900.c" 1
+ 744 034e 0000      		nop
+ 745               	 ;  0 "" 2
+ 746               	/* #NOAPP */
+ 747               	.L19:
+ 207:sim900.c      ****     }
+ 208:sim900.c      ****     POP_TXT("r0");
+ 748               		.loc 1 208 0
+ 749               	/* #APP */
+ 750               	 ;  208 "sim900.c" 1
+ 751 0350 0F90      		pop r0
+ 752               		
+ 753               	 ;  0 "" 2
+ 209:sim900.c      **** #ifdef RAMPZ
+ 210:sim900.c      ****     POP(tmp);
+ 754               		.loc 1 210 0
+ 755               	 ;  210 "sim900.c" 1
+ 756 0352 8F91      		pop r24
+ 757               		
+ 758               	 ;  0 "" 2
+ 211:sim900.c      ****     RAMPZ = tmp;
+ 759               		.loc 1 211 0
+ 760               	/* #NOAPP */
+ 761 0354 8BBF      		out __RAMPZ__,r24
+ 212:sim900.c      **** #endif
+ 213:sim900.c      ****     POP(tmp);
+ 762               		.loc 1 213 0
+ 763               	/* #APP */
+ 764               	 ;  213 "sim900.c" 1
+ 765 0356 8F91      		pop r24
+ 766               		
+ 767               	 ;  0 "" 2
+ 214:sim900.c      ****     SREG = tmp;
+ 768               		.loc 1 214 0
+ 769               	/* #NOAPP */
+ 770 0358 8FBF      		out __SREG__,r24
+ 215:sim900.c      ****     POP(tmp);
+ 771               		.loc 1 215 0
+ 772               	/* #APP */
+ 773               	 ;  215 "sim900.c" 1
+ 774 035a 8F91      		pop r24
+ 775               		
+ 776               	 ;  0 "" 2
+ 216:sim900.c      ****     reti();
+ 777               		.loc 1 216 0
+ 778               	 ;  216 "sim900.c" 1
+ 779 035c 1895      		reti
+ 780               	 ;  0 "" 2
+ 781               	/* epilogue start */
+ 217:sim900.c      **** }
+ 782               		.loc 1 217 0
+ 783               	/* #NOAPP */
+ 784               		.cfi_endproc
+ 785               	.LFE5:
+ 787               	.global	inicjalizacja_SIM900
+ 789               	inicjalizacja_SIM900:
+ 790               	.LFB8:
+ 218:sim900.c      **** 
+ 219:sim900.c      **** static void ustaw_piny_SIM900(void)
+ 220:sim900.c      **** {
+ 221:sim900.c      ****     SET_HI(DDR_UART_SIM900, TXD_WYJSCIE_SIM900);
+ 222:sim900.c      ****     SET_HI2(PORT_UART_SIM900, TXD_WYJSCIE_SIM900, RXD_WEJSCIE_SIM900);
+ 223:sim900.c      ****     SET_HI(DDR_RTS_SIM900, RTS_WYJSCIE_SIM900);
+ 224:sim900.c      ****     SET_HI(PORT_RTS_SIM900, RTS_WYJSCIE_SIM900);
+ 225:sim900.c      ****     SET_HI(PORT_CTS_SIM900, CTS_WEJSCIE_SIM900);
+ 226:sim900.c      **** }
+ 227:sim900.c      **** 
+ 228:sim900.c      **** static void wylacz_piny_SIM900(void)
+ 229:sim900.c      **** {
+ 230:sim900.c      ****     SET_LO2(PORT_UART_SIM900, TXD_WYJSCIE_SIM900, RXD_WEJSCIE_SIM900);
+ 231:sim900.c      ****     SET_LO(DDR_UART_SIM900, TXD_WYJSCIE_SIM900);
+ 232:sim900.c      ****     SET_LO(PORT_CTS_SIM900, CTS_WEJSCIE_SIM900);
+ 233:sim900.c      ****     SET_LO(PORT_RTS_SIM900, RTS_WYJSCIE_SIM900);
+ 234:sim900.c      ****     SET_LO(DDR_RTS_SIM900, RTS_WYJSCIE_SIM900);
+ 235:sim900.c      **** }
+ 236:sim900.c      **** 
+ 237:sim900.c      **** void inicjalizacja_SIM900(void)
+ 238:sim900.c      **** {
+ 791               		.loc 1 238 0
+ 792               		.cfi_startproc
+ 793               	/* prologue: function */
+ 794               	/* frame size = 0 */
+ 795               	/* stack size = 0 */
+ 796               	.L__stack_usage = 0
+ 239:sim900.c      ****     UBRRL_SIM900 = VUBRR_FABRYCZNA_PREDKOSC_STARTOWA_SIM900 % 256;
+ 797               		.loc 1 239 0
+ 798 035e 83E0      		ldi r24,lo8(3)
+ 799 0360 8093 C400 		sts 196,r24
+ 240:sim900.c      ****     UBRRH_SIM900 = VUBRR_FABRYCZNA_PREDKOSC_STARTOWA_SIM900 / 256;
+ 800               		.loc 1 240 0
+ 801 0364 1092 C500 		sts 197,__zero_reg__
+ 241:sim900.c      ****     UCSRB_SIM900 |= BIT(TXEN) | BIT(RXEN);
+ 802               		.loc 1 241 0
+ 803 0368 E1EC      		ldi r30,lo8(-63)
+ 804 036a F0E0      		ldi r31,0
+ 805 036c 8081      		ld r24,Z
+ 806 036e 8861      		ori r24,lo8(24)
+ 807 0370 8083      		st Z,r24
+ 808               	.LBB6:
+ 809               	.LBB7:
+ 230:sim900.c      ****     SET_LO(DDR_UART_SIM900, TXD_WYJSCIE_SIM900);
+ 810               		.loc 1 230 0
+ 811 0372 8BB1      		in r24,0xb
+ 812 0374 8C7F      		andi r24,lo8(-4)
+ 813 0376 8BB9      		out 0xb,r24
+ 231:sim900.c      ****     SET_LO(PORT_CTS_SIM900, CTS_WEJSCIE_SIM900);
+ 814               		.loc 1 231 0
+ 815 0378 5198      		cbi 0xa,1
+ 232:sim900.c      ****     SET_LO(PORT_RTS_SIM900, RTS_WYJSCIE_SIM900);
+ 816               		.loc 1 232 0
+ 817 037a 4498      		cbi 0x8,4
+ 233:sim900.c      ****     SET_LO(DDR_RTS_SIM900, RTS_WYJSCIE_SIM900);
+ 818               		.loc 1 233 0
+ 819 037c 4598      		cbi 0x8,5
+ 234:sim900.c      **** }
+ 820               		.loc 1 234 0
+ 821 037e 3D98      		cbi 0x7,5
+ 822               	/* epilogue start */
+ 823               	.LBE7:
+ 824               	.LBE6:
+ 242:sim900.c      ****     wylacz_piny_SIM900();
+ 243:sim900.c      **** }
+ 825               		.loc 1 243 0
+ 826 0380 0895      		ret
+ 827               		.cfi_endproc
+ 828               	.LFE8:
+ 830               	.global	zakonczenie_procedury_inicjalizacyjnej
+ 832               	zakonczenie_procedury_inicjalizacyjnej:
+ 833               	.LFB9:
+ 244:sim900.c      **** 
+ 245:sim900.c      **** uchar licznik_100ms_procedura_inicjalizacyjna_SIM900 = 1;
+ 246:sim900.c      **** 
+ 247:sim900.c      **** uchar zakonczenie_procedury_inicjalizacyjnej(void)
+ 248:sim900.c      **** {
+ 834               		.loc 1 248 0
+ 835               		.cfi_startproc
+ 836               	/* prologue: function */
+ 837               	/* frame size = 0 */
+ 838               	/* stack size = 0 */
+ 839               	.L__stack_usage = 0
+ 249:sim900.c      ****     if ( STATUS_WLACZONY_SIM900() )
+ 840               		.loc 1 249 0
+ 841 0382 4F9B      		sbis 0x9,7
+ 842 0384 00C0      		rjmp .L56
+ 843               	.LBB12:
+ 250:sim900.c      ****     {
+ 251:sim900.c      ****         licznik_100ms_procedura_inicjalizacyjna_SIM900 = 0;
+ 844               		.loc 1 251 0
+ 845 0386 1092 0000 		sts licznik_100ms_procedura_inicjalizacyjna_SIM900,__zero_reg__
+ 252:sim900.c      ****         liczba_odebranych_znakow_SIM900 = 0;
+ 846               		.loc 1 252 0
+ 847 038a 1092 0000 		sts liczba_odebranych_znakow_SIM900+1,__zero_reg__
+ 848 038e 1092 0000 		sts liczba_odebranych_znakow_SIM900,__zero_reg__
+ 849               	.LBB13:
+ 850               	.LBB14:
+ 221:sim900.c      ****     SET_HI2(PORT_UART_SIM900, TXD_WYJSCIE_SIM900, RXD_WEJSCIE_SIM900);
+ 851               		.loc 1 221 0
+ 852 0392 519A      		sbi 0xa,1
+ 222:sim900.c      ****     SET_HI(DDR_RTS_SIM900, RTS_WYJSCIE_SIM900);
+ 853               		.loc 1 222 0
+ 854 0394 8BB1      		in r24,0xb
+ 855 0396 8360      		ori r24,lo8(3)
+ 856 0398 8BB9      		out 0xb,r24
+ 223:sim900.c      ****     SET_HI(PORT_RTS_SIM900, RTS_WYJSCIE_SIM900);
+ 857               		.loc 1 223 0
+ 858 039a 3D9A      		sbi 0x7,5
+ 224:sim900.c      ****     SET_HI(PORT_CTS_SIM900, CTS_WEJSCIE_SIM900);
+ 859               		.loc 1 224 0
+ 860 039c 459A      		sbi 0x8,5
+ 225:sim900.c      **** }
+ 861               		.loc 1 225 0
+ 862 039e 449A      		sbi 0x8,4
+ 863 03a0 8FEF      		ldi r24,lo8(-1)
+ 864 03a2 0895      		ret
+ 865               	.L56:
+ 866               	.LBE14:
+ 867               	.LBE13:
+ 868               	.LBE12:
+ 253:sim900.c      ****         ustaw_piny_SIM900();
+ 254:sim900.c      ****         return TRUE;
+ 255:sim900.c      ****     }
+ 256:sim900.c      ****     return FALSE;
+ 869               		.loc 1 256 0
+ 870 03a4 80E0      		ldi r24,0
+ 871               	/* epilogue start */
+ 257:sim900.c      **** }
+ 872               		.loc 1 257 0
+ 873 03a6 0895      		ret
+ 874               		.cfi_endproc
+ 875               	.LFE9:
+ 877               	.global	procedura_inicjalizacyjna_SIM900_100MS
+ 879               	procedura_inicjalizacyjna_SIM900_100MS:
+ 880               	.LFB10:
+ 258:sim900.c      **** 
+ 259:sim900.c      **** uchar procedura_inicjalizacyjna_SIM900_100MS(void)
+ 260:sim900.c      **** {
+ 881               		.loc 1 260 0
+ 882               		.cfi_startproc
+ 883               	/* prologue: function */
+ 884               	/* frame size = 0 */
+ 885               	/* stack size = 0 */
+ 886               	.L__stack_usage = 0
+ 261:sim900.c      ****     if ( licznik_100ms_procedura_inicjalizacyjna_SIM900 )
+ 887               		.loc 1 261 0
+ 888 03a8 8091 0000 		lds r24,licznik_100ms_procedura_inicjalizacyjna_SIM900
+ 889 03ac 8823      		tst r24
+ 890 03ae 01F0      		breq .L57
+ 262:sim900.c      ****     {
+ 263:sim900.c      ****         ++licznik_100ms_procedura_inicjalizacyjna_SIM900;
+ 891               		.loc 1 263 0
+ 892 03b0 91E0      		ldi r25,lo8(1)
+ 893 03b2 980F      		add r25,r24
+ 894 03b4 9093 0000 		sts licznik_100ms_procedura_inicjalizacyjna_SIM900,r25
+ 264:sim900.c      ****         switch ( licznik_100ms_procedura_inicjalizacyjna_SIM900 )
+ 895               		.loc 1 264 0
+ 896 03b8 913A      		cpi r25,lo8(-95)
+ 897 03ba 01F0      		breq .L59
+ 898 03bc 00F4      		brsh .L60
+ 899 03be 9F30      		cpi r25,lo8(15)
+ 900 03c0 01F0      		breq .L61
+ 901 03c2 00F4      		brsh .L62
+ 902 03c4 9230      		cpi r25,lo8(2)
+ 903 03c6 01F0      		breq .L63
+ 904 03c8 9330      		cpi r25,lo8(3)
+ 905 03ca 01F0      		breq .L67
+ 906               	.L78:
+ 265:sim900.c      ****         {
+ 266:sim900.c      ****         case 2:
+ 267:sim900.c      ****         {
+ 268:sim900.c      ****             WYLACZ_PWRKEY_SIM900();
+ 269:sim900.c      ****             if ( zakonczenie_procedury_inicjalizacyjnej() )
+ 270:sim900.c      ****                 return TRUE;
+ 271:sim900.c      ****         }
+ 272:sim900.c      ****         case 3: WLACZ_PWRKEY_SIM900(); break;
+ 273:sim900.c      ****         case 15: WYLACZ_PWRKEY_SIM900(); break;
+ 274:sim900.c      ****         case 40: case 41: case 42: case 43: 
+ 275:sim900.c      ****         {
+ 276:sim900.c      ****             if ( zakonczenie_procedury_inicjalizacyjnej() )
+ 277:sim900.c      ****                 return TRUE;
+ 278:sim900.c      ****             break;
+ 279:sim900.c      ****         }
+ 280:sim900.c      ****         case 161:
+ 281:sim900.c      ****         {
+ 282:sim900.c      ****             podlaczony_modul_gsm_SIM900 = FALSE;
+ 283:sim900.c      ****             podlaczona_karta_SIM_SIM900 = FALSE;
+ 284:sim900.c      ****             break;
+ 285:sim900.c      ****         }
+ 286:sim900.c      ****         case 163: break;
+ 287:sim900.c      ****         case 200: WLACZ_PWRKEY_SIM900(); break;
+ 288:sim900.c      ****         case 215: WYLACZ_PWRKEY_SIM900(); break;
+ 289:sim900.c      ****         case 245: case 246: case 247: case 248: case 249: case 250: case 251: case 252: case 253: c
+ 290:sim900.c      ****         {
+ 291:sim900.c      ****             if ( zakonczenie_procedury_inicjalizacyjnej() )
+ 292:sim900.c      ****                 return TRUE;
+ 293:sim900.c      ****             break;
+ 294:sim900.c      ****         }
+ 295:sim900.c      ****         case 255: WYKONAJ_PROCEDURE_INICJALIZACYJNA_SIM900(); break;
+ 296:sim900.c      ****         }
+ 297:sim900.c      ****     }
+ 298:sim900.c      ****     return FALSE;
+ 907               		.loc 1 298 0
+ 908 03cc 80E0      		ldi r24,0
+ 273:sim900.c      ****         case 40: case 41: case 42: case 43: 
+ 909               		.loc 1 273 0
+ 910 03ce 0895      		ret
+ 911               	.L62:
+ 264:sim900.c      ****         switch ( licznik_100ms_procedura_inicjalizacyjna_SIM900 )
+ 912               		.loc 1 264 0
+ 913 03d0 8752      		subi r24,lo8(-(-39))
+ 914 03d2 8430      		cpi r24,lo8(4)
+ 915 03d4 00F4      		brsh .L78
+ 916               	.L65:
+ 276:sim900.c      ****                 return TRUE;
+ 917               		.loc 1 276 0
+ 918 03d6 0E94 0000 		call zakonczenie_procedury_inicjalizacyjnej
+ 919               	.LVL24:
+ 920 03da 91E0      		ldi r25,lo8(1)
+ 921 03dc 8111      		cpse r24,__zero_reg__
+ 922 03de 00C0      		rjmp .L69
+ 923 03e0 90E0      		ldi r25,0
+ 924               	.L69:
+ 925 03e2 892F      		mov r24,r25
+ 926 03e4 8195      		neg r24
+ 927 03e6 0895      		ret
+ 928               	.L60:
+ 264:sim900.c      ****         {
+ 929               		.loc 1 264 0
+ 930 03e8 9F3F      		cpi r25,lo8(-1)
+ 931 03ea 00F4      		brsh .L66
+ 932 03ec 953F      		cpi r25,lo8(-11)
+ 933 03ee 00F4      		brsh .L65
+ 934 03f0 983C      		cpi r25,lo8(-56)
+ 935 03f2 01F0      		breq .L67
+ 936 03f4 973D      		cpi r25,lo8(-41)
+ 937 03f6 01F4      		brne .L78
+ 938               	.L61:
+ 273:sim900.c      ****         case 40: case 41: case 42: case 43: 
+ 939               		.loc 1 273 0
+ 940 03f8 5698      		cbi 0xa,6
+ 941 03fa 00C0      		rjmp .L78
+ 942               	.L63:
+ 268:sim900.c      ****             if ( zakonczenie_procedury_inicjalizacyjnej() )
+ 943               		.loc 1 268 0
+ 944 03fc 5698      		cbi 0xa,6
+ 269:sim900.c      ****                 return TRUE;
+ 945               		.loc 1 269 0
+ 946 03fe 0E94 0000 		call zakonczenie_procedury_inicjalizacyjnej
+ 947               	.LVL25:
+ 948 0402 8111      		cpse r24,__zero_reg__
+ 949 0404 00C0      		rjmp .L71
+ 950               	.L67:
+ 287:sim900.c      ****         case 215: WYLACZ_PWRKEY_SIM900(); break;
+ 951               		.loc 1 287 0
+ 952 0406 569A      		sbi 0xa,6
+ 953 0408 00C0      		rjmp .L78
+ 954               	.L59:
+ 282:sim900.c      ****             podlaczona_karta_SIM_SIM900 = FALSE;
+ 955               		.loc 1 282 0
+ 956 040a 1092 0000 		sts podlaczony_modul_gsm_SIM900,__zero_reg__
+ 283:sim900.c      ****             break;
+ 957               		.loc 1 283 0
+ 958 040e 1092 0000 		sts podlaczona_karta_SIM_SIM900,__zero_reg__
+ 959 0412 00C0      		rjmp .L78
+ 960               	.L66:
+ 295:sim900.c      ****         }
+ 961               		.loc 1 295 0
+ 962 0414 81E0      		ldi r24,lo8(1)
+ 963 0416 8093 0000 		sts licznik_100ms_procedura_inicjalizacyjna_SIM900,r24
+ 964 041a 00C0      		rjmp .L78
+ 965               	.L71:
+ 270:sim900.c      ****         }
+ 966               		.loc 1 270 0
+ 967 041c 8FEF      		ldi r24,lo8(-1)
+ 968               	.L57:
+ 969               	/* epilogue start */
+ 299:sim900.c      **** }...
+ 970               		.loc 1 299 0
+ 971 041e 0895      		ret
+ 972               		.cfi_endproc
+ 973               	.LFE10:
+ 975               	.global	licznik_100ms_procedura_inicjalizacyjna_SIM900
+ 976               		.data
+ 979               	licznik_100ms_procedura_inicjalizacyjna_SIM900:
+ 980 0000 01        		.byte	1
+ 981               		.comm	polozenie_otrzymanych_komend_SIM900,10,1
+ 982               		.comm	flaga_odebrany_znak_zachety,1,1
+ 983               		.comm	czekanie_na_odebranie_zachety,1,1
+ 984               		.comm	czy_jest_nowe_polecenie_SIM900,1,1
+ 985               		.comm	poczatek_polecenia_SIM900,2,1
+ 986               		.comm	zakonczenie_polecenia_SIM900,2,1
+ 987               		.comm	liczba_znakow_pdu_do_odebrania,2,1
+ 988               		.comm	wykonywanie_rozmowy_telefonicznej,1,1
+ 989               	.global	podlaczona_karta_SIM_SIM900
+ 990               		.section .bss
+ 993               	podlaczona_karta_SIM_SIM900:
+ 994 0000 00        		.zero	1
+ 995               	.global	podlaczony_modul_gsm_SIM900
+ 998               	podlaczony_modul_gsm_SIM900:
+ 999 0001 00        		.zero	1
+ 1000               	.global	komenda_SIM900
+ 1003               	komenda_SIM900:
+ 1004 0002 00        		.zero	1
+ 1005               		.comm	liczba_wysylanych_znakow_SIM900,2,1
+ 1006               	.global	sprawdzaj_wejscie_CTS_SIM900
+ 1009               	sprawdzaj_wejscie_CTS_SIM900:
+ 1010 0003 00        		.zero	1
+ 1011               		.comm	nr_wyslanego_znaku_SIM900,2,1
+ 1012               		.comm	licznik_opoznienie_oczekiwania_na_bajt_SIM900,1,1
+ 1013               		.comm	liczba_odebranych_znakow_SIM900,2,1
+ 1014               		.comm	odebrany_blok_SIM900,401,1
+ 1015               		.text
+ 1016               	.Letext0:
+ 1017               		.file 2 "/usr/local/avr8-gnu-toolchain/avr/include/stdint.h"
+ 1018               		.file 3 "narzedzia.h"
+ 1019               		.file 4 "poleceniagsm.h"
+ 1020               		.file 5 "pamiec_ram.h"
+ 1021               		.file 6 "sim900.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 sim900.c
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:13     .text:0000000000000000 wyslij_znaki_SIM900
+                            *COM*:0000000000000002 liczba_wysylanych_znakow_SIM900
+                            *COM*:0000000000000002 nr_wyslanego_znaku_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:1009   .bss:0000000000000003 sprawdzaj_wejscie_CTS_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:66     .text:0000000000000032 wyslij_polecenie_ROM_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:143    .text:000000000000006a wyslij_polecenie_RAM_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:186    .text:0000000000000094 __vector_22
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:305    .text:000000000000011c __vector_20
+                            *COM*:0000000000000002 liczba_odebranych_znakow_SIM900
+                            *COM*:0000000000000191 odebrany_blok_SIM900
+                            *COM*:0000000000000001 czy_jest_nowe_polecenie_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:1003   .bss:0000000000000002 komenda_SIM900
+                            *COM*:0000000000000002 poczatek_polecenia_SIM900
+                            *COM*:0000000000000002 zakonczenie_polecenia_SIM900
+                            *COM*:000000000000000a polozenie_otrzymanych_komend_SIM900
+                            *COM*:0000000000000001 czekanie_na_odebranie_zachety
+                            *COM*:0000000000000001 flaga_odebrany_znak_zachety
+                            *COM*:0000000000000001 licznik_opoznienie_oczekiwania_na_bajt_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:789    .text:000000000000035e inicjalizacja_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:832    .text:0000000000000382 zakonczenie_procedury_inicjalizacyjnej
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:979    .data:0000000000000000 licznik_100ms_procedura_inicjalizacyjna_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:879    .text:00000000000003a8 procedura_inicjalizacyjna_SIM900_100MS
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:998    .bss:0000000000000001 podlaczony_modul_gsm_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:993    .bss:0000000000000000 podlaczona_karta_SIM_SIM900
+                            *COM*:0000000000000002 liczba_znakow_pdu_do_odebrania
+                            *COM*:0000000000000001 wykonywanie_rozmowy_telefonicznej
+
+UNDEFINED SYMBOLS
+wysylany_blok_SIM900
+__do_copy_data
+__do_clear_bss

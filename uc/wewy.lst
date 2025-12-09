@@ -1,0 +1,589 @@
+   1               		.file	"wewy.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__RAMPZ__ = 0x3b
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.text
+   9               	.Ltext0:
+  10               		.cfi_sections	.debug_frame
+  11               	.global	aktualny_stan_logiczny_na_wejsciu
+  13               	aktualny_stan_logiczny_na_wejsciu:
+  14               	.LFB5:
+  15               		.file 1 "wewy.c"
+   1:wewy.c        **** 
+   2:wewy.c        **** #include "wewy.h"
+   3:wewy.c        **** #include <avr/eeprom.h>
+   4:wewy.c        **** #include "zapiseeprom.h"
+   5:wewy.c        **** 
+   6:wewy.c        **** #ifndef TEST_ATMEGA128
+   7:wewy.c        **** #include "pin_ATmega328.h"
+   8:wewy.c        **** #else
+   9:wewy.c        **** #include "pin_ATmega128.h"
+  10:wewy.c        **** #endif
+  11:wewy.c        **** 
+  12:wewy.c        **** uchar licznik_wejscie[LICZBA_WEJSC];
+  13:wewy.c        **** 
+  14:wewy.c        **** ulong czas_trwania_impulsu_na_wejsciu[LICZBA_WEJSC];
+  15:wewy.c        **** ulong czas_trwania_impulsu_off_na_wejsciu[LICZBA_WEJSC];
+  16:wewy.c        **** uchar stan_logiczny_na_wejsciu[LICZBA_WEJSC];
+  17:wewy.c        **** 
+  18:wewy.c        **** ulong czas_trwania_impulsu[LICZBA_WEJSC];
+  19:wewy.c        **** ulong czas_trwania_impulsu_off[LICZBA_WEJSC];
+  20:wewy.c        **** 
+  21:wewy.c        **** uchar licznik_wstrzymanie_alarmow_po_inicjalizacji_100ms;
+  22:wewy.c        **** 
+  23:wewy.c        **** uchar poprzedni_stan_logiczny_na_wejsciu[LICZBA_WEJSC];
+  24:wewy.c        **** 
+  25:wewy.c        **** uchar aktualny_stan_logiczny_na_wejsciu(const uchar nr_wej)
+  26:wewy.c        **** {
+  16               		.loc 1 26 0
+  17               		.cfi_startproc
+  18               	.LVL0:
+  19               	/* prologue: function */
+  20               	/* frame size = 0 */
+  21               	/* stack size = 0 */
+  22               	.L__stack_usage = 0
+  23               	.LBB10:
+  24               	.LBB11:
+  25               		.file 2 "wewy.h"
+   1:wewy.h        **** 
+   2:wewy.h        **** #include <avr/io.h>
+   3:wewy.h        **** #include "narzedzia.h"
+   4:wewy.h        **** #include "konfiguracja_eeprom.h"
+   5:wewy.h        **** 
+   6:wewy.h        **** #define LICZBA_WEJSC	1
+   7:wewy.h        **** extern uchar licznik_wejscie[LICZBA_WEJSC];
+   8:wewy.h        **** 
+   9:wewy.h        **** extern uchar parametry_wejscia[LICZBA_WEJSC];
+  10:wewy.h        **** void kopiuj_parametry_we_wy_z_eeprom(void);
+  11:wewy.h        **** 
+  12:wewy.h        **** extern ulong czas_trwania_impulsu_na_wejsciu[LICZBA_WEJSC];
+  13:wewy.h        **** extern ulong czas_trwania_impulsu_off_na_wejsciu[LICZBA_WEJSC];
+  14:wewy.h        **** 
+  15:wewy.h        **** #define STAN_LOGICZNY_NA_WEJSCIU_WYZWOLENIE	0x02
+  16:wewy.h        **** #define STAN_LOGICZNY_NA_WEJSCIU_ON					0x01
+  17:wewy.h        **** #define STAN_LOGICZNY_NA_WEJSCIU_OFF				0x00
+  18:wewy.h        **** #define CZY_WYZWOLENIE_NA_WEJSCIU(NR_WEJ)	(stan_logiczny_na_wejsciu[NR_WEJ] & STAN_LOGICZNY_NA_WEJS
+  19:wewy.h        **** #define CZY_AKTUALNY_STAN_LOGICZNY_ON(NR_WEJ)	(stan_logiczny_na_wejsciu[NR_WEJ] & STAN_LOGICZNY_NA_
+  20:wewy.h        **** #define CZY_AKTUALNY_STAN_LOGICZNY_OFF(NR_WEJ)	(!CZY_AKTUALNY_STAN_LOGICZNY_ON(NR_WEJ))
+  21:wewy.h        **** 
+  22:wewy.h        **** extern uchar stan_logiczny_na_wejsciu[LICZBA_WEJSC];
+  23:wewy.h        **** 
+  24:wewy.h        **** void steruj_wejscia_10ms(void);
+  25:wewy.h        **** void aktualizuj_stan_wyzwolenia_wejsc_100ms(void);
+  26:wewy.h        **** void inicjalizuj_parametry_we_wy(void);
+  27:wewy.h        **** 
+  28:wewy.h        **** static uchar stan_wejscia(const uchar nr_wejscia) __attribute__((unused));
+  29:wewy.h        **** 
+  30:wewy.h        **** static uchar stan_wejscia(const uchar nr_wejscia)
+  31:wewy.h        **** {
+  32:wewy.h        **** 	return licznik_wejscie[nr_wejscia] & 0xf0;
+  26               		.loc 2 32 0
+  27 0000 E82F      		mov r30,r24
+  28 0002 F0E0      		ldi r31,0
+  29 0004 E050      		subi r30,lo8(-(licznik_wejscie))
+  30 0006 F040      		sbci r31,hi8(-(licznik_wejscie))
+  31 0008 9081      		ld r25,Z
+  32 000a 907F      		andi r25,lo8(-16)
+  33               	.LBE11:
+  34               	.LBE10:
+  27:wewy.c        **** 	const uchar s = stan_wejscia(nr_wej) != 0;
+  28:wewy.c        **** 	const uchar par = PARAMETRY_WEJSCIA_TRYB_NORMALNIE_OTWARTY | PARAMETRY_WEJSCIA_WYZWALANIE_MINUSEM
+  29:wewy.c        **** 		| PARAMETRY_WEJSCIA_MASKA_KONTROLOWANIE_WEJSCIA;
+  30:wewy.c        **** 	if ( !( ( TRYB_WEJSCIA(par) != PARAMETRY_WEJSCIA_TRYB_NORMALNIE_ZAMKNIETY ) ^ CZY_WYZWALANIE_PLUSE
+  31:wewy.c        **** 		return s ? STAN_LOGICZNY_NA_WEJSCIU_ON : STAN_LOGICZNY_NA_WEJSCIU_OFF;
+  32:wewy.c        **** 	else
+  33:wewy.c        **** 		return s ? STAN_LOGICZNY_NA_WEJSCIU_OFF : STAN_LOGICZNY_NA_WEJSCIU_ON;
+  35               		.loc 1 33 0
+  36 000c 81E0      		ldi r24,lo8(1)
+  37               	.LVL1:
+  38 000e 01F0      		breq .L2
+  39 0010 80E0      		ldi r24,0
+  40               	.L2:
+  41               	/* epilogue start */
+  34:wewy.c        **** }
+  42               		.loc 1 34 0
+  43 0012 0895      		ret
+  44               		.cfi_endproc
+  45               	.LFE5:
+  47               	.global	aktualizuj_stan_wyzwolenia_wejsc_100ms
+  49               	aktualizuj_stan_wyzwolenia_wejsc_100ms:
+  50               	.LFB6:
+  35:wewy.c        **** 
+  36:wewy.c        **** void aktualizuj_stan_wyzwolenia_wejsc_100ms(void)
+  37:wewy.c        **** {
+  51               		.loc 1 37 0
+  52               		.cfi_startproc
+  53               	/* prologue: function */
+  54               	/* frame size = 0 */
+  55               	/* stack size = 0 */
+  56               	.L__stack_usage = 0
+  57               	.LVL2:
+  58               	.LBB12:
+  59               	.LBB13:
+  38:wewy.c        **** 	for (uchar nr_wej = 0; nr_wej < LICZBA_WEJSC; ++nr_wej)
+  39:wewy.c        **** 	{
+  40:wewy.c        **** 		stan_logiczny_na_wejsciu[nr_wej] &= ~STAN_LOGICZNY_NA_WEJSCIU_WYZWOLENIE;	// pozostaje stary stan
+  60               		.loc 1 40 0
+  61 0014 9091 0000 		lds r25,stan_logiczny_na_wejsciu
+  62 0018 892F      		mov r24,r25
+  63 001a 8D7F      		andi r24,lo8(-3)
+  64 001c 8093 0000 		sts stan_logiczny_na_wejsciu,r24
+  65               	.LVL3:
+  66               	.LBB14:
+  67               	.LBB15:
+  68               	.LBB16:
+  69               	.LBB17:
+  70               		.loc 2 32 0
+  71 0020 8091 0000 		lds r24,licznik_wejscie
+  72 0024 807F      		andi r24,lo8(-16)
+  73               	.LVL4:
+  74               	.LBE17:
+  75               	.LBE16:
+  76               	.LBE15:
+  77               	.LBE14:
+  41:wewy.c        **** 		uchar chwilowy_stan_logiczny = aktualny_stan_logiczny_na_wejsciu(nr_wej);
+  42:wewy.c        **** 		if ( CZY_AKTUALNY_STAN_LOGICZNY_OFF(nr_wej) )
+  78               		.loc 1 42 0
+  79 0026 90FD      		sbrc r25,0
+  80 0028 00C0      		rjmp .L7
+  43:wewy.c        **** 		{
+  44:wewy.c        **** 			if ( chwilowy_stan_logiczny == STAN_LOGICZNY_NA_WEJSCIU_ON )
+  81               		.loc 1 44 0
+  82 002a 8111      		cpse r24,__zero_reg__
+  83 002c 00C0      		rjmp .L8
+  45:wewy.c        **** 			{
+  46:wewy.c        **** 				if ( czas_trwania_impulsu[nr_wej] < czas_trwania_impulsu_na_wejsciu[nr_wej] )
+  84               		.loc 1 46 0
+  85 002e 8091 0000 		lds r24,czas_trwania_impulsu
+  86 0032 9091 0000 		lds r25,czas_trwania_impulsu+1
+  87 0036 A091 0000 		lds r26,czas_trwania_impulsu+2
+  88 003a B091 0000 		lds r27,czas_trwania_impulsu+3
+  89               	.LVL5:
+  90 003e 4091 0000 		lds r20,czas_trwania_impulsu_na_wejsciu
+  91 0042 5091 0000 		lds r21,czas_trwania_impulsu_na_wejsciu+1
+  92 0046 6091 0000 		lds r22,czas_trwania_impulsu_na_wejsciu+2
+  93 004a 7091 0000 		lds r23,czas_trwania_impulsu_na_wejsciu+3
+  94 004e 8417      		cp r24,r20
+  95 0050 9507      		cpc r25,r21
+  96 0052 A607      		cpc r26,r22
+  97 0054 B707      		cpc r27,r23
+  98 0056 00F4      		brsh .L10
+  47:wewy.c        **** 				{
+  48:wewy.c        **** 					if ( ++czas_trwania_impulsu[nr_wej] == czas_trwania_impulsu_na_wejsciu[nr_wej] )
+  99               		.loc 1 48 0
+ 100 0058 0196      		adiw r24,1
+ 101 005a A11D      		adc r26,__zero_reg__
+ 102 005c B11D      		adc r27,__zero_reg__
+ 103 005e 8093 0000 		sts czas_trwania_impulsu,r24
+ 104 0062 9093 0000 		sts czas_trwania_impulsu+1,r25
+ 105 0066 A093 0000 		sts czas_trwania_impulsu+2,r26
+ 106 006a B093 0000 		sts czas_trwania_impulsu+3,r27
+ 107 006e 4817      		cp r20,r24
+ 108 0070 5907      		cpc r21,r25
+ 109 0072 6A07      		cpc r22,r26
+ 110 0074 7B07      		cpc r23,r27
+ 111 0076 01F4      		brne .L10
+  49:wewy.c        **** 						stan_logiczny_na_wejsciu[nr_wej] = STAN_LOGICZNY_NA_WEJSCIU_ON;
+ 112               		.loc 1 49 0
+ 113 0078 81E0      		ldi r24,lo8(1)
+ 114 007a 8093 0000 		sts stan_logiczny_na_wejsciu,r24
+ 115               	.L10:
+  50:wewy.c        **** 				}
+  51:wewy.c        **** 			}
+  52:wewy.c        **** 			else
+  53:wewy.c        **** 			{
+  54:wewy.c        **** 				czas_trwania_impulsu[nr_wej] = 0;	// zaczyna odliczaæ od nowa, poniewa¿ nie by³ to zbyt d³ugi i
+  55:wewy.c        **** 			}
+  56:wewy.c        **** 		}
+  57:wewy.c        **** 		else	// STAN_LOGICZNY_NA_WEJSCIU_ON
+  58:wewy.c        **** 		{
+  59:wewy.c        **** 			if ( chwilowy_stan_logiczny == STAN_LOGICZNY_NA_WEJSCIU_OFF )
+  60:wewy.c        **** 			{
+  61:wewy.c        **** 				if ( czas_trwania_impulsu_off[nr_wej] < czas_trwania_impulsu_off_na_wejsciu[nr_wej] )
+  62:wewy.c        **** 				{
+  63:wewy.c        **** 					if ( ++czas_trwania_impulsu_off[nr_wej] == czas_trwania_impulsu_off_na_wejsciu[nr_wej] )
+  64:wewy.c        **** 						stan_logiczny_na_wejsciu[nr_wej] = STAN_LOGICZNY_NA_WEJSCIU_OFF;
+  65:wewy.c        **** 				}
+  66:wewy.c        **** 			}
+  67:wewy.c        **** 			else
+  68:wewy.c        **** 			{
+  69:wewy.c        **** 				czas_trwania_impulsu_off[nr_wej] = 0;	// zaczyna odliczaæ od nowa, poniewa¿ nie by³ to zbyt d³u
+  70:wewy.c        **** 			}
+  71:wewy.c        **** 		}
+  72:wewy.c        **** 		if ( stan_logiczny_na_wejsciu[nr_wej] != poprzedni_stan_logiczny_na_wejsciu[nr_wej] )
+ 116               		.loc 1 72 0
+ 117 007e 8091 0000 		lds r24,stan_logiczny_na_wejsciu
+ 118 0082 9091 0000 		lds r25,poprzedni_stan_logiczny_na_wejsciu
+ 119 0086 8917      		cp r24,r25
+ 120 0088 01F0      		breq .L13
+  73:wewy.c        **** 		{
+  74:wewy.c        **** 			poprzedni_stan_logiczny_na_wejsciu[nr_wej] = stan_logiczny_na_wejsciu[nr_wej];	// tutaj nie ma s
+ 121               		.loc 1 74 0
+ 122 008a 8093 0000 		sts poprzedni_stan_logiczny_na_wejsciu,r24
+  75:wewy.c        **** 			stan_logiczny_na_wejsciu[nr_wej] |= STAN_LOGICZNY_NA_WEJSCIU_WYZWOLENIE;
+ 123               		.loc 1 75 0
+ 124 008e 982F      		mov r25,r24
+ 125 0090 9260      		ori r25,lo8(2)
+ 126 0092 9093 0000 		sts stan_logiczny_na_wejsciu,r25
+  76:wewy.c        **** 			if ( CZY_AKTUALNY_STAN_LOGICZNY_OFF(nr_wej) )
+ 127               		.loc 1 76 0
+ 128 0096 80FD      		sbrc r24,0
+ 129 0098 00C0      		rjmp .L14
+  77:wewy.c        **** 				czas_trwania_impulsu[nr_wej] = 0;
+ 130               		.loc 1 77 0
+ 131 009a 1092 0000 		sts czas_trwania_impulsu,__zero_reg__
+ 132 009e 1092 0000 		sts czas_trwania_impulsu+1,__zero_reg__
+ 133 00a2 1092 0000 		sts czas_trwania_impulsu+2,__zero_reg__
+ 134 00a6 1092 0000 		sts czas_trwania_impulsu+3,__zero_reg__
+ 135               	.L13:
+  78:wewy.c        **** 			else
+  79:wewy.c        **** 				czas_trwania_impulsu_off[nr_wej] = 0;
+  80:wewy.c        **** 		}
+  81:wewy.c        **** 		if ( licznik_wstrzymanie_alarmow_po_inicjalizacji_100ms )
+ 136               		.loc 1 81 0
+ 137 00aa 8091 0000 		lds r24,licznik_wstrzymanie_alarmow_po_inicjalizacji_100ms
+ 138 00ae 8823      		tst r24
+ 139 00b0 01F0      		breq .L6
+  82:wewy.c        **** 			stan_logiczny_na_wejsciu[nr_wej] &= ~STAN_LOGICZNY_NA_WEJSCIU_WYZWOLENIE;
+ 140               		.loc 1 82 0
+ 141 00b2 9091 0000 		lds r25,stan_logiczny_na_wejsciu
+ 142 00b6 9D7F      		andi r25,lo8(-3)
+ 143 00b8 9093 0000 		sts stan_logiczny_na_wejsciu,r25
+ 144               	.LVL6:
+ 145               	.LBE13:
+ 146               	.LBE12:
+  83:wewy.c        **** 	}
+  84:wewy.c        **** 	
+  85:wewy.c        **** 	if ( licznik_wstrzymanie_alarmow_po_inicjalizacji_100ms )
+  86:wewy.c        **** 		--licznik_wstrzymanie_alarmow_po_inicjalizacji_100ms;
+ 147               		.loc 1 86 0
+ 148 00bc 8150      		subi r24,lo8(-(-1))
+ 149 00be 8093 0000 		sts licznik_wstrzymanie_alarmow_po_inicjalizacji_100ms,r24
+ 150               	.LVL7:
+ 151               	.L6:
+ 152               	/* epilogue start */
+  87:wewy.c        **** }
+ 153               		.loc 1 87 0
+ 154 00c2 0895      		ret
+ 155               	.LVL8:
+ 156               	.L8:
+ 157               	.LBB19:
+ 158               	.LBB18:
+  54:wewy.c        **** 			}
+ 159               		.loc 1 54 0
+ 160 00c4 1092 0000 		sts czas_trwania_impulsu,__zero_reg__
+ 161 00c8 1092 0000 		sts czas_trwania_impulsu+1,__zero_reg__
+ 162 00cc 1092 0000 		sts czas_trwania_impulsu+2,__zero_reg__
+ 163 00d0 1092 0000 		sts czas_trwania_impulsu+3,__zero_reg__
+ 164 00d4 00C0      		rjmp .L10
+ 165               	.L7:
+  59:wewy.c        **** 			{
+ 166               		.loc 1 59 0
+ 167 00d6 8823      		tst r24
+ 168 00d8 01F0      		breq .L12
+  61:wewy.c        **** 				{
+ 169               		.loc 1 61 0
+ 170 00da 8091 0000 		lds r24,czas_trwania_impulsu_off
+ 171 00de 9091 0000 		lds r25,czas_trwania_impulsu_off+1
+ 172 00e2 A091 0000 		lds r26,czas_trwania_impulsu_off+2
+ 173 00e6 B091 0000 		lds r27,czas_trwania_impulsu_off+3
+ 174               	.LVL9:
+ 175 00ea 4091 0000 		lds r20,czas_trwania_impulsu_off_na_wejsciu
+ 176 00ee 5091 0000 		lds r21,czas_trwania_impulsu_off_na_wejsciu+1
+ 177 00f2 6091 0000 		lds r22,czas_trwania_impulsu_off_na_wejsciu+2
+ 178 00f6 7091 0000 		lds r23,czas_trwania_impulsu_off_na_wejsciu+3
+ 179 00fa 8417      		cp r24,r20
+ 180 00fc 9507      		cpc r25,r21
+ 181 00fe A607      		cpc r26,r22
+ 182 0100 B707      		cpc r27,r23
+ 183 0102 00F0      		brlo .+2
+ 184 0104 00C0      		rjmp .L10
+  63:wewy.c        **** 						stan_logiczny_na_wejsciu[nr_wej] = STAN_LOGICZNY_NA_WEJSCIU_OFF;
+ 185               		.loc 1 63 0
+ 186 0106 0196      		adiw r24,1
+ 187 0108 A11D      		adc r26,__zero_reg__
+ 188 010a B11D      		adc r27,__zero_reg__
+ 189 010c 8093 0000 		sts czas_trwania_impulsu_off,r24
+ 190 0110 9093 0000 		sts czas_trwania_impulsu_off+1,r25
+ 191 0114 A093 0000 		sts czas_trwania_impulsu_off+2,r26
+ 192 0118 B093 0000 		sts czas_trwania_impulsu_off+3,r27
+ 193 011c 4817      		cp r20,r24
+ 194 011e 5907      		cpc r21,r25
+ 195 0120 6A07      		cpc r22,r26
+ 196 0122 7B07      		cpc r23,r27
+ 197 0124 01F0      		breq .+2
+ 198 0126 00C0      		rjmp .L10
+  64:wewy.c        **** 				}
+ 199               		.loc 1 64 0
+ 200 0128 1092 0000 		sts stan_logiczny_na_wejsciu,__zero_reg__
+ 201 012c 00C0      		rjmp .L10
+ 202               	.LVL10:
+ 203               	.L12:
+  69:wewy.c        **** 			}
+ 204               		.loc 1 69 0
+ 205 012e 1092 0000 		sts czas_trwania_impulsu_off,__zero_reg__
+ 206 0132 1092 0000 		sts czas_trwania_impulsu_off+1,__zero_reg__
+ 207 0136 1092 0000 		sts czas_trwania_impulsu_off+2,__zero_reg__
+ 208 013a 1092 0000 		sts czas_trwania_impulsu_off+3,__zero_reg__
+ 209 013e 00C0      		rjmp .L10
+ 210               	.LVL11:
+ 211               	.L14:
+  79:wewy.c        **** 		}
+ 212               		.loc 1 79 0
+ 213 0140 1092 0000 		sts czas_trwania_impulsu_off,__zero_reg__
+ 214 0144 1092 0000 		sts czas_trwania_impulsu_off+1,__zero_reg__
+ 215 0148 1092 0000 		sts czas_trwania_impulsu_off+2,__zero_reg__
+ 216 014c 1092 0000 		sts czas_trwania_impulsu_off+3,__zero_reg__
+ 217 0150 00C0      		rjmp .L13
+ 218               	.LBE18:
+ 219               	.LBE19:
+ 220               		.cfi_endproc
+ 221               	.LFE6:
+ 223               	.global	steruj_wejscia_10ms
+ 225               	steruj_wejscia_10ms:
+ 226               	.LFB7:
+  88:wewy.c        **** 
+  89:wewy.c        **** void steruj_wejscia_10ms(void)
+  90:wewy.c        **** {
+ 227               		.loc 1 90 0
+ 228               		.cfi_startproc
+ 229               	/* prologue: function */
+ 230               	/* frame size = 0 */
+ 231               	/* stack size = 0 */
+ 232               	.L__stack_usage = 0
+  91:wewy.c        **** #define TEST_LICZNIKA_WEJSCIA(NR_WEJSCIA)		\
+  92:wewy.c        **** 	licznik = licznik_wejscie[NR_WEJSCIA-1];	\
+  93:wewy.c        **** 	if ( !STAN_WEJSCIE_##NR_WEJSCIA() )				\
+  94:wewy.c        **** 		licznik >>= 1;													\
+  95:wewy.c        **** 	licznik |= 0x01;													\
+  96:wewy.c        **** 	if ( STAN_WEJSCIE_##NR_WEJSCIA() )				\
+  97:wewy.c        **** 		licznik <<= 1;													\
+  98:wewy.c        **** 	licznik_wejscie[NR_WEJSCIA-1] = licznik;
+  99:wewy.c        **** 	
+ 100:wewy.c        **** 	uchar licznik;
+ 101:wewy.c        **** 	TEST_LICZNIKA_WEJSCIA(1);
+ 233               		.loc 1 101 0
+ 234 0152 8091 0000 		lds r24,licznik_wejscie
+ 235               	.LVL12:
+ 236 0156 189B      		sbis 0x3,0
+ 237               		.loc 1 101 0 is_stmt 0 discriminator 1
+ 238 0158 8695      		lsr r24
+ 239               	.LVL13:
+ 240               	.L20:
+ 241               		.loc 1 101 0 discriminator 3
+ 242 015a 8160      		ori r24,lo8(1)
+ 243               	.LVL14:
+ 244 015c 1899      		sbic 0x3,0
+ 245               		.loc 1 101 0 discriminator 4
+ 246 015e 880F      		lsl r24
+ 247               	.LVL15:
+ 248               	.L21:
+ 249               		.loc 1 101 0 discriminator 6
+ 250 0160 8093 0000 		sts licznik_wejscie,r24
+ 251               	/* epilogue start */
+ 102:wewy.c        **** }
+ 252               		.loc 1 102 0 is_stmt 1 discriminator 6
+ 253 0164 0895      		ret
+ 254               		.cfi_endproc
+ 255               	.LFE7:
+ 257               	.global	steruj_wyjscia_100ms
+ 259               	steruj_wyjscia_100ms:
+ 260               	.LFB8:
+ 103:wewy.c        **** 
+ 104:wewy.c        **** ulong licznik_przelacznik_wyjscia[LICZBA_WYJSC];
+ 105:wewy.c        **** 
+ 106:wewy.c        **** uchar stan_wyjscie[LICZBA_WYJSC];
+ 107:wewy.c        **** 
+ 108:wewy.c        **** void steruj_wyjscia_100ms(void)
+ 109:wewy.c        **** {
+ 261               		.loc 1 109 0
+ 262               		.cfi_startproc
+ 263               	/* prologue: function */
+ 264               	/* frame size = 0 */
+ 265               	/* stack size = 0 */
+ 266               	.L__stack_usage = 0
+ 267               	.LVL16:
+ 268 0166 8091 0000 		lds r24,licznik_przelacznik_wyjscia
+ 269 016a 9091 0000 		lds r25,licznik_przelacznik_wyjscia+1
+ 270 016e A091 0000 		lds r26,licznik_przelacznik_wyjscia+2
+ 271 0172 B091 0000 		lds r27,licznik_przelacznik_wyjscia+3
+ 272 0176 2091 0000 		lds r18,stan_wyjscie
+ 273               	.LBB20:
+ 110:wewy.c        **** 	for (uchar i = 0; i < LICZBA_WYJSC; ++i)
+ 111:wewy.c        **** 	{
+ 112:wewy.c        **** 		if ( licznik_przelacznik_wyjscia[i] != 0 )
+ 274               		.loc 1 112 0
+ 275 017a 0097      		sbiw r24,0
+ 276 017c A105      		cpc r26,__zero_reg__
+ 277 017e B105      		cpc r27,__zero_reg__
+ 278 0180 01F0      		breq .L29
+ 113:wewy.c        **** 		{
+ 114:wewy.c        **** 			if ( --licznik_przelacznik_wyjscia[i] == 0 )
+ 279               		.loc 1 114 0
+ 280 0182 0197      		sbiw r24,1
+ 281 0184 A109      		sbc r26,__zero_reg__
+ 282 0186 B109      		sbc r27,__zero_reg__
+ 283 0188 01F4      		brne .L27
+ 115:wewy.c        **** 				stan_wyjscie[i] = not stan_wyjscie[i];
+ 284               		.loc 1 115 0
+ 285 018a 81E0      		ldi r24,lo8(1)
+ 286 018c 2111      		cpse r18,__zero_reg__
+ 287 018e 80E0      		ldi r24,0
+ 288               	.L28:
+ 289 0190 282F      		mov r18,r24
+ 290               	.LVL17:
+ 291 0192 1092 0000 		sts licznik_przelacznik_wyjscia,__zero_reg__
+ 292 0196 1092 0000 		sts licznik_przelacznik_wyjscia+1,__zero_reg__
+ 293 019a 1092 0000 		sts licznik_przelacznik_wyjscia+2,__zero_reg__
+ 294 019e 1092 0000 		sts licznik_przelacznik_wyjscia+3,__zero_reg__
+ 295 01a2 8093 0000 		sts stan_wyjscie,r24
+ 296               	.LVL18:
+ 297               	.L29:
+ 298               	.LBE20:
+ 116:wewy.c        **** 		}
+ 117:wewy.c        **** 	}
+ 118:wewy.c        **** 	if ( stan_wyjscie[0] )
+ 299               		.loc 1 118 0
+ 300 01a6 2223      		tst r18
+ 301 01a8 01F0      		breq .L30
+ 119:wewy.c        **** 		WLACZ_OUT0();
+ 302               		.loc 1 119 0
+ 303 01aa 5D9A      		sbi 0xb,5
+ 304 01ac 0895      		ret
+ 305               	.LVL19:
+ 306               	.L27:
+ 307 01ae 8093 0000 		sts licznik_przelacznik_wyjscia,r24
+ 308 01b2 9093 0000 		sts licznik_przelacznik_wyjscia+1,r25
+ 309 01b6 A093 0000 		sts licznik_przelacznik_wyjscia+2,r26
+ 310 01ba B093 0000 		sts licznik_przelacznik_wyjscia+3,r27
+ 311 01be 00C0      		rjmp .L29
+ 312               	.LVL20:
+ 313               	.L30:
+ 120:wewy.c        **** 	else
+ 121:wewy.c        **** 		WYLACZ_OUT0();
+ 314               		.loc 1 121 0
+ 315 01c0 5D98      		cbi 0xb,5
+ 316               	/* epilogue start */
+ 122:wewy.c        **** }
+ 317               		.loc 1 122 0
+ 318 01c2 0895      		ret
+ 319               		.cfi_endproc
+ 320               	.LFE8:
+ 322               	.global	kopiuj_parametry_we_wy_z_eeprom
+ 324               	kopiuj_parametry_we_wy_z_eeprom:
+ 325               	.LFB9:
+ 123:wewy.c        **** 
+ 124:wewy.c        **** void kopiuj_parametry_we_wy_z_eeprom(void)
+ 125:wewy.c        **** {
+ 326               		.loc 1 125 0
+ 327               		.cfi_startproc
+ 328               	/* prologue: function */
+ 329               	/* frame size = 0 */
+ 330               	/* stack size = 0 */
+ 331               	.L__stack_usage = 0
+ 126:wewy.c        **** 	czas_trwania_impulsu_na_wejsciu[0] = czas_trwania_impulsu_off_na_wejsciu[0] = 20;
+ 332               		.loc 1 126 0
+ 333 01c4 84E1      		ldi r24,lo8(20)
+ 334 01c6 90E0      		ldi r25,0
+ 335 01c8 A0E0      		ldi r26,0
+ 336 01ca B0E0      		ldi r27,0
+ 337 01cc 8093 0000 		sts czas_trwania_impulsu_off_na_wejsciu,r24
+ 338 01d0 9093 0000 		sts czas_trwania_impulsu_off_na_wejsciu+1,r25
+ 339 01d4 A093 0000 		sts czas_trwania_impulsu_off_na_wejsciu+2,r26
+ 340 01d8 B093 0000 		sts czas_trwania_impulsu_off_na_wejsciu+3,r27
+ 341 01dc 8093 0000 		sts czas_trwania_impulsu_na_wejsciu,r24
+ 342 01e0 9093 0000 		sts czas_trwania_impulsu_na_wejsciu+1,r25
+ 343 01e4 A093 0000 		sts czas_trwania_impulsu_na_wejsciu+2,r26
+ 344 01e8 B093 0000 		sts czas_trwania_impulsu_na_wejsciu+3,r27
+ 345               	/* epilogue start */
+ 127:wewy.c        **** }
+ 346               		.loc 1 127 0
+ 347 01ec 0895      		ret
+ 348               		.cfi_endproc
+ 349               	.LFE9:
+ 351               	.global	inicjalizuj_parametry_we_wy
+ 353               	inicjalizuj_parametry_we_wy:
+ 354               	.LFB10:
+ 128:wewy.c        **** 
+ 129:wewy.c        **** void inicjalizuj_parametry_we_wy(void)
+ 130:wewy.c        **** {
+ 355               		.loc 1 130 0
+ 356               		.cfi_startproc
+ 357               	/* prologue: function */
+ 358               	/* frame size = 0 */
+ 359               	/* stack size = 0 */
+ 360               	.L__stack_usage = 0
+ 361               	.LVL21:
+ 362               	.LBB21:
+ 131:wewy.c        **** 	for (uchar i = 0; i < LICZBA_WEJSC; ++i)
+ 132:wewy.c        **** 		poprzedni_stan_logiczny_na_wejsciu[i] = 0;
+ 363               		.loc 1 132 0
+ 364 01ee 1092 0000 		sts poprzedni_stan_logiczny_na_wejsciu,__zero_reg__
+ 365               	.LVL22:
+ 366               	.LBE21:
+ 367               	.LBB22:
+ 133:wewy.c        **** 	for (uchar i = 0; i < LICZBA_WYJSC; ++i)
+ 134:wewy.c        **** 		licznik_przelacznik_wyjscia[i] = 0;	
+ 368               		.loc 1 134 0
+ 369 01f2 1092 0000 		sts licznik_przelacznik_wyjscia,__zero_reg__
+ 370 01f6 1092 0000 		sts licznik_przelacznik_wyjscia+1,__zero_reg__
+ 371 01fa 1092 0000 		sts licznik_przelacznik_wyjscia+2,__zero_reg__
+ 372 01fe 1092 0000 		sts licznik_przelacznik_wyjscia+3,__zero_reg__
+ 373               	.LVL23:
+ 374               	.LBE22:
+ 135:wewy.c        **** 	licznik_wstrzymanie_alarmow_po_inicjalizacji_100ms = 30;
+ 375               		.loc 1 135 0
+ 376 0202 8EE1      		ldi r24,lo8(30)
+ 377 0204 8093 0000 		sts licznik_wstrzymanie_alarmow_po_inicjalizacji_100ms,r24
+ 378               	/* epilogue start */
+ 136:wewy.c        **** }
+ 379               		.loc 1 136 0
+ 380 0208 0895      		ret
+ 381               		.cfi_endproc
+ 382               	.LFE10:
+ 384               		.comm	licznik_przelacznik_wyjscia,4,1
+ 385               		.comm	poprzedni_stan_logiczny_na_wejsciu,1,1
+ 386               		.comm	licznik_wstrzymanie_alarmow_po_inicjalizacji_100ms,1,1
+ 387               		.comm	czas_trwania_impulsu_off,4,1
+ 388               		.comm	czas_trwania_impulsu,4,1
+ 389               		.comm	stan_logiczny_na_wejsciu,1,1
+ 390               		.comm	czas_trwania_impulsu_off_na_wejsciu,4,1
+ 391               		.comm	czas_trwania_impulsu_na_wejsciu,4,1
+ 392               		.comm	licznik_wejscie,1,1
+ 393               		.comm	stan_wyjscie,1,1
+ 394               	.Letext0:
+ 395               		.file 3 "/usr/local/avr8-gnu-toolchain/avr/include/stdint.h"
+ 396               		.file 4 "narzedzia.h"
+ 397               		.file 5 "/usr/local/avr8-gnu-toolchain/lib/gcc/avr/7.3.0/include/stddef.h"
+ 398               		.file 6 "/usr/local/avr8-gnu-toolchain/avr/include/stdlib.h"
+ 399               		.file 7 "zapiseeprom.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 wewy.c
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccxMTIlo.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccxMTIlo.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccxMTIlo.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccxMTIlo.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccxMTIlo.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccxMTIlo.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccxMTIlo.s:13     .text:0000000000000000 aktualny_stan_logiczny_na_wejsciu
+                            *COM*:0000000000000001 licznik_wejscie
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccxMTIlo.s:49     .text:0000000000000014 aktualizuj_stan_wyzwolenia_wejsc_100ms
+                            *COM*:0000000000000001 stan_logiczny_na_wejsciu
+                            *COM*:0000000000000004 czas_trwania_impulsu
+                            *COM*:0000000000000004 czas_trwania_impulsu_na_wejsciu
+                            *COM*:0000000000000001 poprzedni_stan_logiczny_na_wejsciu
+                            *COM*:0000000000000001 licznik_wstrzymanie_alarmow_po_inicjalizacji_100ms
+                            *COM*:0000000000000004 czas_trwania_impulsu_off
+                            *COM*:0000000000000004 czas_trwania_impulsu_off_na_wejsciu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccxMTIlo.s:225    .text:0000000000000152 steruj_wejscia_10ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccxMTIlo.s:259    .text:0000000000000166 steruj_wyjscia_100ms
+                            *COM*:0000000000000004 licznik_przelacznik_wyjscia
+                            *COM*:0000000000000001 stan_wyjscie
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccxMTIlo.s:324    .text:00000000000001c4 kopiuj_parametry_we_wy_z_eeprom
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccxMTIlo.s:353    .text:00000000000001ee inicjalizuj_parametry_we_wy
+
+UNDEFINED SYMBOLS
+__do_clear_bss

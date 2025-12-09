@@ -1,0 +1,2073 @@
+   1               		.file	"pdu.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__RAMPZ__ = 0x3b
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.text
+   9               	.Ltext0:
+  10               		.cfi_sections	.debug_frame
+  11               	.global	pdu_to_ascii
+  13               	pdu_to_ascii:
+  14               	.LFB1:
+  15               		.file 1 "pdu.c"
+   1:pdu.c         **** 
+   2:pdu.c         **** #include "pdu.h"
+   3:pdu.c         **** #include <string.h>
+   4:pdu.c         **** #include "narzedzia.h"
+   5:pdu.c         **** #include <avr/pgmspace.h>
+   6:pdu.c         **** #include "konfiguracja.h"
+   7:pdu.c         **** 
+   8:pdu.c         **** #define ALPHABET_SIZE 128
+   9:pdu.c         **** 
+  10:pdu.c         **** static const uchar GSM_Default_Alphabet[ALPHABET_SIZE] PROGMEM = {
+  11:pdu.c         **** 
+  12:pdu.c         **** 	/* ETSI GSM 03.38, version 6.0.1, section 6.2.1; Default alphabet */
+  13:pdu.c         **** 	/* Characters in hex position 10, [12 to 1a] and 24 are not present on
+  14:pdu.c         **** 	   latin1 charset, so we cannot reproduce on the screen, however they are
+  15:pdu.c         **** 	   greek symbol not present even on my Nokia */
+  16:pdu.c         **** 
+  17:pdu.c         **** 	'@',  0xa3, '$',  0xa5, 0xe8, 0xe9, 0xf9, 0xec, 
+  18:pdu.c         **** 	0xf2, 0xc7, '\n', 0xd8, 0xf8, '\r', 0xc5, 0xe5,
+  19:pdu.c         **** 	'?',  '_',  '?',  '?',  '?',  '?',  '?',  '?',
+  20:pdu.c         **** 	'?',  '?',  '?',  '?',  0xc6, 0xe6, 0xdf, 0xc9,
+  21:pdu.c         **** 	' ',  '!',  '\"', '#',  0xa4,  '%',  '&', '\'',
+  22:pdu.c         **** 	'(',  ')',  '*',  '+',  ',',  '-',  '.',  '/',
+  23:pdu.c         **** 	'0',  '1',  '2',  '3',  '4',  '5',  '6',  '7',
+  24:pdu.c         **** 	'8',  '9',  ':',  ';',  '<',  '=',  '>',  '?',
+  25:pdu.c         **** 	0xa1, 'A',  'B',  'C',  'D',  'E',  'F',  'G',
+  26:pdu.c         **** 	'H',  'I',  'J',  'K',  'L',  'M',  'N',  'O',
+  27:pdu.c         **** 	'P',  'Q',  'R',  'S',  'T',  'U',  'V',  'W',
+  28:pdu.c         **** 	'X',  'Y',  'Z',  0xc4, 0xd6, 0xd1, 0xdc, 0xa7,
+  29:pdu.c         **** 	0xbf, 'a',  'b',  'c',  'd',  'e',  'f',  'g',
+  30:pdu.c         **** 	'h',  'i',  'j',  'k',  'l',  'm',  'n',  'o',
+  31:pdu.c         **** 	'p',  'q',  'r',  's',  't',  'u',  'v',  'w',
+  32:pdu.c         **** 	'x',  'y',  'z',  0xe4, 0xf6, 0xf1, 0xfc, 0xe0
+  33:pdu.c         **** };
+  34:pdu.c         **** 
+  35:pdu.c         **** void pdu_to_ascii(const uchar* pdu, uchar* bufor, const uchar dim_bufor)
+  36:pdu.c         **** {
+  16               		.loc 1 36 0
+  17               		.cfi_startproc
+  18               	.LVL0:
+  19 0000 CF92      		push r12
+  20               	.LCFI0:
+  21               		.cfi_def_cfa_offset 3
+  22               		.cfi_offset 12, -2
+  23 0002 DF92      		push r13
+  24               	.LCFI1:
+  25               		.cfi_def_cfa_offset 4
+  26               		.cfi_offset 13, -3
+  27 0004 EF92      		push r14
+  28               	.LCFI2:
+  29               		.cfi_def_cfa_offset 5
+  30               		.cfi_offset 14, -4
+  31 0006 FF92      		push r15
+  32               	.LCFI3:
+  33               		.cfi_def_cfa_offset 6
+  34               		.cfi_offset 15, -5
+  35 0008 0F93      		push r16
+  36               	.LCFI4:
+  37               		.cfi_def_cfa_offset 7
+  38               		.cfi_offset 16, -6
+  39 000a 1F93      		push r17
+  40               	.LCFI5:
+  41               		.cfi_def_cfa_offset 8
+  42               		.cfi_offset 17, -7
+  43 000c CF93      		push r28
+  44               	.LCFI6:
+  45               		.cfi_def_cfa_offset 9
+  46               		.cfi_offset 28, -8
+  47 000e DF93      		push r29
+  48               	.LCFI7:
+  49               		.cfi_def_cfa_offset 10
+  50               		.cfi_offset 29, -9
+  51               	/* prologue: function */
+  52               	/* frame size = 0 */
+  53               	/* stack size = 8 */
+  54               	.L__stack_usage = 8
+  37:pdu.c         **** 	const uchar l = *pdu++;
+  55               		.loc 1 37 0
+  56 0010 DC01      		movw r26,r24
+  57 0012 1196      		adiw r26,1
+  58               	.LVL1:
+  59 0014 FC01      		movw r30,r24
+  60 0016 F080      		ld r15,Z
+  61               	.LVL2:
+  38:pdu.c         **** 	uchar* ascii = bufor;
+  39:pdu.c         **** 	uchar flaga = 0x80;
+  40:pdu.c         **** 	uchar pom = 0;
+  41:pdu.c         **** 	uchar w = 0;
+  42:pdu.c         **** 	const uchar roz_1 = min(dim_bufor-1, l);
+  62               		.loc 1 42 0
+  63 0018 F416      		cp r15,r20
+  64 001a 00F0      		brlo .L2
+  65               		.loc 1 42 0 is_stmt 0 discriminator 1
+  66 001c FF24      		clr r15
+  67 001e FA94      		dec r15
+  68               	.LVL3:
+  69 0020 F40E      		add r15,r20
+  70               	.L2:
+  71               	.LVL4:
+  72 0022 EB01      		movw r28,r22
+  73               	.LBB2:
+  43:pdu.c         **** 	for (uchar i = 0; i < roz_1; )
+  74               		.loc 1 43 0 is_stmt 1 discriminator 4
+  75 0024 40E0      		ldi r20,0
+  76               	.LVL5:
+  77               	.LBE2:
+  41:pdu.c         **** 	const uchar roz_1 = min(dim_bufor-1, l);
+  78               		.loc 1 41 0 discriminator 4
+  79 0026 E12C      		mov r14,__zero_reg__
+  40:pdu.c         **** 	uchar w = 0;
+  80               		.loc 1 40 0 discriminator 4
+  81 0028 E0E0      		ldi r30,0
+  39:pdu.c         **** 	uchar pom = 0;
+  82               		.loc 1 39 0 discriminator 4
+  83 002a 50E8      		ldi r21,lo8(-128)
+  84               	.LBB6:
+  85               	.LBB3:
+  44:pdu.c         **** {
+  45:pdu.c         **** 		*ascii++ = pgm_read_byte(GSM_Default_Alphabet + (((*pdu & (~flaga)) << w) + pom));
+  46:pdu.c         **** 		const uchar k = ++i & 0x07;
+  47:pdu.c         **** 		if ( k != 0 )
+  48:pdu.c         **** 		{
+  49:pdu.c         **** 			pom = (*pdu++ & flaga) >> (7 - w);
+  86               		.loc 1 49 0 discriminator 4
+  87 002c 87E0      		ldi r24,lo8(7)
+  88 002e 90E0      		ldi r25,0
+  89               	.LVL6:
+  90               	.L3:
+  91               	.LBE3:
+  43:pdu.c         **** {
+  92               		.loc 1 43 0 discriminator 1
+  93 0030 4F11      		cpse r20,r15
+  94 0032 00C0      		rjmp .L5
+  95               	.LBE6:
+  50:pdu.c         **** 			flaga = (flaga >> 1) + 0x80;
+  51:pdu.c         **** 		}
+  52:pdu.c         **** 		else
+  53:pdu.c         **** 		{
+  54:pdu.c         **** 			flaga = 0x80;
+  55:pdu.c         **** 			pom = 0;
+  56:pdu.c         **** 		}
+  57:pdu.c         **** 		w = k;
+  58:pdu.c         **** 	}
+  59:pdu.c         **** 	*ascii = '\0';
+  96               		.loc 1 59 0
+  97 0034 640F      		add r22,r20
+  98 0036 711D      		adc r23,__zero_reg__
+  99               	.LVL7:
+ 100 0038 FB01      		movw r30,r22
+ 101               	.LVL8:
+ 102 003a 1082      		st Z,__zero_reg__
+ 103               	/* epilogue start */
+  60:pdu.c         **** }
+ 104               		.loc 1 60 0
+ 105 003c DF91      		pop r29
+ 106 003e CF91      		pop r28
+ 107               	.LVL9:
+ 108 0040 1F91      		pop r17
+ 109 0042 0F91      		pop r16
+ 110 0044 FF90      		pop r15
+ 111               	.LVL10:
+ 112 0046 EF90      		pop r14
+ 113               	.LVL11:
+ 114 0048 DF90      		pop r13
+ 115 004a CF90      		pop r12
+ 116 004c 0895      		ret
+ 117               	.LVL12:
+ 118               	.L5:
+ 119               	.LBB7:
+ 120               	.LBB5:
+ 121               	.LBB4:
+  45:pdu.c         **** 		const uchar k = ++i & 0x07;
+ 122               		.loc 1 45 0
+ 123 004e 2E2D      		mov r18,r14
+ 124 0050 30E0      		ldi r19,0
+ 125               	.LVL13:
+ 126 0052 0C91      		ld r16,X
+ 127 0054 10E0      		ldi r17,0
+ 128 0056 C52E      		mov r12,r21
+ 129 0058 D12C      		mov r13,__zero_reg__
+ 130 005a C094      		com r12
+ 131 005c D094      		com r13
+ 132 005e 0C21      		and r16,r12
+ 133 0060 1D21      		and r17,r13
+ 134 0062 00C0      		rjmp 2f
+ 135               		1:
+ 136 0064 000F      		lsl r16
+ 137 0066 111F      		rol r17
+ 138               		2:
+ 139 0068 EA94      		dec r14
+ 140 006a 02F4      		brpl 1b
+ 141 006c E00F      		add r30,r16
+ 142 006e F12F      		mov r31,r17
+ 143 0070 F11D      		adc r31,__zero_reg__
+ 144               	.LVL14:
+ 145 0072 E050      		subi r30,lo8(-(GSM_Default_Alphabet))
+ 146 0074 F040      		sbci r31,hi8(-(GSM_Default_Alphabet))
+ 147               	/* #APP */
+ 148               	 ;  45 "pdu.c" 1
+ 149 0076 E491      		lpm r30, Z
+ 150               		
+ 151               	 ;  0 "" 2
+ 152               	.LVL15:
+ 153               	/* #NOAPP */
+ 154               	.LBE4:
+ 155 0078 E993      		st Y+,r30
+ 156               	.LVL16:
+  46:pdu.c         **** 		if ( k != 0 )
+ 157               		.loc 1 46 0
+ 158 007a 4F5F      		subi r20,lo8(-(1))
+ 159               	.LVL17:
+ 160 007c F42F      		mov r31,r20
+ 161 007e F770      		andi r31,lo8(7)
+ 162 0080 EF2E      		mov r14,r31
+ 163               	.LVL18:
+  47:pdu.c         **** 		{
+ 164               		.loc 1 47 0
+ 165 0082 01F0      		breq .L6
+ 166               	.LVL19:
+  49:pdu.c         **** 			flaga = (flaga >> 1) + 0x80;
+ 167               		.loc 1 49 0
+ 168 0084 EC91      		ld r30,X
+ 169               	.LVL20:
+ 170 0086 E523      		and r30,r21
+ 171 0088 F0E0      		ldi r31,0
+ 172 008a 8C01      		movw r16,r24
+ 173 008c 021B      		sub r16,r18
+ 174 008e 130B      		sbc r17,r19
+ 175 0090 00C0      		rjmp 2f
+ 176               		1:
+ 177 0092 F595      		asr r31
+ 178 0094 E795      		ror r30
+ 179               		2:
+ 180 0096 0A95      		dec r16
+ 181 0098 02F4      		brpl 1b
+  50:pdu.c         **** 		}
+ 182               		.loc 1 50 0
+ 183 009a 5695      		lsr r21
+ 184               	.LVL21:
+ 185 009c 5058      		subi r21,lo8(-(-128))
+ 186               	.LVL22:
+  49:pdu.c         **** 			flaga = (flaga >> 1) + 0x80;
+ 187               		.loc 1 49 0
+ 188 009e 1196      		adiw r26,1
+ 189               	.LVL23:
+ 190 00a0 00C0      		rjmp .L3
+ 191               	.LVL24:
+ 192               	.L6:
+  55:pdu.c         **** 		}
+ 193               		.loc 1 55 0
+ 194 00a2 E0E0      		ldi r30,0
+ 195               	.LVL25:
+  54:pdu.c         **** 			pom = 0;
+ 196               		.loc 1 54 0
+ 197 00a4 50E8      		ldi r21,lo8(-128)
+ 198               	.LVL26:
+ 199 00a6 00C0      		rjmp .L3
+ 200               	.LBE5:
+ 201               	.LBE7:
+ 202               		.cfi_endproc
+ 203               	.LFE1:
+ 205               	.global	ascii_to_pdu_blok
+ 207               	ascii_to_pdu_blok:
+ 208               	.LFB2:
+  61:pdu.c         **** 
+  62:pdu.c         **** static const uchar GSM_Default_DeAlphabet[256] PROGMEM = {
+  63:pdu.c         **** 	0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x0a, 0x3f, 0x3f, 0x0d, 0x3f, 0x3f, 
+  64:pdu.c         **** 	0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 
+  65:pdu.c         **** 	0x20, 0x21, 0x22, 0x23, 0x02, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 
+  66:pdu.c         **** 	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f, 
+  67:pdu.c         **** 	0x00, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 
+  68:pdu.c         **** 	0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5a, 0x3f, 0x3f, 0x3f, 0x3f, 0x11, 
+  69:pdu.c         **** 	0x3f, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f, 
+  70:pdu.c         **** 	0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 
+  71:pdu.c         **** 	0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 
+  72:pdu.c         **** 	0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 
+  73:pdu.c         **** 	0x3f, 0x40, 0x3f, 0x01, 0x24, 0x03, 0x3f, 0x5f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 
+  74:pdu.c         **** 	0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x60, 
+  75:pdu.c         **** 	0x3f, 0x3f, 0x3f, 0x3f, 0x5b, 0x0e, 0x1c, 0x09, 0x3f, 0x1f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 
+  76:pdu.c         **** 	0x3f, 0x5d, 0x3f, 0x3f, 0x3f, 0x3f, 0x5c, 0x3f, 0x0b, 0x3f, 0x3f, 0x3f, 0x5e, 0x3f, 0x3f, 0x1e, 
+  77:pdu.c         **** 	0x7f, 0x3f, 0x3f, 0x3f, 0x7b, 0x0f, 0x1d, 0x3f, 0x04, 0x05, 0x3f, 0x3f, 0x07, 0x3f, 0x3f, 0x3f, 
+  78:pdu.c         **** 	0x3f, 0x7d, 0x08, 0x3f, 0x3f, 0x3f, 0x7c, 0x3f, 0x0c, 0x06, 0x3f, 0x3f, 0x7e, 0x3f, 0x3f, 0x3f
+  79:pdu.c         **** };
+  80:pdu.c         **** 
+  81:pdu.c         **** uchar* ascii_to_pdu_blok(uchar* bufor_pdu, const uchar* ascii, 
+  82:pdu.c         **** 	const uchar* ascii_end)
+  83:pdu.c         **** {
+ 209               		.loc 1 83 0
+ 210               		.cfi_startproc
+ 211               	.LVL27:
+ 212 00a8 CF92      		push r12
+ 213               	.LCFI8:
+ 214               		.cfi_def_cfa_offset 3
+ 215               		.cfi_offset 12, -2
+ 216 00aa DF92      		push r13
+ 217               	.LCFI9:
+ 218               		.cfi_def_cfa_offset 4
+ 219               		.cfi_offset 13, -3
+ 220 00ac EF92      		push r14
+ 221               	.LCFI10:
+ 222               		.cfi_def_cfa_offset 5
+ 223               		.cfi_offset 14, -4
+ 224 00ae FF92      		push r15
+ 225               	.LCFI11:
+ 226               		.cfi_def_cfa_offset 6
+ 227               		.cfi_offset 15, -5
+ 228 00b0 0F93      		push r16
+ 229               	.LCFI12:
+ 230               		.cfi_def_cfa_offset 7
+ 231               		.cfi_offset 16, -6
+ 232 00b2 1F93      		push r17
+ 233               	.LCFI13:
+ 234               		.cfi_def_cfa_offset 8
+ 235               		.cfi_offset 17, -7
+ 236 00b4 CF93      		push r28
+ 237               	.LCFI14:
+ 238               		.cfi_def_cfa_offset 9
+ 239               		.cfi_offset 28, -8
+ 240 00b6 DF93      		push r29
+ 241               	.LCFI15:
+ 242               		.cfi_def_cfa_offset 10
+ 243               		.cfi_offset 29, -9
+ 244               	/* prologue: function */
+ 245               	/* frame size = 0 */
+ 246               	/* stack size = 8 */
+ 247               	.L__stack_usage = 8
+ 248 00b8 8C01      		movw r16,r24
+  84:pdu.c         **** 	bufor_pdu[0] = (uchar)(ascii_end - ascii);
+ 249               		.loc 1 84 0
+ 250 00ba CA01      		movw r24,r20
+ 251               	.LVL28:
+ 252 00bc 861B      		sub r24,r22
+ 253 00be 970B      		sbc r25,r23
+ 254 00c0 E801      		movw r28,r16
+ 255 00c2 8993      		st Y+,r24
+  85:pdu.c         **** 	const uchar roz_1 = bufor_pdu[0] - 1;	// rozmiar = roz_1 + 1
+ 256               		.loc 1 85 0
+ 257 00c4 8150      		subi r24,lo8(-(-1))
+ 258               	.LVL29:
+  86:pdu.c         **** 	uchar j = 0;
+  87:pdu.c         **** 	uchar l = 0;
+ 259               		.loc 1 87 0
+ 260 00c6 90E0      		ldi r25,0
+  86:pdu.c         **** 	uchar j = 0;
+ 261               		.loc 1 86 0
+ 262 00c8 20E0      		ldi r18,0
+ 263               	.LBB8:
+  88:pdu.c         **** 	uchar* pdu_ptr = bufor_pdu+1;
+  89:pdu.c         **** 	uchar konwersja;
+  90:pdu.c         **** 	while ( j < roz_1 )
+  91:pdu.c         **** 	{
+  92:pdu.c         **** 		uchar l_7 = 7 - l;
+  93:pdu.c         **** 		konwersja = ((pgm_read_byte(GSM_Default_DeAlphabet + ascii[j])) & (0x7fu << l)) >> l;
+ 264               		.loc 1 93 0
+ 265 00ca 4FE7      		ldi r20,lo8(127)
+ 266 00cc 50E0      		ldi r21,0
+ 267               	.LVL30:
+  92:pdu.c         **** 		konwersja = ((pgm_read_byte(GSM_Default_DeAlphabet + ascii[j])) & (0x7fu << l)) >> l;
+ 268               		.loc 1 92 0
+ 269 00ce 37E0      		ldi r19,lo8(7)
+  94:pdu.c         **** 		konwersja |= ((pgm_read_byte(GSM_Default_DeAlphabet + ascii[j+1])) & (0xffu >> l_7)) << l_7;
+ 270               		.loc 1 94 0
+ 271 00d0 EE24      		clr r14
+ 272 00d2 EA94      		dec r14
+ 273 00d4 F12C      		mov r15,__zero_reg__
+ 274               	.LVL31:
+ 275               	.L8:
+ 276 00d6 DE01      		movw r26,r28
+ 277               	.LVL32:
+ 278               	.LBE8:
+  90:pdu.c         **** 	{
+ 279               		.loc 1 90 0
+ 280 00d8 2817      		cp r18,r24
+ 281 00da 00F0      		brlo .L10
+  95:pdu.c         **** 		//*pdu_ptr++ = pgm_read_byte(GSM_Default_DeAlphabet + konwersja);
+  96:pdu.c         **** 		*pdu_ptr++ = konwersja;
+  97:pdu.c         **** 		if ( ++l == 7 )
+  98:pdu.c         **** 		{
+  99:pdu.c         **** 			l = 0;
+ 100:pdu.c         **** 			++j;
+ 101:pdu.c         **** 		}
+ 102:pdu.c         **** 		++j;
+ 103:pdu.c         **** 	}
+ 104:pdu.c         **** 	if ( bufor_pdu[0] % 8 != 0 )
+ 282               		.loc 1 104 0
+ 283 00dc F801      		movw r30,r16
+ 284 00de 8081      		ld r24,Z
+ 285               	.LVL33:
+ 286 00e0 8770      		andi r24,lo8(7)
+ 287 00e2 01F0      		breq .L7
+ 288               	.LVL34:
+ 289               	.LBB11:
+ 105:pdu.c         **** 	{
+ 106:pdu.c         **** 		konwersja = (((pgm_read_byte(GSM_Default_DeAlphabet + ascii[j])) & (0x7fu << l)) >> l );
+ 290               		.loc 1 106 0
+ 291 00e4 FB01      		movw r30,r22
+ 292 00e6 E20F      		add r30,r18
+ 293 00e8 F11D      		adc r31,__zero_reg__
+ 294 00ea E081      		ld r30,Z
+ 295 00ec F0E0      		ldi r31,0
+ 296 00ee E050      		subi r30,lo8(-(GSM_Default_DeAlphabet))
+ 297 00f0 F040      		sbci r31,hi8(-(GSM_Default_DeAlphabet))
+ 298               	/* #APP */
+ 299               	 ;  106 "pdu.c" 1
+ 300 00f2 2491      		lpm r18, Z
+ 301               		
+ 302               	 ;  0 "" 2
+ 303               	.LVL35:
+ 304               	/* #NOAPP */
+ 305               	.LBE11:
+ 306 00f4 4FE7      		ldi r20,lo8(127)
+ 307 00f6 50E0      		ldi r21,0
+ 308 00f8 092E      		mov r0,r25
+ 309 00fa 00C0      		rjmp 2f
+ 310               		1:
+ 311 00fc 440F      		lsl r20
+ 312 00fe 551F      		rol r21
+ 313               		2:
+ 314 0100 0A94      		dec r0
+ 315 0102 02F4      		brpl 1b
+ 316 0104 E22F      		mov r30,r18
+ 317 0106 F0E0      		ldi r31,0
+ 318 0108 E423      		and r30,r20
+ 319 010a F523      		and r31,r21
+ 320 010c 00C0      		rjmp 2f
+ 321               		1:
+ 322 010e F695      		lsr r31
+ 323 0110 E795      		ror r30
+ 324               		2:
+ 325 0112 9A95      		dec r25
+ 326 0114 02F4      		brpl 1b
+ 327 0116 E883      		st Y,r30
+ 107:pdu.c         **** 		//*pdu_ptr++ = pgm_read_byte(GSM_Default_DeAlphabet + konwersja);
+ 108:pdu.c         **** 		*pdu_ptr++ = konwersja;
+ 328               		.loc 1 108 0
+ 329 0118 1196      		adiw r26,1
+ 330               	.LVL36:
+ 331               	.L7:
+ 109:pdu.c         **** 	}
+ 110:pdu.c         **** 	return pdu_ptr;
+ 111:pdu.c         **** }
+ 332               		.loc 1 111 0
+ 333 011a CD01      		movw r24,r26
+ 334               	/* epilogue start */
+ 335 011c DF91      		pop r29
+ 336 011e CF91      		pop r28
+ 337 0120 1F91      		pop r17
+ 338 0122 0F91      		pop r16
+ 339               	.LVL37:
+ 340 0124 FF90      		pop r15
+ 341 0126 EF90      		pop r14
+ 342 0128 DF90      		pop r13
+ 343 012a CF90      		pop r12
+ 344 012c 0895      		ret
+ 345               	.LVL38:
+ 346               	.L10:
+ 347               	.LBB12:
+ 348               	.LBB9:
+  93:pdu.c         **** 		konwersja |= ((pgm_read_byte(GSM_Default_DeAlphabet + ascii[j+1])) & (0xffu >> l_7)) << l_7;
+ 349               		.loc 1 93 0
+ 350 012e 6B01      		movw r12,r22
+ 351 0130 C20E      		add r12,r18
+ 352 0132 D11C      		adc r13,__zero_reg__
+ 353               	.LVL39:
+ 354 0134 D601      		movw r26,r12
+ 355               	.LVL40:
+ 356 0136 EC91      		ld r30,X
+ 357 0138 F0E0      		ldi r31,0
+ 358 013a E050      		subi r30,lo8(-(GSM_Default_DeAlphabet))
+ 359 013c F040      		sbci r31,hi8(-(GSM_Default_DeAlphabet))
+ 360               	/* #APP */
+ 361               	 ;  93 "pdu.c" 1
+ 362 013e E491      		lpm r30, Z
+ 363               		
+ 364               	 ;  0 "" 2
+ 365               	.LVL41:
+ 366               	/* #NOAPP */
+ 367               	.LBE9:
+ 368 0140 DA01      		movw r26,r20
+ 369 0142 092E      		mov r0,r25
+ 370 0144 00C0      		rjmp 2f
+ 371               		1:
+ 372 0146 AA0F      		lsl r26
+ 373 0148 BB1F      		rol r27
+ 374               		2:
+ 375 014a 0A94      		dec r0
+ 376 014c 02F4      		brpl 1b
+ 377 014e F0E0      		ldi r31,0
+ 378 0150 AE23      		and r26,r30
+ 379 0152 BF23      		and r27,r31
+ 380 0154 092E      		mov r0,r25
+ 381 0156 00C0      		rjmp 2f
+ 382               		1:
+ 383 0158 B695      		lsr r27
+ 384 015a A795      		ror r26
+ 385               		2:
+ 386 015c 0A94      		dec r0
+ 387 015e 02F4      		brpl 1b
+ 388               	.LVL42:
+ 389               	.LBB10:
+  94:pdu.c         **** 		//*pdu_ptr++ = pgm_read_byte(GSM_Default_DeAlphabet + konwersja);
+ 390               		.loc 1 94 0
+ 391 0160 F601      		movw r30,r12
+ 392               	.LVL43:
+ 393 0162 B181      		ldd r27,Z+1
+ 394 0164 EB2F      		mov r30,r27
+ 395 0166 F0E0      		ldi r31,0
+ 396 0168 E050      		subi r30,lo8(-(GSM_Default_DeAlphabet))
+ 397 016a F040      		sbci r31,hi8(-(GSM_Default_DeAlphabet))
+ 398               	/* #APP */
+ 399               	 ;  94 "pdu.c" 1
+ 400 016c E491      		lpm r30, Z
+ 401               		
+ 402               	 ;  0 "" 2
+ 403               	.LVL44:
+ 404               	/* #NOAPP */
+ 405               	.LBE10:
+  92:pdu.c         **** 		konwersja = ((pgm_read_byte(GSM_Default_DeAlphabet + ascii[j])) & (0x7fu << l)) >> l;
+ 406               		.loc 1 92 0
+ 407 016e B32F      		mov r27,r19
+ 408 0170 B91B      		sub r27,r25
+ 409               	.LVL45:
+  94:pdu.c         **** 		//*pdu_ptr++ = pgm_read_byte(GSM_Default_DeAlphabet + konwersja);
+ 410               		.loc 1 94 0
+ 411 0172 6701      		movw r12,r14
+ 412               	.LVL46:
+ 413 0174 0B2E      		mov r0,r27
+ 414 0176 00C0      		rjmp 2f
+ 415               		1:
+ 416 0178 D694      		lsr r13
+ 417 017a C794      		ror r12
+ 418               		2:
+ 419 017c 0A94      		dec r0
+ 420 017e 02F4      		brpl 1b
+ 421 0180 EC21      		and r30,r12
+ 422               	.LVL47:
+ 423 0182 00C0      		rjmp 2f
+ 424               		1:
+ 425 0184 EE0F      		lsl r30
+ 426               		2:
+ 427 0186 BA95      		dec r27
+ 428 0188 02F4      		brpl 1b
+ 429 018a EA2B      		or r30,r26
+  96:pdu.c         **** 		if ( ++l == 7 )
+ 430               		.loc 1 96 0
+ 431 018c E993      		st Y+,r30
+ 432               	.LVL48:
+  97:pdu.c         **** 		{
+ 433               		.loc 1 97 0
+ 434 018e 9F5F      		subi r25,lo8(-(1))
+ 435               	.LVL49:
+ 436 0190 9730      		cpi r25,lo8(7)
+ 437 0192 01F4      		brne .L9
+ 438 0194 2F5F      		subi r18,lo8(-(1))
+ 439               	.LVL50:
+  99:pdu.c         **** 			++j;
+ 440               		.loc 1 99 0
+ 441 0196 90E0      		ldi r25,0
+ 442               	.LVL51:
+ 443               	.L9:
+ 102:pdu.c         **** 	}
+ 444               		.loc 1 102 0
+ 445 0198 2F5F      		subi r18,lo8(-(1))
+ 446               	.LVL52:
+ 447 019a 00C0      		rjmp .L8
+ 448               	.LBE12:
+ 449               		.cfi_endproc
+ 450               	.LFE2:
+ 452               	.global	konwertuj_blok_dwa_znaki_na_znak_pdu
+ 454               	konwertuj_blok_dwa_znaki_na_znak_pdu:
+ 455               	.LFB3:
+ 112:pdu.c         **** 
+ 113:pdu.c         **** void konwertuj_blok_dwa_znaki_na_znak_pdu(const uchar* blok_danych, 
+ 114:pdu.c         **** 	const uchar liczba_znakow, uchar* ptr)
+ 115:pdu.c         **** {
+ 456               		.loc 1 115 0
+ 457               		.cfi_startproc
+ 458               	.LVL53:
+ 459               	/* prologue: function */
+ 460               	/* frame size = 0 */
+ 461               	/* stack size = 0 */
+ 462               	.L__stack_usage = 0
+ 463 019c FC01      		movw r30,r24
+ 464               	.LBB13:
+ 116:pdu.c         **** 	for (uint i = 0; i < liczba_znakow; ++i)
+ 465               		.loc 1 116 0
+ 466 019e DA01      		movw r26,r20
+ 467 01a0 70E0      		ldi r23,0
+ 468               	.LVL54:
+ 469               	.L16:
+ 470               		.loc 1 116 0 is_stmt 0 discriminator 2
+ 471 01a2 CD01      		movw r24,r26
+ 472 01a4 841B      		sub r24,r20
+ 473 01a6 950B      		sbc r25,r21
+ 474 01a8 8617      		cp r24,r22
+ 475 01aa 9707      		cpc r25,r23
+ 476 01ac 00F0      		brlo .L21
+ 477               	/* epilogue start */
+ 478               	.LBE13:
+ 117:pdu.c         **** 	{
+ 118:pdu.c         **** 		uchar ch = *blok_danych++;
+ 119:pdu.c         **** 		uchar wynik = ( ch < ('9' + 1)) ? (ch - '0') : (ch - ('A' - 10));
+ 120:pdu.c         **** 		wynik <<= 4;
+ 121:pdu.c         **** 		ch = *blok_danych++;
+ 122:pdu.c         **** 		wynik += ( ch < ('9' + 1)) ? (ch - '0') : (ch - ('A' - 10));
+ 123:pdu.c         **** 		*ptr++ = wynik;
+ 124:pdu.c         **** 	}
+ 125:pdu.c         **** }
+ 479               		.loc 1 125 0 is_stmt 1
+ 480 01ae 0895      		ret
+ 481               	.L21:
+ 482               	.LVL55:
+ 483               	.LBB15:
+ 484               	.LBB14:
+ 118:pdu.c         **** 		uchar wynik = ( ch < ('9' + 1)) ? (ch - '0') : (ch - ('A' - 10));
+ 485               		.loc 1 118 0
+ 486 01b0 9081      		ld r25,Z
+ 487               	.LVL56:
+ 119:pdu.c         **** 		wynik <<= 4;
+ 488               		.loc 1 119 0
+ 489 01b2 9A33      		cpi r25,lo8(58)
+ 490 01b4 00F4      		brsh .L17
+ 119:pdu.c         **** 		wynik <<= 4;
+ 491               		.loc 1 119 0 is_stmt 0 discriminator 1
+ 492 01b6 9053      		subi r25,lo8(-(-48))
+ 493               	.LVL57:
+ 494               	.L18:
+ 120:pdu.c         **** 		ch = *blok_danych++;
+ 495               		.loc 1 120 0 is_stmt 1 discriminator 4
+ 496 01b8 292F      		mov r18,r25
+ 497 01ba 2295      		swap r18
+ 498 01bc 207F      		andi r18,lo8(-16)
+ 499               	.LVL58:
+ 121:pdu.c         **** 		wynik += ( ch < ('9' + 1)) ? (ch - '0') : (ch - ('A' - 10));
+ 500               		.loc 1 121 0 discriminator 4
+ 501 01be 9181      		ldd r25,Z+1
+ 502               	.LVL59:
+ 122:pdu.c         **** 		*ptr++ = wynik;
+ 503               		.loc 1 122 0 discriminator 4
+ 504 01c0 9A33      		cpi r25,lo8(58)
+ 505 01c2 00F4      		brsh .L19
+ 122:pdu.c         **** 		*ptr++ = wynik;
+ 506               		.loc 1 122 0 is_stmt 0 discriminator 1
+ 507 01c4 9053      		subi r25,lo8(-(-48))
+ 508               	.LVL60:
+ 509               	.L20:
+ 122:pdu.c         **** 		*ptr++ = wynik;
+ 510               		.loc 1 122 0 discriminator 4
+ 511 01c6 920F      		add r25,r18
+ 512               	.LVL61:
+ 123:pdu.c         **** 	}
+ 513               		.loc 1 123 0 is_stmt 1 discriminator 4
+ 514 01c8 9D93      		st X+,r25
+ 515               	.LVL62:
+ 516 01ca 3296      		adiw r30,2
+ 517               	.LVL63:
+ 518 01cc 00C0      		rjmp .L16
+ 519               	.LVL64:
+ 520               	.L17:
+ 119:pdu.c         **** 		wynik <<= 4;
+ 521               		.loc 1 119 0 discriminator 2
+ 522 01ce 9753      		subi r25,lo8(-(-55))
+ 523               	.LVL65:
+ 524 01d0 00C0      		rjmp .L18
+ 525               	.LVL66:
+ 526               	.L19:
+ 122:pdu.c         **** 		*ptr++ = wynik;
+ 527               		.loc 1 122 0 discriminator 2
+ 528 01d2 9753      		subi r25,lo8(-(-55))
+ 529               	.LVL67:
+ 530 01d4 00C0      		rjmp .L20
+ 531               	.LBE14:
+ 532               	.LBE15:
+ 533               		.cfi_endproc
+ 534               	.LFE3:
+ 536               	.global	pobierz_numer_telefonu_nadawcy_z_PDU
+ 538               	pobierz_numer_telefonu_nadawcy_z_PDU:
+ 539               	.LFB4:
+ 126:pdu.c         **** 
+ 127:pdu.c         **** uchar* pobierz_numer_telefonu_nadawcy_z_PDU(const uchar* pdu_ptr, uchar* bufor_numer_telefonu, ucha
+ 128:pdu.c         **** {
+ 540               		.loc 1 128 0
+ 541               		.cfi_startproc
+ 542               	.LVL68:
+ 543 01d6 1F93      		push r17
+ 544               	.LCFI16:
+ 545               		.cfi_def_cfa_offset 3
+ 546               		.cfi_offset 17, -2
+ 547 01d8 CF93      		push r28
+ 548               	.LCFI17:
+ 549               		.cfi_def_cfa_offset 4
+ 550               		.cfi_offset 28, -3
+ 551 01da DF93      		push r29
+ 552               	.LCFI18:
+ 553               		.cfi_def_cfa_offset 5
+ 554               		.cfi_offset 29, -4
+ 555               	/* prologue: function */
+ 556               	/* frame size = 0 */
+ 557               	/* stack size = 3 */
+ 558               	.L__stack_usage = 3
+ 559 01dc DC01      		movw r26,r24
+ 560 01de EA01      		movw r28,r20
+ 129:pdu.c         **** 	//pdu_ptr += pdu_ptr[0] + 2;
+ 130:pdu.c         **** 	if ( (pdu_ptr[0] + 1) >= 200 )	// (1)
+ 561               		.loc 1 130 0
+ 562 01e0 8C91      		ld r24,X
+ 563               	.LVL69:
+ 564 01e2 873C      		cpi r24,lo8(-57)
+ 565 01e4 00F0      		brlo .L23
+ 566               	.LVL70:
+ 567               	.L26:
+ 131:pdu.c         **** 	{
+ 132:pdu.c         **** 		*bufor_numer_telefonu = 0;
+ 568               		.loc 1 132 0
+ 569 01e6 DB01      		movw r26,r22
+ 570 01e8 1C92      		st X,__zero_reg__
+ 133:pdu.c         **** 		*nietypowy_sms = TRUE;
+ 571               		.loc 1 133 0
+ 572 01ea 8FEF      		ldi r24,lo8(-1)
+ 573 01ec 8883      		st Y,r24
+ 134:pdu.c         **** 		return 0;
+ 574               		.loc 1 134 0
+ 575 01ee 90E0      		ldi r25,0
+ 576 01f0 80E0      		ldi r24,0
+ 577               	.LVL71:
+ 578               	.L22:
+ 579               	/* epilogue start */
+ 135:pdu.c         **** 	}
+ 136:pdu.c         **** 	*nietypowy_sms = FALSE;
+ 137:pdu.c         **** 	pdu_ptr += pdu_ptr[0] + 1;
+ 138:pdu.c         **** 	if ( ! (*pdu_ptr == 0x04 || *pdu_ptr == 0x00) )	//First octet of the SMS-DELIVER PDU
+ 139:pdu.c         **** 		*nietypowy_sms = TRUE;
+ 140:pdu.c         **** 	++pdu_ptr;
+ 141:pdu.c         **** 	const uchar liczba_cyfr_w_telefonie = *pdu_ptr++;
+ 142:pdu.c         **** 	if ( liczba_cyfr_w_telefonie > MAX_LICZBA_ZNAKOW_TELEFON )	// (1)
+ 143:pdu.c         **** 	{
+ 144:pdu.c         **** 		*bufor_numer_telefonu = 0;
+ 145:pdu.c         **** 		*nietypowy_sms = TRUE;
+ 146:pdu.c         **** 		return 0;
+ 147:pdu.c         **** 	}
+ 148:pdu.c         **** 	const uchar typ_telefonu = *pdu_ptr++;
+ 149:pdu.c         **** 	const uchar dobry_telefon = (typ_telefonu == 129 || typ_telefonu == 145);
+ 150:pdu.c         **** 	if ( typ_telefonu == 145 )
+ 151:pdu.c         **** 		*bufor_numer_telefonu++ = '+';
+ 152:pdu.c         **** 	for (uchar i = 0; i < liczba_cyfr_w_telefonie; ++i)
+ 153:pdu.c         **** 	{
+ 154:pdu.c         **** 		uchar znak = *pdu_ptr;
+ 155:pdu.c         **** 		if ( (i & 0x01) != 0)
+ 156:pdu.c         **** 		{
+ 157:pdu.c         **** 			SWAP(znak);
+ 158:pdu.c         **** 			++pdu_ptr;
+ 159:pdu.c         **** 		}
+ 160:pdu.c         **** 		*bufor_numer_telefonu++ = (dobry_telefon ? ((znak & 0x0f) + '0') : '0');
+ 161:pdu.c         **** 	}
+ 162:pdu.c         **** 	*bufor_numer_telefonu = '\0';
+ 163:pdu.c         **** 	if ( !(liczba_cyfr_w_telefonie & 0x01) )
+ 164:pdu.c         **** 		--pdu_ptr;
+ 165:pdu.c         **** 	if ( pdu_ptr[2] != 0 )	// TP-DCS Data coding scheme
+ 166:pdu.c         **** 		*nietypowy_sms = TRUE;
+ 167:pdu.c         **** 	pdu_ptr += 3;
+ 168:pdu.c         **** 	return (uchar*) pdu_ptr;
+ 169:pdu.c         **** }
+ 580               		.loc 1 169 0
+ 581 01f2 DF91      		pop r29
+ 582 01f4 CF91      		pop r28
+ 583               	.LVL72:
+ 584 01f6 1F91      		pop r17
+ 585 01f8 0895      		ret
+ 586               	.LVL73:
+ 587               	.L23:
+ 136:pdu.c         **** 	pdu_ptr += pdu_ptr[0] + 1;
+ 588               		.loc 1 136 0
+ 589 01fa 1882      		st Y,__zero_reg__
+ 137:pdu.c         **** 	if ( ! (*pdu_ptr == 0x04 || *pdu_ptr == 0x00) )	//First octet of the SMS-DELIVER PDU
+ 590               		.loc 1 137 0
+ 591 01fc 8C91      		ld r24,X
+ 592 01fe 90E0      		ldi r25,0
+ 593 0200 0196      		adiw r24,1
+ 594 0202 A80F      		add r26,r24
+ 595 0204 B91F      		adc r27,r25
+ 596               	.LVL74:
+ 138:pdu.c         **** 		*nietypowy_sms = TRUE;
+ 597               		.loc 1 138 0
+ 598 0206 8C91      		ld r24,X
+ 599 0208 8B7F      		andi r24,lo8(-5)
+ 600 020a 01F0      		breq .L25
+ 139:pdu.c         **** 	++pdu_ptr;
+ 601               		.loc 1 139 0
+ 602 020c 8FEF      		ldi r24,lo8(-1)
+ 603 020e 8883      		st Y,r24
+ 604               	.L25:
+ 605               	.LVL75:
+ 141:pdu.c         **** 	if ( liczba_cyfr_w_telefonie > MAX_LICZBA_ZNAKOW_TELEFON )	// (1)
+ 606               		.loc 1 141 0
+ 607 0210 1196      		adiw r26,1
+ 608 0212 2C91      		ld r18,X
+ 609 0214 1197      		sbiw r26,1
+ 610               	.LVL76:
+ 142:pdu.c         **** 	{
+ 611               		.loc 1 142 0
+ 612 0216 2131      		cpi r18,lo8(17)
+ 613 0218 00F4      		brsh .L26
+ 148:pdu.c         **** 	const uchar dobry_telefon = (typ_telefonu == 129 || typ_telefonu == 145);
+ 614               		.loc 1 148 0
+ 615 021a FD01      		movw r30,r26
+ 616 021c 3396      		adiw r30,3
+ 617               	.LVL77:
+ 618 021e 1296      		adiw r26,2
+ 619 0220 8C91      		ld r24,X
+ 620               	.LVL78:
+ 149:pdu.c         **** 	if ( typ_telefonu == 145 )
+ 621               		.loc 1 149 0
+ 622 0222 982F      		mov r25,r24
+ 623 0224 9F7E      		andi r25,lo8(-17)
+ 624 0226 31E0      		ldi r19,lo8(1)
+ 625 0228 9138      		cpi r25,lo8(-127)
+ 626 022a 01F0      		breq .L27
+ 627 022c 30E0      		ldi r19,0
+ 628               	.L27:
+ 629               	.LVL79:
+ 150:pdu.c         **** 		*bufor_numer_telefonu++ = '+';
+ 630               		.loc 1 150 0
+ 631 022e 8139      		cpi r24,lo8(-111)
+ 632 0230 01F4      		brne .L28
+ 633               	.LVL80:
+ 151:pdu.c         **** 	for (uchar i = 0; i < liczba_cyfr_w_telefonie; ++i)
+ 634               		.loc 1 151 0
+ 635 0232 8BE2      		ldi r24,lo8(43)
+ 636               	.LVL81:
+ 637 0234 DB01      		movw r26,r22
+ 638               	.LVL82:
+ 639 0236 8C93      		st X,r24
+ 640               	.LVL83:
+ 641 0238 6F5F      		subi r22,-1
+ 642 023a 7F4F      		sbci r23,-1
+ 643               	.LVL84:
+ 644               	.L28:
+ 645 023c AB01      		movw r20,r22
+ 646               	.LVL85:
+ 151:pdu.c         **** 	for (uchar i = 0; i < liczba_cyfr_w_telefonie; ++i)
+ 647               		.loc 1 151 0 is_stmt 0 discriminator 2
+ 648 023e 10E0      		ldi r17,0
+ 649 0240 00C0      		rjmp .L31
+ 650               	.LVL86:
+ 651               	.L32:
+ 652               	.LBB16:
+ 653               	.LBB17:
+ 154:pdu.c         **** 		if ( (i & 0x01) != 0)
+ 654               		.loc 1 154 0 is_stmt 1
+ 655 0242 8081      		ld r24,Z
+ 656               	.LVL87:
+ 155:pdu.c         **** 		{
+ 657               		.loc 1 155 0
+ 658 0244 9923      		tst r25
+ 659 0246 01F0      		breq .L29
+ 157:pdu.c         **** 			++pdu_ptr;
+ 660               		.loc 1 157 0
+ 661               	/* #APP */
+ 662               	 ;  157 "pdu.c" 1
+ 663 0248 8295      		swap r24
+ 664               		
+ 665               	 ;  0 "" 2
+ 666               	.LVL88:
+ 158:pdu.c         **** 		}
+ 667               		.loc 1 158 0
+ 668               	/* #NOAPP */
+ 669 024a 3196      		adiw r30,1
+ 670               	.LVL89:
+ 671               	.L29:
+ 160:pdu.c         **** 	}
+ 672               		.loc 1 160 0
+ 673 024c 8F70      		andi r24,lo8(15)
+ 674               	.LVL90:
+ 675 024e 805D      		subi r24,lo8(-(48))
+ 676 0250 3111      		cpse r19,__zero_reg__
+ 677 0252 00C0      		rjmp .L30
+ 678 0254 80E3      		ldi r24,lo8(48)
+ 679               	.L30:
+ 680               	.LVL91:
+ 160:pdu.c         **** 	}
+ 681               		.loc 1 160 0 is_stmt 0 discriminator 4
+ 682 0256 DA01      		movw r26,r20
+ 683 0258 8D93      		st X+,r24
+ 684               	.LVL92:
+ 685 025a AD01      		movw r20,r26
+ 686               	.LBE17:
+ 152:pdu.c         **** 	{
+ 687               		.loc 1 152 0 is_stmt 1 discriminator 4
+ 688 025c 1F5F      		subi r17,lo8(-(1))
+ 689               	.LVL93:
+ 690               	.L31:
+ 691 025e 912F      		mov r25,r17
+ 692 0260 9170      		andi r25,lo8(1)
+ 152:pdu.c         **** 	{
+ 693               		.loc 1 152 0 is_stmt 0 discriminator 2
+ 694 0262 1213      		cpse r17,r18
+ 695 0264 00C0      		rjmp .L32
+ 696               	.LBE16:
+ 162:pdu.c         **** 	if ( !(liczba_cyfr_w_telefonie & 0x01) )
+ 697               		.loc 1 162 0 is_stmt 1
+ 698 0266 DB01      		movw r26,r22
+ 699 0268 A10F      		add r26,r17
+ 700 026a B11D      		adc r27,__zero_reg__
+ 701 026c 1C92      		st X,__zero_reg__
+ 163:pdu.c         **** 		--pdu_ptr;
+ 702               		.loc 1 163 0
+ 703 026e 9111      		cpse r25,__zero_reg__
+ 704 0270 00C0      		rjmp .L33
+ 164:pdu.c         **** 	if ( pdu_ptr[2] != 0 )	// TP-DCS Data coding scheme
+ 705               		.loc 1 164 0
+ 706 0272 3197      		sbiw r30,1
+ 707               	.LVL94:
+ 708               	.L33:
+ 165:pdu.c         **** 		*nietypowy_sms = TRUE;
+ 709               		.loc 1 165 0
+ 710 0274 8281      		ldd r24,Z+2
+ 711 0276 8823      		tst r24
+ 712 0278 01F0      		breq .L34
+ 166:pdu.c         **** 	pdu_ptr += 3;
+ 713               		.loc 1 166 0
+ 714 027a 8FEF      		ldi r24,lo8(-1)
+ 715 027c 8883      		st Y,r24
+ 716               	.L34:
+ 167:pdu.c         **** 	return (uchar*) pdu_ptr;
+ 717               		.loc 1 167 0
+ 718 027e CF01      		movw r24,r30
+ 719 0280 0396      		adiw r24,3
+ 720               	.LVL95:
+ 168:pdu.c         **** }
+ 721               		.loc 1 168 0
+ 722 0282 00C0      		rjmp .L22
+ 723               		.cfi_endproc
+ 724               	.LFE4:
+ 726               	.global	pobierz_date_z_PDU
+ 728               	pobierz_date_z_PDU:
+ 729               	.LFB5:
+ 170:pdu.c         **** 
+ 171:pdu.c         **** const uchar* pobierz_date_z_PDU(const uchar* ptr, uchar* rok, uchar* miesiac, uchar* dzien)
+ 172:pdu.c         **** {
+ 730               		.loc 1 172 0
+ 731               		.cfi_startproc
+ 732               	.LVL96:
+ 733               	/* prologue: function */
+ 734               	/* frame size = 0 */
+ 735               	/* stack size = 0 */
+ 736               	.L__stack_usage = 0
+ 737 0284 FC01      		movw r30,r24
+ 738               	.LVL97:
+ 173:pdu.c         **** 	*rok = *ptr++;
+ 739               		.loc 1 173 0
+ 740 0286 9081      		ld r25,Z
+ 174:pdu.c         **** 	*rok = 10 * (*rok & 0x0f) + ((*rok & 0xf0) >> 4);
+ 741               		.loc 1 174 0
+ 742 0288 A92F      		mov r26,r25
+ 743 028a AF70      		andi r26,lo8(15)
+ 744 028c 8AE0      		ldi r24,lo8(10)
+ 745               	.LVL98:
+ 746 028e 9295      		swap r25
+ 747 0290 9F70      		andi r25,lo8(15)
+ 748 0292 A89F      		mul r26,r24
+ 749 0294 900D      		add r25,r0
+ 750 0296 1124      		clr __zero_reg__
+ 751 0298 DB01      		movw r26,r22
+ 752 029a 9C93      		st X,r25
+ 753               	.LVL99:
+ 175:pdu.c         **** 	*miesiac = *ptr++;
+ 754               		.loc 1 175 0
+ 755 029c 9181      		ldd r25,Z+1
+ 176:pdu.c         **** 	*miesiac = 10 * (*miesiac & 0x0f) + ((*miesiac & 0xf0) >> 4);
+ 756               		.loc 1 176 0
+ 757 029e 692F      		mov r22,r25
+ 758               	.LVL100:
+ 759 02a0 6F70      		andi r22,lo8(15)
+ 760 02a2 9295      		swap r25
+ 761 02a4 9F70      		andi r25,lo8(15)
+ 762 02a6 689F      		mul r22,r24
+ 763 02a8 900D      		add r25,r0
+ 764 02aa 1124      		clr __zero_reg__
+ 765 02ac DA01      		movw r26,r20
+ 766               	.LVL101:
+ 767 02ae 9C93      		st X,r25
+ 768               	.LVL102:
+ 177:pdu.c         **** 	*dzien = *ptr++;
+ 769               		.loc 1 177 0
+ 770 02b0 9281      		ldd r25,Z+2
+ 178:pdu.c         **** 	*dzien = 10 * (*dzien & 0x0f) + ((*dzien & 0xf0) >> 4);
+ 771               		.loc 1 178 0
+ 772 02b2 492F      		mov r20,r25
+ 773               	.LVL103:
+ 774 02b4 4F70      		andi r20,lo8(15)
+ 775 02b6 9295      		swap r25
+ 776 02b8 9F70      		andi r25,lo8(15)
+ 777 02ba 489F      		mul r20,r24
+ 778 02bc 900D      		add r25,r0
+ 779 02be 1124      		clr __zero_reg__
+ 780 02c0 D901      		movw r26,r18
+ 781               	.LVL104:
+ 782 02c2 9C93      		st X,r25
+ 179:pdu.c         **** 	return ptr;
+ 180:pdu.c         **** }
+ 783               		.loc 1 180 0
+ 784 02c4 CF01      		movw r24,r30
+ 785 02c6 0396      		adiw r24,3
+ 786               	.LVL105:
+ 787               	/* epilogue start */
+ 788 02c8 0895      		ret
+ 789               		.cfi_endproc
+ 790               	.LFE5:
+ 792               	.global	pobierz_czas_z_PDU
+ 794               	pobierz_czas_z_PDU:
+ 795               	.LFB6:
+ 181:pdu.c         **** 
+ 182:pdu.c         **** const uchar* pobierz_czas_z_PDU(const uchar* ptr, uchar* godzina, uchar* minuta)
+ 183:pdu.c         **** {
+ 796               		.loc 1 183 0
+ 797               		.cfi_startproc
+ 798               	.LVL106:
+ 799               	/* prologue: function */
+ 800               	/* frame size = 0 */
+ 801               	/* stack size = 0 */
+ 802               	.L__stack_usage = 0
+ 803 02ca FC01      		movw r30,r24
+ 804               	.LVL107:
+ 184:pdu.c         **** 	*godzina = *ptr++;
+ 805               		.loc 1 184 0
+ 806 02cc 9081      		ld r25,Z
+ 185:pdu.c         **** 	*godzina = 10 * (*godzina & 0x0f) + ((*godzina & 0xf0) >> 4);
+ 807               		.loc 1 185 0
+ 808 02ce 292F      		mov r18,r25
+ 809 02d0 2F70      		andi r18,lo8(15)
+ 810 02d2 8AE0      		ldi r24,lo8(10)
+ 811               	.LVL108:
+ 812 02d4 9295      		swap r25
+ 813 02d6 9F70      		andi r25,lo8(15)
+ 814 02d8 289F      		mul r18,r24
+ 815 02da 900D      		add r25,r0
+ 816 02dc 1124      		clr __zero_reg__
+ 817 02de DB01      		movw r26,r22
+ 818 02e0 9C93      		st X,r25
+ 819               	.LVL109:
+ 186:pdu.c         **** 	*minuta = *ptr++;
+ 820               		.loc 1 186 0
+ 821 02e2 9181      		ldd r25,Z+1
+ 187:pdu.c         **** 	*minuta = 10 * (*minuta & 0x0f) + ((*minuta & 0xf0) >> 4);
+ 822               		.loc 1 187 0
+ 823 02e4 292F      		mov r18,r25
+ 824 02e6 2F70      		andi r18,lo8(15)
+ 825 02e8 9295      		swap r25
+ 826 02ea 9F70      		andi r25,lo8(15)
+ 827 02ec 289F      		mul r18,r24
+ 828 02ee 900D      		add r25,r0
+ 829 02f0 1124      		clr __zero_reg__
+ 830 02f2 DA01      		movw r26,r20
+ 831 02f4 9C93      		st X,r25
+ 188:pdu.c         **** 	return ptr + 2;
+ 189:pdu.c         **** }
+ 832               		.loc 1 189 0
+ 833 02f6 CF01      		movw r24,r30
+ 834 02f8 0496      		adiw r24,4
+ 835               	/* epilogue start */
+ 836 02fa 0895      		ret
+ 837               		.cfi_endproc
+ 838               	.LFE6:
+ 840               	.global	wpisz_telefon_w_formacie_sms
+ 842               	wpisz_telefon_w_formacie_sms:
+ 843               	.LFB7:
+ 190:pdu.c         **** 
+ 191:pdu.c         **** uchar* wpisz_telefon_w_formacie_sms(uchar* ptr, const uchar* telefon)
+ 192:pdu.c         **** {
+ 844               		.loc 1 192 0
+ 845               		.cfi_startproc
+ 846               	.LVL110:
+ 847 02fc CF93      		push r28
+ 848               	.LCFI19:
+ 849               		.cfi_def_cfa_offset 3
+ 850               		.cfi_offset 28, -2
+ 851 02fe DF93      		push r29
+ 852               	.LCFI20:
+ 853               		.cfi_def_cfa_offset 4
+ 854               		.cfi_offset 29, -3
+ 855               	/* prologue: function */
+ 856               	/* frame size = 0 */
+ 857               	/* stack size = 2 */
+ 858               	.L__stack_usage = 2
+ 859 0300 DC01      		movw r26,r24
+ 860 0302 FB01      		movw r30,r22
+ 193:pdu.c         **** 	uchar typ_telefonu;
+ 194:pdu.c         **** 	if ( *telefon == '+' )
+ 861               		.loc 1 194 0
+ 862 0304 8081      		ld r24,Z
+ 863               	.LVL111:
+ 864 0306 8B32      		cpi r24,lo8(43)
+ 865 0308 01F4      		brne .L58
+ 195:pdu.c         **** 	{
+ 196:pdu.c         **** 		++telefon;
+ 866               		.loc 1 196 0
+ 867 030a 3196      		adiw r30,1
+ 868               	.LVL112:
+ 197:pdu.c         **** 		typ_telefonu = 145;
+ 869               		.loc 1 197 0
+ 870 030c 81E9      		ldi r24,lo8(-111)
+ 871               	.LVL113:
+ 872               	.L51:
+ 198:pdu.c         **** 	}
+ 199:pdu.c         **** 	else
+ 200:pdu.c         **** 		typ_telefonu = 129;
+ 201:pdu.c         **** 	const uchar liczba_cyfr_telefonu = strlen(telefon);
+ 873               		.loc 1 201 0
+ 874 030e EF01      		movw r28,r30
+ 875               		0:
+ 876 0310 0990      		ld __tmp_reg__,Y+
+ 877 0312 0020      		tst __tmp_reg__
+ 878 0314 01F4      		brne 0b
+ 879 0316 9E01      		movw r18,r28
+ 880 0318 2150      		subi r18,1
+ 881 031a 3109      		sbc r19,__zero_reg__
+ 882 031c 2E1B      		sub r18,r30
+ 883 031e 3F0B      		sbc r19,r31
+ 884               	.LVL114:
+ 202:pdu.c         **** 	if ( liczba_cyfr_telefonu == 0 )
+ 885               		.loc 1 202 0
+ 886 0320 2111      		cpse r18,__zero_reg__
+ 887 0322 00C0      		rjmp .L52
+ 203:pdu.c         **** 	{
+ 204:pdu.c         **** 		*ptr++ = liczba_cyfr_telefonu;
+ 888               		.loc 1 204 0
+ 889 0324 CD01      		movw r24,r26
+ 890               	.LVL115:
+ 891 0326 0196      		adiw r24,1
+ 892               	.LVL116:
+ 893 0328 1C92      		st X,__zero_reg__
+ 894               	.LVL117:
+ 895               	.L50:
+ 896               	/* epilogue start */
+ 205:pdu.c         **** 		return ptr;
+ 206:pdu.c         **** 	}
+ 207:pdu.c         **** 	*ptr++ = liczba_cyfr_telefonu;
+ 208:pdu.c         **** 	*ptr++ = typ_telefonu;
+ 209:pdu.c         **** 	const uchar k = (liczba_cyfr_telefonu + 1) / 2;
+ 210:pdu.c         **** 	for (uchar i = 0; i < k; ++i)
+ 211:pdu.c         **** 	{
+ 212:pdu.c         **** 		uchar ch = (*telefon++ - '0');
+ 213:pdu.c         **** 		if ( *telefon != '\0' )
+ 214:pdu.c         **** 			ch |= (*telefon++ - '0') << 4;
+ 215:pdu.c         **** 		else
+ 216:pdu.c         **** 			ch |= 0xf0;
+ 217:pdu.c         **** 		*ptr++ = ch;
+ 218:pdu.c         **** 	}
+ 219:pdu.c         **** 	return ptr;
+ 220:pdu.c         **** }
+ 897               		.loc 1 220 0
+ 898 032a DF91      		pop r29
+ 899 032c CF91      		pop r28
+ 900 032e 0895      		ret
+ 901               	.LVL118:
+ 902               	.L58:
+ 200:pdu.c         **** 	const uchar liczba_cyfr_telefonu = strlen(telefon);
+ 903               		.loc 1 200 0
+ 904 0330 81E8      		ldi r24,lo8(-127)
+ 905 0332 00C0      		rjmp .L51
+ 906               	.LVL119:
+ 907               	.L52:
+ 207:pdu.c         **** 	*ptr++ = typ_telefonu;
+ 908               		.loc 1 207 0
+ 909 0334 2C93      		st X,r18
+ 208:pdu.c         **** 	const uchar k = (liczba_cyfr_telefonu + 1) / 2;
+ 910               		.loc 1 208 0
+ 911 0336 AD01      		movw r20,r26
+ 912 0338 4E5F      		subi r20,-2
+ 913 033a 5F4F      		sbci r21,-1
+ 914               	.LVL120:
+ 915 033c 1196      		adiw r26,1
+ 916 033e 8C93      		st X,r24
+ 209:pdu.c         **** 	for (uchar i = 0; i < k; ++i)
+ 917               		.loc 1 209 0
+ 918 0340 C901      		movw r24,r18
+ 919               	.LVL121:
+ 920 0342 9927      		clr r25
+ 921 0344 0196      		adiw r24,1
+ 922 0346 9595      		asr r25
+ 923 0348 8795      		ror r24
+ 924               	.LVL122:
+ 925 034a 682F      		mov r22,r24
+ 926               	.LVL123:
+ 927 034c 742F      		mov r23,r20
+ 928               	.LBB18:
+ 210:pdu.c         **** 	{
+ 929               		.loc 1 210 0
+ 930 034e DA01      		movw r26,r20
+ 931               	.LVL124:
+ 932               	.L54:
+ 210:pdu.c         **** 	{
+ 933               		.loc 1 210 0 is_stmt 0 discriminator 1
+ 934 0350 2A2F      		mov r18,r26
+ 935 0352 271B      		sub r18,r23
+ 936 0354 2617      		cp r18,r22
+ 937 0356 00F0      		brlo .L57
+ 938 0358 840F      		add r24,r20
+ 939 035a 951F      		adc r25,r21
+ 940               	.LVL125:
+ 941 035c 00C0      		rjmp .L50
+ 942               	.LVL126:
+ 943               	.L57:
+ 944               	.LBB19:
+ 212:pdu.c         **** 		if ( *telefon != '\0' )
+ 945               		.loc 1 212 0 is_stmt 1
+ 946 035e 2081      		ld r18,Z
+ 947 0360 2053      		subi r18,lo8(-(-48))
+ 948               	.LVL127:
+ 213:pdu.c         **** 			ch |= (*telefon++ - '0') << 4;
+ 949               		.loc 1 213 0
+ 950 0362 3181      		ldd r19,Z+1
+ 951 0364 3323      		tst r19
+ 952 0366 01F0      		breq .L55
+ 214:pdu.c         **** 		else
+ 953               		.loc 1 214 0
+ 954 0368 3296      		adiw r30,2
+ 955               	.LVL128:
+ 956 036a 3295      		swap r19
+ 957 036c 307F      		andi r19,lo8(-16)
+ 958 036e 232B      		or r18,r19
+ 959               	.LVL129:
+ 960               	.L56:
+ 217:pdu.c         **** 	}
+ 961               		.loc 1 217 0 discriminator 2
+ 962 0370 2D93      		st X+,r18
+ 963               	.LVL130:
+ 964 0372 00C0      		rjmp .L54
+ 965               	.LVL131:
+ 966               	.L55:
+ 212:pdu.c         **** 		if ( *telefon != '\0' )
+ 967               		.loc 1 212 0
+ 968 0374 3196      		adiw r30,1
+ 969               	.LVL132:
+ 216:pdu.c         **** 		*ptr++ = ch;
+ 970               		.loc 1 216 0
+ 971 0376 206F      		ori r18,lo8(-16)
+ 972               	.LVL133:
+ 973 0378 00C0      		rjmp .L56
+ 974               	.LBE19:
+ 975               	.LBE18:
+ 976               		.cfi_endproc
+ 977               	.LFE7:
+ 979               	.global	wpisz_centrum_sms_w_formacie_sms
+ 981               	wpisz_centrum_sms_w_formacie_sms:
+ 982               	.LFB8:
+ 221:pdu.c         **** 
+ 222:pdu.c         **** uchar* wpisz_centrum_sms_w_formacie_sms(uchar* ptr, const uchar* telefon)
+ 223:pdu.c         **** {
+ 983               		.loc 1 223 0
+ 984               		.cfi_startproc
+ 985               	.LVL134:
+ 986 037a CF93      		push r28
+ 987               	.LCFI21:
+ 988               		.cfi_def_cfa_offset 3
+ 989               		.cfi_offset 28, -2
+ 990 037c DF93      		push r29
+ 991               	.LCFI22:
+ 992               		.cfi_def_cfa_offset 4
+ 993               		.cfi_offset 29, -3
+ 994               	/* prologue: function */
+ 995               	/* frame size = 0 */
+ 996               	/* stack size = 2 */
+ 997               	.L__stack_usage = 2
+ 998 037e EC01      		movw r28,r24
+ 999 0380 DB01      		movw r26,r22
+ 224:pdu.c         **** 	if ( *telefon == '\0' )
+ 1000               		.loc 1 224 0
+ 1001 0382 8C91      		ld r24,X
+ 1002               	.LVL135:
+ 1003 0384 8111      		cpse r24,__zero_reg__
+ 1004 0386 00C0      		rjmp .L60
+ 225:pdu.c         **** 	{
+ 226:pdu.c         **** 		*ptr++ = 0x00;
+ 1005               		.loc 1 226 0
+ 1006 0388 CE01      		movw r24,r28
+ 1007 038a 0196      		adiw r24,1
+ 1008               	.LVL136:
+ 1009 038c 1882      		st Y,__zero_reg__
+ 1010               	.LVL137:
+ 1011               	.L59:
+ 1012               	/* epilogue start */
+ 227:pdu.c         **** 		return ptr;
+ 228:pdu.c         **** 	}
+ 229:pdu.c         **** 	uchar typ_telefonu;
+ 230:pdu.c         **** 	if ( *telefon == '+' )
+ 231:pdu.c         **** 	{
+ 232:pdu.c         **** 		++telefon;
+ 233:pdu.c         **** 		typ_telefonu = 145;
+ 234:pdu.c         **** 	}
+ 235:pdu.c         **** 	else
+ 236:pdu.c         **** 		typ_telefonu = 129;
+ 237:pdu.c         **** 	const uchar liczba_cyfr_telefonu = strlen(telefon);
+ 238:pdu.c         **** 	*ptr++ = (liczba_cyfr_telefonu + 1) / 2 + 1;
+ 239:pdu.c         **** 	*ptr++ = typ_telefonu;
+ 240:pdu.c         **** 	const uchar k = (liczba_cyfr_telefonu + 1) / 2;
+ 241:pdu.c         **** 	for (uchar i = 0; i < k; ++i)
+ 242:pdu.c         **** 	{
+ 243:pdu.c         **** 		uchar ch = (*telefon++ - '0');
+ 244:pdu.c         **** 		if ( *telefon != '\0' )
+ 245:pdu.c         **** 			ch |= (*telefon++ - '0') << 4;
+ 246:pdu.c         **** 		else
+ 247:pdu.c         **** 			ch |= 0xf0;
+ 248:pdu.c         **** 		*ptr++ = ch;
+ 249:pdu.c         **** 	}
+ 250:pdu.c         **** 	return ptr;
+ 251:pdu.c         **** }
+ 1013               		.loc 1 251 0
+ 1014 038e DF91      		pop r29
+ 1015 0390 CF91      		pop r28
+ 1016 0392 0895      		ret
+ 1017               	.LVL138:
+ 1018               	.L60:
+ 230:pdu.c         **** 	{
+ 1019               		.loc 1 230 0
+ 1020 0394 8B32      		cpi r24,lo8(43)
+ 1021 0396 01F4      		brne .L67
+ 232:pdu.c         **** 		typ_telefonu = 145;
+ 1022               		.loc 1 232 0
+ 1023 0398 1196      		adiw r26,1
+ 1024               	.LVL139:
+ 233:pdu.c         **** 	}
+ 1025               		.loc 1 233 0
+ 1026 039a 81E9      		ldi r24,lo8(-111)
+ 1027               	.LVL140:
+ 1028               	.L62:
+ 237:pdu.c         **** 	*ptr++ = (liczba_cyfr_telefonu + 1) / 2 + 1;
+ 1029               		.loc 1 237 0
+ 1030 039c FD01      		movw r30,r26
+ 1031               		0:
+ 1032 039e 0190      		ld __tmp_reg__,Z+
+ 1033 03a0 0020      		tst __tmp_reg__
+ 1034 03a2 01F4      		brne 0b
+ 1035 03a4 3197      		sbiw r30,1
+ 1036 03a6 9F01      		movw r18,r30
+ 1037 03a8 2A1B      		sub r18,r26
+ 1038 03aa 3B0B      		sbc r19,r27
+ 1039               	.LVL141:
+ 238:pdu.c         **** 	*ptr++ = typ_telefonu;
+ 1040               		.loc 1 238 0
+ 1041 03ac 3327      		clr r19
+ 1042               	.LVL142:
+ 1043 03ae 2F5F      		subi r18,-1
+ 1044 03b0 3F4F      		sbci r19,-1
+ 1045 03b2 3595      		asr r19
+ 1046 03b4 2795      		ror r18
+ 1047 03b6 622F      		mov r22,r18
+ 1048               	.LVL143:
+ 1049 03b8 91E0      		ldi r25,lo8(1)
+ 1050 03ba 920F      		add r25,r18
+ 1051 03bc 9883      		st Y,r25
+ 239:pdu.c         **** 	const uchar k = (liczba_cyfr_telefonu + 1) / 2;
+ 1052               		.loc 1 239 0
+ 1053 03be AE01      		movw r20,r28
+ 1054 03c0 4E5F      		subi r20,-2
+ 1055 03c2 5F4F      		sbci r21,-1
+ 1056               	.LVL144:
+ 1057 03c4 8983      		std Y+1,r24
+ 1058               	.LVL145:
+ 1059 03c6 742F      		mov r23,r20
+ 1060               	.LBB20:
+ 241:pdu.c         **** 	{
+ 1061               		.loc 1 241 0
+ 1062 03c8 FA01      		movw r30,r20
+ 1063               	.LVL146:
+ 1064               	.L63:
+ 241:pdu.c         **** 	{
+ 1065               		.loc 1 241 0 is_stmt 0 discriminator 1
+ 1066 03ca 8E2F      		mov r24,r30
+ 1067 03cc 871B      		sub r24,r23
+ 1068 03ce 8617      		cp r24,r22
+ 1069 03d0 00F0      		brlo .L66
+ 1070 03d2 CA01      		movw r24,r20
+ 1071 03d4 820F      		add r24,r18
+ 1072 03d6 931F      		adc r25,r19
+ 1073 03d8 00C0      		rjmp .L59
+ 1074               	.LVL147:
+ 1075               	.L67:
+ 1076               	.LBE20:
+ 236:pdu.c         **** 	const uchar liczba_cyfr_telefonu = strlen(telefon);
+ 1077               		.loc 1 236 0 is_stmt 1
+ 1078 03da 81E8      		ldi r24,lo8(-127)
+ 1079 03dc 00C0      		rjmp .L62
+ 1080               	.LVL148:
+ 1081               	.L66:
+ 1082               	.LBB22:
+ 1083               	.LBB21:
+ 243:pdu.c         **** 		if ( *telefon != '\0' )
+ 1084               		.loc 1 243 0
+ 1085 03de 8C91      		ld r24,X
+ 1086 03e0 8053      		subi r24,lo8(-(-48))
+ 1087               	.LVL149:
+ 244:pdu.c         **** 			ch |= (*telefon++ - '0') << 4;
+ 1088               		.loc 1 244 0
+ 1089 03e2 1196      		adiw r26,1
+ 1090 03e4 9C91      		ld r25,X
+ 1091 03e6 1197      		sbiw r26,1
+ 1092 03e8 9923      		tst r25
+ 1093 03ea 01F0      		breq .L64
+ 245:pdu.c         **** 		else
+ 1094               		.loc 1 245 0
+ 1095 03ec 1296      		adiw r26,2
+ 1096               	.LVL150:
+ 1097 03ee 9295      		swap r25
+ 1098 03f0 907F      		andi r25,lo8(-16)
+ 1099 03f2 892B      		or r24,r25
+ 1100               	.LVL151:
+ 1101               	.L65:
+ 248:pdu.c         **** 	}
+ 1102               		.loc 1 248 0 discriminator 2
+ 1103 03f4 8193      		st Z+,r24
+ 1104               	.LVL152:
+ 1105 03f6 00C0      		rjmp .L63
+ 1106               	.LVL153:
+ 1107               	.L64:
+ 243:pdu.c         **** 		if ( *telefon != '\0' )
+ 1108               		.loc 1 243 0
+ 1109 03f8 1196      		adiw r26,1
+ 1110               	.LVL154:
+ 247:pdu.c         **** 		*ptr++ = ch;
+ 1111               		.loc 1 247 0
+ 1112 03fa 806F      		ori r24,lo8(-16)
+ 1113               	.LVL155:
+ 1114 03fc 00C0      		rjmp .L65
+ 1115               	.LBE21:
+ 1116               	.LBE22:
+ 1117               		.cfi_endproc
+ 1118               	.LFE8:
+ 1120               	.global	zapisz_naglowek_pdu
+ 1122               	zapisz_naglowek_pdu:
+ 1123               	.LFB9:
+ 252:pdu.c         **** 
+ 253:pdu.c         **** uchar* zapisz_naglowek_pdu(uchar* ptr, const uchar* telefon_odbiorcy, 
+ 254:pdu.c         **** 	const uchar* telefon_centrum_sms, const uchar TP_PID, const uchar TP_DCS)
+ 255:pdu.c         **** {
+ 1124               		.loc 1 255 0
+ 1125               		.cfi_startproc
+ 1126               	.LVL156:
+ 1127 03fe EF92      		push r14
+ 1128               	.LCFI23:
+ 1129               		.cfi_def_cfa_offset 3
+ 1130               		.cfi_offset 14, -2
+ 1131 0400 FF92      		push r15
+ 1132               	.LCFI24:
+ 1133               		.cfi_def_cfa_offset 4
+ 1134               		.cfi_offset 15, -3
+ 1135 0402 0F93      		push r16
+ 1136               	.LCFI25:
+ 1137               		.cfi_def_cfa_offset 5
+ 1138               		.cfi_offset 16, -4
+ 1139 0404 CF93      		push r28
+ 1140               	.LCFI26:
+ 1141               		.cfi_def_cfa_offset 6
+ 1142               		.cfi_offset 28, -5
+ 1143               	/* prologue: function */
+ 1144               	/* frame size = 0 */
+ 1145               	/* stack size = 4 */
+ 1146               	.L__stack_usage = 4
+ 1147 0406 7B01      		movw r14,r22
+ 1148 0408 C22F      		mov r28,r18
+ 256:pdu.c         **** 	ptr = wpisz_centrum_sms_w_formacie_sms(ptr, telefon_centrum_sms);
+ 1149               		.loc 1 256 0
+ 1150 040a BA01      		movw r22,r20
+ 1151               	.LVL157:
+ 1152 040c 0E94 0000 		call wpisz_centrum_sms_w_formacie_sms
+ 1153               	.LVL158:
+ 257:pdu.c         **** 	*ptr++ = 0x11;
+ 1154               		.loc 1 257 0
+ 1155 0410 21E1      		ldi r18,lo8(17)
+ 1156 0412 FC01      		movw r30,r24
+ 1157 0414 2083      		st Z,r18
+ 1158               	.LVL159:
+ 258:pdu.c         **** 	*ptr++ = 0x00;
+ 1159               		.loc 1 258 0
+ 1160 0416 1182      		std Z+1,__zero_reg__
+ 259:pdu.c         **** 	ptr = wpisz_telefon_w_formacie_sms(ptr, telefon_odbiorcy);
+ 1161               		.loc 1 259 0
+ 1162 0418 B701      		movw r22,r14
+ 1163 041a 0296      		adiw r24,2
+ 1164               	.LVL160:
+ 1165 041c 0E94 0000 		call wpisz_telefon_w_formacie_sms
+ 1166               	.LVL161:
+ 260:pdu.c         **** 	*ptr++ = TP_PID;	// TP-PID. Protocol identifier 
+ 1167               		.loc 1 260 0
+ 1168 0420 FC01      		movw r30,r24
+ 1169 0422 C083      		st Z,r28
+ 1170               	.LVL162:
+ 261:pdu.c         **** 	*ptr++ = TP_DCS;	// TP-DCS. Data coding scheme (7-bit, 8-bit, UCS2)
+ 1171               		.loc 1 261 0
+ 1172 0424 0183      		std Z+1,r16
+ 1173               	.LVL163:
+ 262:pdu.c         **** 	*ptr++ = 0xAA;	// TP-Validity-Period. "AA" means 4 days
+ 1174               		.loc 1 262 0
+ 1175 0426 2AEA      		ldi r18,lo8(-86)
+ 1176 0428 2283      		std Z+2,r18
+ 263:pdu.c         **** 	return ptr;
+ 264:pdu.c         **** }
+ 1177               		.loc 1 264 0
+ 1178 042a 0396      		adiw r24,3
+ 1179               	.LVL164:
+ 1180               	/* epilogue start */
+ 1181 042c CF91      		pop r28
+ 1182               	.LVL165:
+ 1183 042e 0F91      		pop r16
+ 1184               	.LVL166:
+ 1185 0430 FF90      		pop r15
+ 1186 0432 EF90      		pop r14
+ 1187               	.LVL167:
+ 1188 0434 0895      		ret
+ 1189               		.cfi_endproc
+ 1190               	.LFE9:
+ 1192               	.global	konwertuj_pdu_na_blok_wysylany
+ 1194               	konwertuj_pdu_na_blok_wysylany:
+ 1195               	.LFB10:
+ 265:pdu.c         **** 
+ 266:pdu.c         **** void konwertuj_pdu_na_blok_wysylany(uchar* buf, const uchar* pdu_ptr, 
+ 267:pdu.c         **** 	const uchar dlugosc_pdu)
+ 268:pdu.c         **** {
+ 1196               		.loc 1 268 0
+ 1197               		.cfi_startproc
+ 1198               	.LVL168:
+ 1199 0436 CF93      		push r28
+ 1200               	.LCFI27:
+ 1201               		.cfi_def_cfa_offset 3
+ 1202               		.cfi_offset 28, -2
+ 1203 0438 DF93      		push r29
+ 1204               	.LCFI28:
+ 1205               		.cfi_def_cfa_offset 4
+ 1206               		.cfi_offset 29, -3
+ 1207 043a 1F92      		push __zero_reg__
+ 1208               	.LCFI29:
+ 1209               		.cfi_def_cfa_offset 5
+ 1210 043c CDB7      		in r28,__SP_L__
+ 1211 043e DEB7      		in r29,__SP_H__
+ 1212               	.LCFI30:
+ 1213               		.cfi_def_cfa_register 28
+ 1214               	/* prologue: function */
+ 1215               	/* frame size = 1 */
+ 1216               	/* stack size = 3 */
+ 1217               	.L__stack_usage = 3
+ 1218               	.LVL169:
+ 1219 0440 9C01      		movw r18,r24
+ 1220 0442 562F      		mov r21,r22
+ 1221               	.LBB23:
+ 269:pdu.c         **** 	static const char znak_wartosc_heksadecymalna[] PROGMEM = "0123456789ABCDEF";
+ 270:pdu.c         **** 	for (uchar i = 0; i < dlugosc_pdu; ++i)
+ 1222               		.loc 1 270 0
+ 1223 0444 DB01      		movw r26,r22
+ 1224               	.LVL170:
+ 1225               	.L70:
+ 1226               		.loc 1 270 0 is_stmt 0 discriminator 1
+ 1227 0446 8A2F      		mov r24,r26
+ 1228 0448 851B      		sub r24,r21
+ 1229 044a 8417      		cp r24,r20
+ 1230 044c 00F0      		brlo .L71
+ 1231               	/* epilogue start */
+ 1232               	.LBE23:
+ 271:pdu.c         **** 	{
+ 272:pdu.c         **** 		uchar znak = *pdu_ptr++;
+ 273:pdu.c         **** 		volatile uchar pom = znak & 0xf0;	// bardzo wa¿ne jst s³owo volatile, bo kompilator Ÿle generuje 
+ 274:pdu.c         **** 		SWAP(pom);
+ 275:pdu.c         **** 		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + pom);
+ 276:pdu.c         **** 		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + (znak & 0x0f));
+ 277:pdu.c         **** 	}
+ 278:pdu.c         **** }
+ 1233               		.loc 1 278 0 is_stmt 1
+ 1234 044e 0F90      		pop __tmp_reg__
+ 1235 0450 DF91      		pop r29
+ 1236 0452 CF91      		pop r28
+ 1237 0454 0895      		ret
+ 1238               	.L71:
+ 1239               	.LVL171:
+ 1240               	.LBB27:
+ 1241               	.LBB24:
+ 272:pdu.c         **** 		volatile uchar pom = znak & 0xf0;	// bardzo wa¿ne jst s³owo volatile, bo kompilator Ÿle generuje 
+ 1242               		.loc 1 272 0 discriminator 3
+ 1243 0456 9D91      		ld r25,X+
+ 1244               	.LVL172:
+ 273:pdu.c         **** 		SWAP(pom);
+ 1245               		.loc 1 273 0 discriminator 3
+ 1246 0458 892F      		mov r24,r25
+ 1247 045a 807F      		andi r24,lo8(-16)
+ 1248 045c 8983      		std Y+1,r24
+ 274:pdu.c         **** 		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + pom);
+ 1249               		.loc 1 274 0 discriminator 3
+ 1250               	/* #APP */
+ 1251               	 ;  274 "pdu.c" 1
+ 1252 045e 8295      		swap r24
+ 1253               		
+ 1254               	 ;  0 "" 2
+ 1255               	/* #NOAPP */
+ 1256 0460 8983      		std Y+1,r24
+ 1257               	.LBB25:
+ 275:pdu.c         **** 		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + (znak & 0x0f));
+ 1258               		.loc 1 275 0 discriminator 3
+ 1259 0462 E981      		ldd r30,Y+1
+ 1260               	.LVL173:
+ 1261 0464 F0E0      		ldi r31,0
+ 1262 0466 E050      		subi r30,lo8(-(znak_wartosc_heksadecymalna.2041))
+ 1263 0468 F040      		sbci r31,hi8(-(znak_wartosc_heksadecymalna.2041))
+ 1264               	.LVL174:
+ 1265               	/* #APP */
+ 1266               	 ;  275 "pdu.c" 1
+ 1267 046a 8491      		lpm r24, Z
+ 1268               		
+ 1269               	 ;  0 "" 2
+ 1270               	.LVL175:
+ 1271               	/* #NOAPP */
+ 1272               	.LBE25:
+ 1273 046c F901      		movw r30,r18
+ 1274 046e 8083      		st Z,r24
+ 1275               	.LVL176:
+ 1276               	.LBB26:
+ 276:pdu.c         **** 	}
+ 1277               		.loc 1 276 0 discriminator 3
+ 1278 0470 9F70      		andi r25,lo8(15)
+ 1279               	.LVL177:
+ 1280 0472 E92F      		mov r30,r25
+ 1281 0474 F0E0      		ldi r31,0
+ 1282 0476 E050      		subi r30,lo8(-(znak_wartosc_heksadecymalna.2041))
+ 1283 0478 F040      		sbci r31,hi8(-(znak_wartosc_heksadecymalna.2041))
+ 1284               	/* #APP */
+ 1285               	 ;  276 "pdu.c" 1
+ 1286 047a 8491      		lpm r24, Z
+ 1287               		
+ 1288               	 ;  0 "" 2
+ 1289               	.LVL178:
+ 1290               	/* #NOAPP */
+ 1291               	.LBE26:
+ 1292 047c F901      		movw r30,r18
+ 1293 047e 8183      		std Z+1,r24
+ 1294               	.LVL179:
+ 1295 0480 2E5F      		subi r18,-2
+ 1296 0482 3F4F      		sbci r19,-1
+ 1297               	.LVL180:
+ 1298 0484 00C0      		rjmp .L70
+ 1299               	.LBE24:
+ 1300               	.LBE27:
+ 1301               		.cfi_endproc
+ 1302               	.LFE10:
+ 1304               		.section	.progmem.data,"a",@progbits
+ 1307               	znak_wartosc_heksadecymalna.2041:
+ 1308 0000 3031 3233 		.string	"0123456789ABCDEF"
+ 1308      3435 3637 
+ 1308      3839 4142 
+ 1308      4344 4546 
+ 1308      00
+ 1311               	GSM_Default_DeAlphabet:
+ 1312 0011 3F        		.byte	63
+ 1313 0012 3F        		.byte	63
+ 1314 0013 3F        		.byte	63
+ 1315 0014 3F        		.byte	63
+ 1316 0015 3F        		.byte	63
+ 1317 0016 3F        		.byte	63
+ 1318 0017 3F        		.byte	63
+ 1319 0018 3F        		.byte	63
+ 1320 0019 3F        		.byte	63
+ 1321 001a 3F        		.byte	63
+ 1322 001b 0A        		.byte	10
+ 1323 001c 3F        		.byte	63
+ 1324 001d 3F        		.byte	63
+ 1325 001e 0D        		.byte	13
+ 1326 001f 3F        		.byte	63
+ 1327 0020 3F        		.byte	63
+ 1328 0021 3F        		.byte	63
+ 1329 0022 3F        		.byte	63
+ 1330 0023 3F        		.byte	63
+ 1331 0024 3F        		.byte	63
+ 1332 0025 3F        		.byte	63
+ 1333 0026 3F        		.byte	63
+ 1334 0027 3F        		.byte	63
+ 1335 0028 3F        		.byte	63
+ 1336 0029 3F        		.byte	63
+ 1337 002a 3F        		.byte	63
+ 1338 002b 3F        		.byte	63
+ 1339 002c 3F        		.byte	63
+ 1340 002d 3F        		.byte	63
+ 1341 002e 3F        		.byte	63
+ 1342 002f 3F        		.byte	63
+ 1343 0030 3F        		.byte	63
+ 1344 0031 20        		.byte	32
+ 1345 0032 21        		.byte	33
+ 1346 0033 22        		.byte	34
+ 1347 0034 23        		.byte	35
+ 1348 0035 02        		.byte	2
+ 1349 0036 25        		.byte	37
+ 1350 0037 26        		.byte	38
+ 1351 0038 27        		.byte	39
+ 1352 0039 28        		.byte	40
+ 1353 003a 29        		.byte	41
+ 1354 003b 2A        		.byte	42
+ 1355 003c 2B        		.byte	43
+ 1356 003d 2C        		.byte	44
+ 1357 003e 2D        		.byte	45
+ 1358 003f 2E        		.byte	46
+ 1359 0040 2F        		.byte	47
+ 1360 0041 30        		.byte	48
+ 1361 0042 31        		.byte	49
+ 1362 0043 32        		.byte	50
+ 1363 0044 33        		.byte	51
+ 1364 0045 34        		.byte	52
+ 1365 0046 35        		.byte	53
+ 1366 0047 36        		.byte	54
+ 1367 0048 37        		.byte	55
+ 1368 0049 38        		.byte	56
+ 1369 004a 39        		.byte	57
+ 1370 004b 3A        		.byte	58
+ 1371 004c 3B        		.byte	59
+ 1372 004d 3C        		.byte	60
+ 1373 004e 3D        		.byte	61
+ 1374 004f 3E        		.byte	62
+ 1375 0050 3F        		.byte	63
+ 1376 0051 00        		.byte	0
+ 1377 0052 41        		.byte	65
+ 1378 0053 42        		.byte	66
+ 1379 0054 43        		.byte	67
+ 1380 0055 44        		.byte	68
+ 1381 0056 45        		.byte	69
+ 1382 0057 46        		.byte	70
+ 1383 0058 47        		.byte	71
+ 1384 0059 48        		.byte	72
+ 1385 005a 49        		.byte	73
+ 1386 005b 4A        		.byte	74
+ 1387 005c 4B        		.byte	75
+ 1388 005d 4C        		.byte	76
+ 1389 005e 4D        		.byte	77
+ 1390 005f 4E        		.byte	78
+ 1391 0060 4F        		.byte	79
+ 1392 0061 50        		.byte	80
+ 1393 0062 51        		.byte	81
+ 1394 0063 52        		.byte	82
+ 1395 0064 53        		.byte	83
+ 1396 0065 54        		.byte	84
+ 1397 0066 55        		.byte	85
+ 1398 0067 56        		.byte	86
+ 1399 0068 57        		.byte	87
+ 1400 0069 58        		.byte	88
+ 1401 006a 59        		.byte	89
+ 1402 006b 5A        		.byte	90
+ 1403 006c 3F        		.byte	63
+ 1404 006d 3F        		.byte	63
+ 1405 006e 3F        		.byte	63
+ 1406 006f 3F        		.byte	63
+ 1407 0070 11        		.byte	17
+ 1408 0071 3F        		.byte	63
+ 1409 0072 61        		.byte	97
+ 1410 0073 62        		.byte	98
+ 1411 0074 63        		.byte	99
+ 1412 0075 64        		.byte	100
+ 1413 0076 65        		.byte	101
+ 1414 0077 66        		.byte	102
+ 1415 0078 67        		.byte	103
+ 1416 0079 68        		.byte	104
+ 1417 007a 69        		.byte	105
+ 1418 007b 6A        		.byte	106
+ 1419 007c 6B        		.byte	107
+ 1420 007d 6C        		.byte	108
+ 1421 007e 6D        		.byte	109
+ 1422 007f 6E        		.byte	110
+ 1423 0080 6F        		.byte	111
+ 1424 0081 70        		.byte	112
+ 1425 0082 71        		.byte	113
+ 1426 0083 72        		.byte	114
+ 1427 0084 73        		.byte	115
+ 1428 0085 74        		.byte	116
+ 1429 0086 75        		.byte	117
+ 1430 0087 76        		.byte	118
+ 1431 0088 77        		.byte	119
+ 1432 0089 78        		.byte	120
+ 1433 008a 79        		.byte	121
+ 1434 008b 7A        		.byte	122
+ 1435 008c 3F        		.byte	63
+ 1436 008d 3F        		.byte	63
+ 1437 008e 3F        		.byte	63
+ 1438 008f 3F        		.byte	63
+ 1439 0090 3F        		.byte	63
+ 1440 0091 3F        		.byte	63
+ 1441 0092 3F        		.byte	63
+ 1442 0093 3F        		.byte	63
+ 1443 0094 3F        		.byte	63
+ 1444 0095 3F        		.byte	63
+ 1445 0096 3F        		.byte	63
+ 1446 0097 3F        		.byte	63
+ 1447 0098 3F        		.byte	63
+ 1448 0099 3F        		.byte	63
+ 1449 009a 3F        		.byte	63
+ 1450 009b 3F        		.byte	63
+ 1451 009c 3F        		.byte	63
+ 1452 009d 3F        		.byte	63
+ 1453 009e 3F        		.byte	63
+ 1454 009f 3F        		.byte	63
+ 1455 00a0 3F        		.byte	63
+ 1456 00a1 3F        		.byte	63
+ 1457 00a2 3F        		.byte	63
+ 1458 00a3 3F        		.byte	63
+ 1459 00a4 3F        		.byte	63
+ 1460 00a5 3F        		.byte	63
+ 1461 00a6 3F        		.byte	63
+ 1462 00a7 3F        		.byte	63
+ 1463 00a8 3F        		.byte	63
+ 1464 00a9 3F        		.byte	63
+ 1465 00aa 3F        		.byte	63
+ 1466 00ab 3F        		.byte	63
+ 1467 00ac 3F        		.byte	63
+ 1468 00ad 3F        		.byte	63
+ 1469 00ae 3F        		.byte	63
+ 1470 00af 3F        		.byte	63
+ 1471 00b0 3F        		.byte	63
+ 1472 00b1 3F        		.byte	63
+ 1473 00b2 40        		.byte	64
+ 1474 00b3 3F        		.byte	63
+ 1475 00b4 01        		.byte	1
+ 1476 00b5 24        		.byte	36
+ 1477 00b6 03        		.byte	3
+ 1478 00b7 3F        		.byte	63
+ 1479 00b8 5F        		.byte	95
+ 1480 00b9 3F        		.byte	63
+ 1481 00ba 3F        		.byte	63
+ 1482 00bb 3F        		.byte	63
+ 1483 00bc 3F        		.byte	63
+ 1484 00bd 3F        		.byte	63
+ 1485 00be 3F        		.byte	63
+ 1486 00bf 3F        		.byte	63
+ 1487 00c0 3F        		.byte	63
+ 1488 00c1 3F        		.byte	63
+ 1489 00c2 3F        		.byte	63
+ 1490 00c3 3F        		.byte	63
+ 1491 00c4 3F        		.byte	63
+ 1492 00c5 3F        		.byte	63
+ 1493 00c6 3F        		.byte	63
+ 1494 00c7 3F        		.byte	63
+ 1495 00c8 3F        		.byte	63
+ 1496 00c9 3F        		.byte	63
+ 1497 00ca 3F        		.byte	63
+ 1498 00cb 3F        		.byte	63
+ 1499 00cc 3F        		.byte	63
+ 1500 00cd 3F        		.byte	63
+ 1501 00ce 3F        		.byte	63
+ 1502 00cf 3F        		.byte	63
+ 1503 00d0 60        		.byte	96
+ 1504 00d1 3F        		.byte	63
+ 1505 00d2 3F        		.byte	63
+ 1506 00d3 3F        		.byte	63
+ 1507 00d4 3F        		.byte	63
+ 1508 00d5 5B        		.byte	91
+ 1509 00d6 0E        		.byte	14
+ 1510 00d7 1C        		.byte	28
+ 1511 00d8 09        		.byte	9
+ 1512 00d9 3F        		.byte	63
+ 1513 00da 1F        		.byte	31
+ 1514 00db 3F        		.byte	63
+ 1515 00dc 3F        		.byte	63
+ 1516 00dd 3F        		.byte	63
+ 1517 00de 3F        		.byte	63
+ 1518 00df 3F        		.byte	63
+ 1519 00e0 3F        		.byte	63
+ 1520 00e1 3F        		.byte	63
+ 1521 00e2 5D        		.byte	93
+ 1522 00e3 3F        		.byte	63
+ 1523 00e4 3F        		.byte	63
+ 1524 00e5 3F        		.byte	63
+ 1525 00e6 3F        		.byte	63
+ 1526 00e7 5C        		.byte	92
+ 1527 00e8 3F        		.byte	63
+ 1528 00e9 0B        		.byte	11
+ 1529 00ea 3F        		.byte	63
+ 1530 00eb 3F        		.byte	63
+ 1531 00ec 3F        		.byte	63
+ 1532 00ed 5E        		.byte	94
+ 1533 00ee 3F        		.byte	63
+ 1534 00ef 3F        		.byte	63
+ 1535 00f0 1E        		.byte	30
+ 1536 00f1 7F        		.byte	127
+ 1537 00f2 3F        		.byte	63
+ 1538 00f3 3F        		.byte	63
+ 1539 00f4 3F        		.byte	63
+ 1540 00f5 7B        		.byte	123
+ 1541 00f6 0F        		.byte	15
+ 1542 00f7 1D        		.byte	29
+ 1543 00f8 3F        		.byte	63
+ 1544 00f9 04        		.byte	4
+ 1545 00fa 05        		.byte	5
+ 1546 00fb 3F        		.byte	63
+ 1547 00fc 3F        		.byte	63
+ 1548 00fd 07        		.byte	7
+ 1549 00fe 3F        		.byte	63
+ 1550 00ff 3F        		.byte	63
+ 1551 0100 3F        		.byte	63
+ 1552 0101 3F        		.byte	63
+ 1553 0102 7D        		.byte	125
+ 1554 0103 08        		.byte	8
+ 1555 0104 3F        		.byte	63
+ 1556 0105 3F        		.byte	63
+ 1557 0106 3F        		.byte	63
+ 1558 0107 7C        		.byte	124
+ 1559 0108 3F        		.byte	63
+ 1560 0109 0C        		.byte	12
+ 1561 010a 06        		.byte	6
+ 1562 010b 3F        		.byte	63
+ 1563 010c 3F        		.byte	63
+ 1564 010d 7E        		.byte	126
+ 1565 010e 3F        		.byte	63
+ 1566 010f 3F        		.byte	63
+ 1567 0110 3F        		.byte	63
+ 1570               	GSM_Default_Alphabet:
+ 1571 0111 40        		.byte	64
+ 1572 0112 A3        		.byte	-93
+ 1573 0113 24        		.byte	36
+ 1574 0114 A5        		.byte	-91
+ 1575 0115 E8        		.byte	-24
+ 1576 0116 E9        		.byte	-23
+ 1577 0117 F9        		.byte	-7
+ 1578 0118 EC        		.byte	-20
+ 1579 0119 F2        		.byte	-14
+ 1580 011a C7        		.byte	-57
+ 1581 011b 0A        		.byte	10
+ 1582 011c D8        		.byte	-40
+ 1583 011d F8        		.byte	-8
+ 1584 011e 0D        		.byte	13
+ 1585 011f C5        		.byte	-59
+ 1586 0120 E5        		.byte	-27
+ 1587 0121 3F        		.byte	63
+ 1588 0122 5F        		.byte	95
+ 1589 0123 3F        		.byte	63
+ 1590 0124 3F        		.byte	63
+ 1591 0125 3F        		.byte	63
+ 1592 0126 3F        		.byte	63
+ 1593 0127 3F        		.byte	63
+ 1594 0128 3F        		.byte	63
+ 1595 0129 3F        		.byte	63
+ 1596 012a 3F        		.byte	63
+ 1597 012b 3F        		.byte	63
+ 1598 012c 3F        		.byte	63
+ 1599 012d C6        		.byte	-58
+ 1600 012e E6        		.byte	-26
+ 1601 012f DF        		.byte	-33
+ 1602 0130 C9        		.byte	-55
+ 1603 0131 20        		.byte	32
+ 1604 0132 21        		.byte	33
+ 1605 0133 22        		.byte	34
+ 1606 0134 23        		.byte	35
+ 1607 0135 A4        		.byte	-92
+ 1608 0136 25        		.byte	37
+ 1609 0137 26        		.byte	38
+ 1610 0138 27        		.byte	39
+ 1611 0139 28        		.byte	40
+ 1612 013a 29        		.byte	41
+ 1613 013b 2A        		.byte	42
+ 1614 013c 2B        		.byte	43
+ 1615 013d 2C        		.byte	44
+ 1616 013e 2D        		.byte	45
+ 1617 013f 2E        		.byte	46
+ 1618 0140 2F        		.byte	47
+ 1619 0141 30        		.byte	48
+ 1620 0142 31        		.byte	49
+ 1621 0143 32        		.byte	50
+ 1622 0144 33        		.byte	51
+ 1623 0145 34        		.byte	52
+ 1624 0146 35        		.byte	53
+ 1625 0147 36        		.byte	54
+ 1626 0148 37        		.byte	55
+ 1627 0149 38        		.byte	56
+ 1628 014a 39        		.byte	57
+ 1629 014b 3A        		.byte	58
+ 1630 014c 3B        		.byte	59
+ 1631 014d 3C        		.byte	60
+ 1632 014e 3D        		.byte	61
+ 1633 014f 3E        		.byte	62
+ 1634 0150 3F        		.byte	63
+ 1635 0151 A1        		.byte	-95
+ 1636 0152 41        		.byte	65
+ 1637 0153 42        		.byte	66
+ 1638 0154 43        		.byte	67
+ 1639 0155 44        		.byte	68
+ 1640 0156 45        		.byte	69
+ 1641 0157 46        		.byte	70
+ 1642 0158 47        		.byte	71
+ 1643 0159 48        		.byte	72
+ 1644 015a 49        		.byte	73
+ 1645 015b 4A        		.byte	74
+ 1646 015c 4B        		.byte	75
+ 1647 015d 4C        		.byte	76
+ 1648 015e 4D        		.byte	77
+ 1649 015f 4E        		.byte	78
+ 1650 0160 4F        		.byte	79
+ 1651 0161 50        		.byte	80
+ 1652 0162 51        		.byte	81
+ 1653 0163 52        		.byte	82
+ 1654 0164 53        		.byte	83
+ 1655 0165 54        		.byte	84
+ 1656 0166 55        		.byte	85
+ 1657 0167 56        		.byte	86
+ 1658 0168 57        		.byte	87
+ 1659 0169 58        		.byte	88
+ 1660 016a 59        		.byte	89
+ 1661 016b 5A        		.byte	90
+ 1662 016c C4        		.byte	-60
+ 1663 016d D6        		.byte	-42
+ 1664 016e D1        		.byte	-47
+ 1665 016f DC        		.byte	-36
+ 1666 0170 A7        		.byte	-89
+ 1667 0171 BF        		.byte	-65
+ 1668 0172 61        		.byte	97
+ 1669 0173 62        		.byte	98
+ 1670 0174 63        		.byte	99
+ 1671 0175 64        		.byte	100
+ 1672 0176 65        		.byte	101
+ 1673 0177 66        		.byte	102
+ 1674 0178 67        		.byte	103
+ 1675 0179 68        		.byte	104
+ 1676 017a 69        		.byte	105
+ 1677 017b 6A        		.byte	106
+ 1678 017c 6B        		.byte	107
+ 1679 017d 6C        		.byte	108
+ 1680 017e 6D        		.byte	109
+ 1681 017f 6E        		.byte	110
+ 1682 0180 6F        		.byte	111
+ 1683 0181 70        		.byte	112
+ 1684 0182 71        		.byte	113
+ 1685 0183 72        		.byte	114
+ 1686 0184 73        		.byte	115
+ 1687 0185 74        		.byte	116
+ 1688 0186 75        		.byte	117
+ 1689 0187 76        		.byte	118
+ 1690 0188 77        		.byte	119
+ 1691 0189 78        		.byte	120
+ 1692 018a 79        		.byte	121
+ 1693 018b 7A        		.byte	122
+ 1694 018c E4        		.byte	-28
+ 1695 018d F6        		.byte	-10
+ 1696 018e F1        		.byte	-15
+ 1697 018f FC        		.byte	-4
+ 1698 0190 E0        		.byte	-32
+ 1699               		.text
+ 1700               	.Letext0:
+ 1701               		.file 2 "narzedzia.h"
+ 1702               		.file 3 "/usr/local/avr8-gnu-toolchain/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 pdu.c
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:13     .text:0000000000000000 pdu_to_ascii
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:1570   .progmem.data:0000000000000111 GSM_Default_Alphabet
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:207    .text:00000000000000a8 ascii_to_pdu_blok
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:1311   .progmem.data:0000000000000011 GSM_Default_DeAlphabet
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:454    .text:000000000000019c konwertuj_blok_dwa_znaki_na_znak_pdu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:538    .text:00000000000001d6 pobierz_numer_telefonu_nadawcy_z_PDU
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:728    .text:0000000000000284 pobierz_date_z_PDU
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:794    .text:00000000000002ca pobierz_czas_z_PDU
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:842    .text:00000000000002fc wpisz_telefon_w_formacie_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:981    .text:000000000000037a wpisz_centrum_sms_w_formacie_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:1122   .text:00000000000003fe zapisz_naglowek_pdu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:1194   .text:0000000000000436 konwertuj_pdu_na_blok_wysylany
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:1307   .progmem.data:0000000000000000 znak_wartosc_heksadecymalna.2041
+
+NO UNDEFINED SYMBOLS

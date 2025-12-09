@@ -1,0 +1,88 @@
+2025-12-06 18:04:16,294 - INFO - Resolved path for tools/eeprom_dump.bin: C:\Users\gramsz\AppData\Local\Temp\_MEI85282\tools/eeprom_dump.bin
+2025-12-06 18:04:16,294 - INFO - Resolved path for tools/firmware_temp.hex: C:\Users\gramsz\AppData\Local\Temp\_MEI85282\tools/firmware_temp.hex
+2025-12-06 18:04:16,294 - INFO - Resolved path for tools/avrdude.exe: C:\Users\gramsz\AppData\Local\Temp\_MEI85282\tools/avrdude.exe
+2025-12-06 18:04:16,294 - INFO - Resolved path for tools/avrdude.conf: C:\Users\gramsz\AppData\Local\Temp\_MEI85282\tools/avrdude.conf
+2025-12-06 18:04:16,294 - INFO - Checking system requirements
+2025-12-06 18:04:16,294 - INFO - Resolved path for permission_test.tmp: C:\Users\gramsz\AppData\Local\Temp\_MEI85282\permission_test.tmp
+2025-12-06 18:04:16,307 - INFO - File permission test passed
+2025-12-06 18:04:16,307 - INFO - Attempting to run avrdude at: C:\Users\gramsz\AppData\Local\Temp\_MEI85282\tools/avrdude.exe
+2025-12-06 18:04:16,737 - INFO - avrdude test output: 
+Usage: avrdude [options]
+Options:
+  -p, --part <partno>       Specify AVR device; -p ? lists all known parts
+  -p, --part <wildcard>/<flags>
+                            Run developer options for matched AVR devices,
+                            e.g., -p ATmega328P/s or /S for part definition
+  -b, --baud <baudrate>     Override RS-232 baud rate
+  -B, --bitclock <bitclock> Specify bit clock period (us)
+  -C, --config <config-file>
+                            Specify location of configuration file
+  -C, --config +<config-file>
+                            Specify additional config file, can be repeated
+  -N, --noconfig            Do not load config file 
+  -c, --programmer <programmer>
+                            Specify programmer; -c ? and -c ?type list all
+  -c, --programmer <wildcard>/<flags>
+                            Run developer options for matched programmers,
+                            e.g., -c 'ur*'/s for programmer info/definition
+  -A                        Disable trailing-0xff removal for file/AVR read
+  -D, --noerase             Disable auto-erase for flash memory; implies -A
+  -i <delay>                Bit state change delay [in microseconds] for
+                            bit-banged ISP and TPI programmers
+  -P, --port <port>         Connection; -P ?s or -P ?sa lists serial ones
+  -r, --reconnect           Reconnect to -P port after "touching" it; wait
+                            400 ms for each -r; needed for some USB boards
+  -F                        Override invalid signature or initial checks
+  -e, --erase               Perform a chip erase at the beginning
+  -O, --osccal              Perform RC oscillator calibration (see AVR053)
+  -t, --terminal            Run an interactive terminal when it is its turn
+  -T <terminal cmd line>    Run terminal line when it is its turn
+  -U, --memory <memstr>:r|w|v:<filename>[:format]
+                            Carry out memory operation when it is its turn
+                            Multiple -t, -T and -U options can be specified
+  -n, --test-memory         Do not write to the device whilst processing -U
+  -V, --noverify-memory     Do not automatically verify during -U
+  -E <exitsp>[,<exitsp>]    List programmer exit specifications
+  -x <extended_param>       Pass <extended_param> to programmer, see -x help
+  -v, --verbose             Verbose output; -v -v for more
+  -q, --quell               Quell progress output; -q -q for less
+  -l, --logfile logfile     Use logfile rather than stderr for diagnostics
+  --version                 Print version and exit
+  -?, --help                Display this usage
+
+avrdude version 8.1, https://github.com/avrdudes/avrdude
+
+2025-12-06 18:04:16,737 - INFO - Resolved path for graphics/logo.png: C:\Users\gramsz\AppData\Local\Temp\_MEI85282\graphics/logo.png
+2025-12-06 18:04:16,808 - INFO - Generated 800 HEX configs for m1284p
+2025-12-06 18:04:18,749 - INFO - COM port updated to: COM3
+2025-12-06 18:04:19,018 - INFO - DTR pulse sent on port COM3
+2025-12-06 18:04:19,021 - INFO - Running avrdude command: C:\Users\gramsz\AppData\Local\Temp\_MEI85282\tools/avrdude.exe -C C:\Users\gramsz\AppData\Local\Temp\_MEI85282\tools/avrdude.conf -c urclock -p m1284p -b 115200 -P COM3 -B 50 -x delay=100 -x strict -U eeprom:r:C:\Users\gramsz\AppData\Local\Temp\_MEI85282\tools/eeprom_dump.bin:r
+2025-12-06 18:04:20,766 - INFO - avrdude output: 
+Warning: -c urclock does not support adjustable bitclock speed; ignoring -B
+Reading eeprom memory ...
+Reading | ################################################## | 100% 1.03s
+Writing 4096 bytes to output file eeprom_dump.bin
+
+Avrdude done.  Thank you.
+
+2025-12-06 18:04:20,766 - INFO - avrdude command executed successfully
+2025-12-06 18:04:20,770 - INFO - Removed temporary file: C:\Users\gramsz\AppData\Local\Temp\_MEI85282\tools/eeprom_dump.bin
+2025-12-06 18:04:20,838 - INFO - Read from EEPROM - Status: 0, Mode: 0, Skryba: 0
+2025-12-06 18:04:25,806 - INFO - Write to EEPROM - Status: 0, Mode: 1, Skryba: 1
+2025-12-06 18:04:25,879 - INFO - Read from EEPROM - Status: 0, Mode: 1, Skryba: 1
+2025-12-06 18:04:29,950 - INFO - COM port updated to: COM3
+2025-12-06 18:04:30,266 - INFO - DTR pulse sent on port COM3
+2025-12-06 18:04:30,266 - INFO - Write to EEPROM - Status: 0, Mode: 1, Skryba: 1
+2025-12-06 18:04:30,302 - INFO - Running avrdude command: C:\Users\gramsz\AppData\Local\Temp\_MEI85282\tools/avrdude.exe -C C:\Users\gramsz\AppData\Local\Temp\_MEI85282\tools/avrdude.conf -c urclock -p m1284p -b 115200 -P COM3 -B 50 -x delay=100 -x strict -U eeprom:w:C:\Users\gramsz\AppData\Local\Temp\_MEI85282\tools/eeprom_dump.bin:r
+2025-12-06 18:04:46,263 - INFO - avrdude output: 
+Warning: -c urclock does not support adjustable bitclock speed; ignoring -B
+Reading 4096 bytes for eeprom from input file eeprom_dump.bin
+Writing 4096 bytes to eeprom
+Writing | ################################################## | 100% 14.24s
+Reading | ################################################## | 100% 1.05s
+4096 bytes of eeprom verified
+
+Avrdude done.  Thank you.
+
+2025-12-06 18:04:46,271 - INFO - avrdude command executed successfully
+2025-12-06 18:04:46,277 - INFO - Removed temporary file: C:\Users\gramsz\AppData\Local\Temp\_MEI85282\tools/eeprom_dump.bin
