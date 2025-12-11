@@ -42,45 +42,48 @@ uchar sprawdz_reset_ustawien(const uchar *buf) {
   return memcmp_R(buf, res_ust) == 0;
 }
 
-#define LICZBA_INSTRUKCJI_SMS 16 // Increased to 16
+#define LICZBA_INSTRUKCJI_SMS 17 // Increased to 17
 #define MAX_LICZBA_ZNAKOW_INSTRUKCJI_SMS 8
 // uwaga: wana jest kolejno oraz usytuowanie pomidzy nimi
-static const uchar instrukcja_sms[LICZBA_INSTRUKCJI_SMS]
-                                 [MAX_LICZBA_ZNAKOW_INSTRUKCJI_SMS] PROGMEM = {
-                                     // przed kad instrukcj musi by kod, litery
-                                     // mog by due lub mae
-                                     "\x04"
-                                     "CODE", // CODE EFGH (zmiana kodu dostpu)
-                                     "\x03"
-                                     "ADD", //
-                                     "\x03"
-                                     "DEL", //
-                                     "\x04"
-                                     "XXXX", // RESET
-                                     "\x06"
-                                     "REPORT", // REPORT
-                                     "\x04"
-                                     "USER", // USER
-                                     "\x04"
-                                     "OPEN", // OPEN
-                                     "\x05"
-                                     "CLOSE", // CLOSE
-                                     "\x04"
-                                     "CLIP", // CLIP (sub-command)
-                                     "\x04"
-                                     "DTMF", // DTMF (sub-command)
-                                     "\x03"
-                                     "SET", // SET HH:MM:SS
-                                     "\x04"
-                                     "TIME", // TIME HH:MM HH:MM lub TIME OFF
-                                     "\x06"
-                                     "SKRYBA", // SKRYBA ON/OFF
-                                     "\x05"
-                                     "DEBUG", // DEBUG (diagnostyka SKRYBA)
-                                     "\x05"
-                                     "START", // START (odblokuj)
-                                     "\x04"
-                                     "STOP", // STOP (zablokuj)
+static const uchar
+    instrukcja_sms[LICZBA_INSTRUKCJI_SMS]
+                  [MAX_LICZBA_ZNAKOW_INSTRUKCJI_SMS] PROGMEM = {
+                      // przed kad instrukcj musi by kod, litery
+                      // mog by due lub mae
+                      "\x04"
+                      "CODE", // CODE EFGH (zmiana kodu dostpu)
+                      "\x03"
+                      "ADD", //
+                      "\x03"
+                      "DEL", //
+                      "\x04"
+                      "XXXX", // RESET
+                      "\x06"
+                      "REPORT", // REPORT
+                      "\x04"
+                      "USER", // USER
+                      "\x04"
+                      "OPEN", // OPEN
+                      "\x05"
+                      "CLOSE", // CLOSE
+                      "\x04"
+                      "CLIP", // CLIP (sub-command)
+                      "\x04"
+                      "DTMF", // DTMF (sub-command)
+                      "\x03"
+                      "SET", // SET HH:MM:SS
+                      "\x04"
+                      "TIME", // TIME HH:MM HH:MM lub TIME OFF
+                      "\x06"
+                      "SKRYBA", // SKRYBA ON/OFF
+                      "\x05"
+                      "DEBUG", // DEBUG (diagnostyka SKRYBA)
+                      "\x05"
+                      "START", // START (odblokuj)
+                      "\x04"
+                      "STOP", // STOP (zablokuj)
+                      "\x03"
+                      "SUB", // SUB numer (dodaj do pozycji 795-800)
 };
 
 enum {
@@ -100,6 +103,7 @@ enum {
   INSTRUKCJA_DEBUG,
   INSTRUKCJA_START,
   INSTRUKCJA_STOP,
+  INSTRUKCJA_SUB,
 };
 
 uchar interpretuj_instrukcje_sms(const uchar **buf_sms, const uchar start,
@@ -188,7 +192,7 @@ uchar interpretuj_wiadomosc_sms(const uchar *sms) {
   }
 
   switch (
-      interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CODE, INSTRUKCJA_STOP + 1)) {
+      interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CODE, INSTRUKCJA_SUB + 1)) {
   case INSTRUKCJA_CODE: {
     przeskocz_biale_znaki(sms);
     for (uchar i = 0; i < LICZBA_BAJTOW_KODU_DOSTEPU; ++i) {
@@ -488,6 +492,13 @@ uchar interpretuj_wiadomosc_sms(const uchar *sms) {
   case INSTRUKCJA_STOP: {
     blokada_systemu = TRUE;
     zapisz_znak_w_eeprom(1, ADRES_EEPROM_BLOKADA_SYSTEMU);
+    return INTERPRETACJA_SMS_POPRAWNY;
+  }
+  case INSTRUKCJA_SUB: {
+    if (not pobierz_numer_telefonu(&sms, &numer_telefonu_do_ktorego_dzwonic[0],
+                                   14))
+      return INTERPRETACJA_SMS_BLEDNE_DANE;
+    dodaj_komende(KOMENDA_KOLEJKI_DODAJ_SUPER_USERA);
     return INTERPRETACJA_SMS_POPRAWNY;
   }
   }

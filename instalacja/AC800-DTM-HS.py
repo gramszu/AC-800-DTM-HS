@@ -315,7 +315,7 @@ class BramsterApp:
         self.skryba_var = tk.IntVar(value=0)  # 0 = Wylaczona, 1 = Wlaczona (adres 4089)
         self.skryba_var.trace_add("write", self.on_skryba_change)
         self.backup_mode = None  # Do przywracania trybu po wyłączeniu Skryby
-        self.skryba_limit_var = tk.IntVar(value=800)  # Limit użytkowników dla Skryby (1-800)
+        self.skryba_limit_var = tk.IntVar(value=795)  # Limit użytkowników dla Skryby (1-795, pozycje 796-800 dla Super Userów)
 
         # Zmienne dla Time Control
         self.time_enabled_var = tk.IntVar(value=0)  # 0 = Wyłączony, 1 = Włączony
@@ -395,13 +395,13 @@ class BramsterApp:
         return 0 <= int(new_value) <= 59
 
     def validate_skryba_limit(self, new_value: str) -> bool:
-        """Walidacja dla limitu Skryba (1-800)."""
+        """Walidacja dla limitu Skryba (1-795)."""
         if new_value == "":
             return True
         if not new_value.isdigit():
             return False
         val = int(new_value)
-        return 1 <= val <= 800
+        return 1 <= val <= 795
 
     def generate_hex_configs(self) -> None:
         """Generuje dynamiczną konfigurację dla aktywnej liczby numerów."""
@@ -494,15 +494,15 @@ class BramsterApp:
             limit_l = data[self.config.EEPROM_ADDR_SKRYBA_LIMIT_L]
             limit_h = data[self.config.EEPROM_ADDR_SKRYBA_LIMIT_H]
             if limit_l == 0xFF and limit_h == 0xFF:
-                # Nie ustawiono - domyślnie 800
-                self.skryba_limit_var.set(800)
+                # Nie ustawiono - domyślnie 795 (pozycje 796-800 dla Super Userów)
+                self.skryba_limit_var.set(795)
             else:
                 limit_value = limit_l | (limit_h << 8)
-                # Walidacja zakresu
-                if 1 <= limit_value <= 800:
+                # Walidacja zakresu (max 795, pozycje 796-800 dla Super Userów)
+                if 1 <= limit_value <= 795:
                     self.skryba_limit_var.set(limit_value)
                 else:
-                    self.skryba_limit_var.set(800)
+                    self.skryba_limit_var.set(795)
 
         # Status
         if self.config.EEPROM_ADDR_STATUS and len(data) > self.config.EEPROM_ADDR_STATUS:

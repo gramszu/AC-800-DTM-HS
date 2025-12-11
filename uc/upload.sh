@@ -13,7 +13,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 MCU="atmega1284p"
 PROGRAMMER="avrisp2"
-FLASH_BASENAME="AC800-DTM-HS.hex"
+FLASH_BASENAME="AC800-DTM-HS-RC3.hex"
 FLASH_FILE="${FLASH_FILE:-$SCRIPT_DIR/$FLASH_BASENAME}"
 EEPROM_FILE="$SCRIPT_DIR/default_eeprom.hex"
 

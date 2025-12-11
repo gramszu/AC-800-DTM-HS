@@ -365,25 +365,25 @@
  299               		.file 4 "komendy.h"
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 komendy.c
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:2      *ABS*:000000000000003e __SP_H__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:3      *ABS*:000000000000003d __SP_L__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:4      *ABS*:000000000000003f __SREG__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:5      *ABS*:000000000000003b __RAMPZ__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:6      *ABS*:0000000000000000 __tmp_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:7      *ABS*:0000000000000001 __zero_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:13     .text:0000000000000000 dodaj_komende
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:13     .text:0000000000000000 dodaj_komende
                             *COM*:000000000000001e komendy_kolejka
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:61     .text:0000000000000024 filtruj_i_dodaj_komende
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:113    .text:000000000000004c filtruj_komendy_z_przedzialu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:178    .text:000000000000007c usun_komende
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:212    .text:0000000000000092 czy_sa_komendy_z_przedzialu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:263    .data:0000000000000000 czas_stop_m
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:268    .data:0000000000000001 czas_stop_h
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:273    .data:0000000000000002 czas_start_m
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:278    .data:0000000000000003 czas_start_h
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:284    .bss:0000000000000000 blokada_sterowania_czasowa
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:61     .text:0000000000000024 filtruj_i_dodaj_komende
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:113    .text:000000000000004c filtruj_komendy_z_przedzialu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:178    .text:000000000000007c usun_komende
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:212    .text:0000000000000092 czy_sa_komendy_z_przedzialu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:263    .data:0000000000000000 czas_stop_m
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:268    .data:0000000000000001 czas_stop_h
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:273    .data:0000000000000002 czas_start_m
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:278    .data:0000000000000003 czas_start_h
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:284    .bss:0000000000000000 blokada_sterowania_czasowa
                             *COM*:0000000000000020 bufor_ustaw_czas
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccY8WK9W.s:291    .data:0000000000000004 rtc_czas
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccImjff7.s:291    .data:0000000000000004 rtc_czas
 
 UNDEFINED SYMBOLS
 __do_copy_data

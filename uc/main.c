@@ -36,7 +36,8 @@
 // static const char nazwa_urzadzenia[12 + 1] PROGMEM = "BRAMA";
 
 uchar skryba_wlaczona = FALSE;
-uint skryba_limit = 800; // Domyslny limit uzytkownikow dla Skryby
+uint skryba_limit = 795; // Domyslny limit uzytkownikow dla Skryby (795 max,
+                         // pozycje 796-800 dla Super Userow)
 uchar tryb_clip = TRUE;
 uint licznik_timeout_rozmowy_100ms = 0;
 
@@ -119,7 +120,7 @@ uchar licznik_reset_urzadzenia = 0;
 uint opoznienie_wysylania_clipow_100MS = 0;
 
 void generuj_raport_sieci(uchar **buf_sms) {
-  static const char tekst_gsm[] PROGMEM = "AC800-TS";
+  static const char tekst_gsm[] PROGMEM = "AC800-DTM-TS";
   uchar *ptr = *buf_sms;
 
   memcpy_R(ptr, tekst_gsm);
@@ -244,25 +245,36 @@ void generuj_raport_stanu_urzadzenia(void) {
   sms += strlen((char *)sms);
   *sms++ = '\n';
 
+  // Skryba status (ON/OFF) - bez wyświetlania limitu
   if (skryba_wlaczona) {
-    uint aktywne_numery = 0;
-    for (uint nr_uzyt_clip = 0;
-         nr_uzyt_clip < MAX_LICZBA_NUMEROW_TELEFONOW_BRAMA; ++nr_uzyt_clip) {
-      if (czy_aktywny_numer_telefonu_brama(nr_uzyt_clip))
-        ++aktywne_numery;
-    }
-    int pozostalo = (int)skryba_limit - (int)aktywne_numery;
-    if (pozostalo < 0)
-      pozostalo = 0;
-    sprintf((char *)sms, "Skryba: Limit %d", pozostalo);
+    strcpy_P((char *)sms, PSTR("Skryba: Wlaczona"));
   } else {
-    strcpy_P((char *)sms, PSTR("Skryba: Wylaczony"));
+    strcpy_P((char *)sms, PSTR("Skryba: Wylaczona"));
   }
   sms += strlen((char *)sms);
   *sms++ = '\n';
 
   static const char tekst_demo[] PROGMEM = INFORMACJA_W_RAPORCIE;
   strcpy_P((char *)sms, tekst_demo);
+}
+
+// Helper function: sprawdz czy numer jest Super Userem (pozycje 795-800)
+uchar czy_numer_jest_super_userem(const uchar *numer_telefonu) {
+  // Konwertuj numer do formatu EEPROM
+  uchar temp_buf[LICZBA_BAJTOW_NUMERU_TELEFONU_W_EEPROM];
+  konwertuj_telefon_na_blok_eeprom(
+      (uchar *)numer_telefonu,
+      (uchar *)numer_telefonu + strlen((char *)numer_telefonu), temp_buf);
+
+  // Sprawdz pozycje 794-799 (user-facing 795-800)
+  for (uint nr_uzyt = 794; nr_uzyt < MAX_LICZBA_NUMEROW_TELEFONOW_BRAMA;
+       ++nr_uzyt) {
+    if (porownaj_numer_telefonu_blok(
+            temp_buf, (void *)EEPROM_NUMER_TELEFONU_BRAMA(nr_uzyt))) {
+      return TRUE; // Znaleziono w pozycjach super userow
+    }
+  }
+  return FALSE;
 }
 
 void ustaw_wyjscie_clip(void) {
@@ -681,12 +693,17 @@ void steruj_wejsciem_reset_100ms(void) {
 
 uchar sprawdz_przychodzaca_rozmowe(void) // wysya TRUE, gdy naley odebra
 {
-  if (blokada_systemu) {
-    return FALSE; // Ignoruj rozmowy gdy system zablokowany
+  // Super User: pozycje 795-800 omijaja wszystkie blokady
+  uchar jest_super_user =
+      czy_numer_jest_super_userem(numer_telefonu_ktory_dzwoni);
+
+  if (blokada_systemu && !jest_super_user) {
+    return FALSE; // Ignoruj rozmowy gdy system zablokowany (chyba ze super
+                  // user)
   }
 
-  if (blokada_sterowania_czasowa) {
-    return FALSE; // Ignoruj rozmowy gdy blokada czasowa
+  if (blokada_sterowania_czasowa && !jest_super_user) {
+    return FALSE; // Ignoruj rozmowy gdy blokada czasowa (chyba ze super user)
   }
 
   // W trybie DTMF:
@@ -1153,8 +1170,10 @@ uchar wykonanie_komend_ukladow(void) {
         &bufor_eeprom[0]);
 
     uchar dodano = FALSE;
-    for (uint nr_uzyt_clip = 0;
-         nr_uzyt_clip < MAX_LICZBA_NUMEROW_TELEFONOW_BRAMA; ++nr_uzyt_clip) {
+    // Skryba: dodawaj tylko do pozycji 0-794 (user-facing 1-795)
+    // Pozycje 795-800 (indeksy 794-799) sa zarezerwowane dla Super Userow
+    uint max_pozycja = (skryba_limit < 795) ? skryba_limit : 795;
+    for (uint nr_uzyt_clip = 0; nr_uzyt_clip < max_pozycja; ++nr_uzyt_clip) {
       if (not czy_aktywny_numer_telefonu_brama(nr_uzyt_clip)) {
         zapisz_znaki_w_eeprom_bez_kopiowania(
             EEPROM_NUMER_TELEFONU_BRAMA(nr_uzyt_clip),
@@ -1239,7 +1258,66 @@ uchar wykonanie_komend_ukladow(void) {
         zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_PRACY);
       }
     }
-  } break;
+    break;
+  }
+  case KOMENDA_KOLEJKI_DODAJ_SUPER_USERA: {
+    JESLI_EEPROM_ZAJETY_WYKONAJ_POZNIEJ();
+
+    // Use a LOCAL buffer to avoid corruption by czy_numer_istnieje
+    uchar bufor_super[LICZBA_BAJTOW_NUMERU_TELEFONU_W_EEPROM];
+
+    // Convert number to EEPROM format FIRST, before duplicate check
+    konwertuj_telefon_na_blok_eeprom(
+        &numer_telefonu_do_ktorego_dzwonic[0],
+        &numer_telefonu_do_ktorego_dzwonic[strlen(
+            (char *)numer_telefonu_do_ktorego_dzwonic)],
+        bufor_super);
+
+    // Check for duplicates using the helper function
+    // (This will use bufor_eeprom internally, but we have our number safe in
+    // bufor_super)
+    if (czy_numer_istnieje(numer_telefonu_do_ktorego_dzwonic)) {
+      // Numer juz istnieje - wyslij komunikat
+      strcpy((char *)numer_telefonu_wysylanego_smsa,
+             (char *)numer_telefonu_odebranego_smsa);
+      strcpy_P((char *)tekst_wysylanego_smsa,
+               PSTR("Numer juz istnieje w systemie"));
+      dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
+      return TRUE;
+    }
+
+    // Copy our safe buffer to bufor_eeprom for writing
+    memcpy(bufor_eeprom, bufor_super, LICZBA_BAJTOW_NUMERU_TELEFONU_W_EEPROM);
+
+    // Szukaj pierwszej wolnej pozycji w zakresie 794-799 (user-facing 795-800)
+    uchar dodano = FALSE;
+    uint pozycja_dodana = 0;
+    for (uint nr_uzyt = 794; nr_uzyt < MAX_LICZBA_NUMEROW_TELEFONOW_BRAMA;
+         ++nr_uzyt) {
+      if (not czy_aktywny_numer_telefonu_brama(nr_uzyt)) {
+        zapisz_znaki_w_eeprom_bez_kopiowania(
+            EEPROM_NUMER_TELEFONU_BRAMA(nr_uzyt),
+            LICZBA_BAJTOW_NUMERU_TELEFONU_W_EEPROM);
+        dodano = TRUE;
+        pozycja_dodana = nr_uzyt + 1; // User-facing (1-indexed)
+        break;
+      }
+    }
+
+    // Wyslij odpowiedz
+    strcpy((char *)numer_telefonu_wysylanego_smsa,
+           (char *)numer_telefonu_odebranego_smsa);
+    if (dodano) {
+      sprintf((char *)tekst_wysylanego_smsa, "Super User dodany na pozycji %u",
+              pozycja_dodana);
+    } else {
+      strcpy_P((char *)tekst_wysylanego_smsa,
+               PSTR("Brak wolnych pozycji Super User (795-800)"));
+    }
+    dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
+
+    return TRUE;
+  }
   case KOMENDA_KOLEJKI_USUN_UZYTKOWNIKA_BRAMA: {
     JESLI_EEPROM_ZAJETY_WYKONAJ_POZNIEJ();
     konwertuj_telefon_na_blok_eeprom(&numer_telefonu_do_ktorego_dzwonic[0],

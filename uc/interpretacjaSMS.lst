@@ -160,8 +160,8 @@
  119               		.loc 1 42 0
  120 006a 44E0      		ldi r20,lo8(4)
  121 006c 50E0      		ldi r21,0
- 122 006e 60E0      		ldi r22,lo8(res_ust.2650)
- 123 0070 70E0      		ldi r23,hi8(res_ust.2650)
+ 122 006e 60E0      		ldi r22,lo8(res_ust.2651)
+ 123 0070 70E0      		ldi r23,hi8(res_ust.2651)
  124 0072 0E94 0000 		call memcmp_P
  125               	.LVL6:
  126 0076 21E0      		ldi r18,lo8(1)
@@ -180,69 +180,73 @@
  140               	interpretuj_instrukcje_sms:
  141               	.LFB9:
   44:interpretacjaSMS.c **** 
-  45:interpretacjaSMS.c **** #define LICZBA_INSTRUKCJI_SMS 16 // Increased to 16
+  45:interpretacjaSMS.c **** #define LICZBA_INSTRUKCJI_SMS 17 // Increased to 17
   46:interpretacjaSMS.c **** #define MAX_LICZBA_ZNAKOW_INSTRUKCJI_SMS 8
   47:interpretacjaSMS.c **** // uwaga: wana jest kolejno oraz usytuowanie pomidzy nimi
-  48:interpretacjaSMS.c **** static const uchar instrukcja_sms[LICZBA_INSTRUKCJI_SMS]
-  49:interpretacjaSMS.c ****                                  [MAX_LICZBA_ZNAKOW_INSTRUKCJI_SMS] PROGMEM = {
-  50:interpretacjaSMS.c ****                                      // przed kad instrukcj musi by kod, litery
-  51:interpretacjaSMS.c ****                                      // mog by due lub mae
-  52:interpretacjaSMS.c ****                                      "\x04"
-  53:interpretacjaSMS.c ****                                      "CODE", // CODE EFGH (zmiana kodu dostpu)
-  54:interpretacjaSMS.c ****                                      "\x03"
-  55:interpretacjaSMS.c ****                                      "ADD", //
-  56:interpretacjaSMS.c ****                                      "\x03"
-  57:interpretacjaSMS.c ****                                      "DEL", //
-  58:interpretacjaSMS.c ****                                      "\x04"
-  59:interpretacjaSMS.c ****                                      "XXXX", // RESET
-  60:interpretacjaSMS.c ****                                      "\x06"
-  61:interpretacjaSMS.c ****                                      "REPORT", // REPORT
-  62:interpretacjaSMS.c ****                                      "\x04"
-  63:interpretacjaSMS.c ****                                      "USER", // USER
-  64:interpretacjaSMS.c ****                                      "\x04"
-  65:interpretacjaSMS.c ****                                      "OPEN", // OPEN
-  66:interpretacjaSMS.c ****                                      "\x05"
-  67:interpretacjaSMS.c ****                                      "CLOSE", // CLOSE
-  68:interpretacjaSMS.c ****                                      "\x04"
-  69:interpretacjaSMS.c ****                                      "CLIP", // CLIP (sub-command)
-  70:interpretacjaSMS.c ****                                      "\x04"
-  71:interpretacjaSMS.c ****                                      "DTMF", // DTMF (sub-command)
-  72:interpretacjaSMS.c ****                                      "\x03"
-  73:interpretacjaSMS.c ****                                      "SET", // SET HH:MM:SS
-  74:interpretacjaSMS.c ****                                      "\x04"
-  75:interpretacjaSMS.c ****                                      "TIME", // TIME HH:MM HH:MM lub TIME OFF
-  76:interpretacjaSMS.c ****                                      "\x06"
-  77:interpretacjaSMS.c ****                                      "SKRYBA", // SKRYBA ON/OFF
-  78:interpretacjaSMS.c ****                                      "\x05"
-  79:interpretacjaSMS.c ****                                      "DEBUG", // DEBUG (diagnostyka SKRYBA)
-  80:interpretacjaSMS.c ****                                      "\x05"
-  81:interpretacjaSMS.c ****                                      "START", // START (odblokuj)
-  82:interpretacjaSMS.c ****                                      "\x04"
-  83:interpretacjaSMS.c ****                                      "STOP", // STOP (zablokuj)
-  84:interpretacjaSMS.c **** };
-  85:interpretacjaSMS.c **** 
-  86:interpretacjaSMS.c **** enum {
-  87:interpretacjaSMS.c ****   INSTRUKCJA_CODE, // code EFGH [K]
-  88:interpretacjaSMS.c ****   INSTRUKCJA_ADD,
-  89:interpretacjaSMS.c ****   INSTRUKCJA_DEL,
-  90:interpretacjaSMS.c ****   INSTRUKCJA_RESET,
-  91:interpretacjaSMS.c ****   INSTRUKCJA_REPORT, // report
-  92:interpretacjaSMS.c ****   INSTRUKCJA_USER, // user +48505691117 E C B R [K] // user del +48505691117 [K]
-  93:interpretacjaSMS.c ****   INSTRUKCJA_OPEN,
-  94:interpretacjaSMS.c ****   INSTRUKCJA_CLOSE,
-  95:interpretacjaSMS.c ****   INSTRUKCJA_CLIP,
-  96:interpretacjaSMS.c ****   INSTRUKCJA_DTMF,
-  97:interpretacjaSMS.c ****   INSTRUKCJA_SET,
-  98:interpretacjaSMS.c ****   INSTRUKCJA_TIME,
-  99:interpretacjaSMS.c ****   INSTRUKCJA_SKRYBA,
- 100:interpretacjaSMS.c ****   INSTRUKCJA_DEBUG,
- 101:interpretacjaSMS.c ****   INSTRUKCJA_START,
- 102:interpretacjaSMS.c ****   INSTRUKCJA_STOP,
- 103:interpretacjaSMS.c **** };
- 104:interpretacjaSMS.c **** 
- 105:interpretacjaSMS.c **** uchar interpretuj_instrukcje_sms(const uchar **buf_sms, const uchar start,
- 106:interpretacjaSMS.c ****                                  const uchar end) {
- 142               		.loc 1 106 0
+  48:interpretacjaSMS.c **** static const uchar
+  49:interpretacjaSMS.c ****     instrukcja_sms[LICZBA_INSTRUKCJI_SMS]
+  50:interpretacjaSMS.c ****                   [MAX_LICZBA_ZNAKOW_INSTRUKCJI_SMS] PROGMEM = {
+  51:interpretacjaSMS.c ****                       // przed kad instrukcj musi by kod, litery
+  52:interpretacjaSMS.c ****                       // mog by due lub mae
+  53:interpretacjaSMS.c ****                       "\x04"
+  54:interpretacjaSMS.c ****                       "CODE", // CODE EFGH (zmiana kodu dostpu)
+  55:interpretacjaSMS.c ****                       "\x03"
+  56:interpretacjaSMS.c ****                       "ADD", //
+  57:interpretacjaSMS.c ****                       "\x03"
+  58:interpretacjaSMS.c ****                       "DEL", //
+  59:interpretacjaSMS.c ****                       "\x04"
+  60:interpretacjaSMS.c ****                       "XXXX", // RESET
+  61:interpretacjaSMS.c ****                       "\x06"
+  62:interpretacjaSMS.c ****                       "REPORT", // REPORT
+  63:interpretacjaSMS.c ****                       "\x04"
+  64:interpretacjaSMS.c ****                       "USER", // USER
+  65:interpretacjaSMS.c ****                       "\x04"
+  66:interpretacjaSMS.c ****                       "OPEN", // OPEN
+  67:interpretacjaSMS.c ****                       "\x05"
+  68:interpretacjaSMS.c ****                       "CLOSE", // CLOSE
+  69:interpretacjaSMS.c ****                       "\x04"
+  70:interpretacjaSMS.c ****                       "CLIP", // CLIP (sub-command)
+  71:interpretacjaSMS.c ****                       "\x04"
+  72:interpretacjaSMS.c ****                       "DTMF", // DTMF (sub-command)
+  73:interpretacjaSMS.c ****                       "\x03"
+  74:interpretacjaSMS.c ****                       "SET", // SET HH:MM:SS
+  75:interpretacjaSMS.c ****                       "\x04"
+  76:interpretacjaSMS.c ****                       "TIME", // TIME HH:MM HH:MM lub TIME OFF
+  77:interpretacjaSMS.c ****                       "\x06"
+  78:interpretacjaSMS.c ****                       "SKRYBA", // SKRYBA ON/OFF
+  79:interpretacjaSMS.c ****                       "\x05"
+  80:interpretacjaSMS.c ****                       "DEBUG", // DEBUG (diagnostyka SKRYBA)
+  81:interpretacjaSMS.c ****                       "\x05"
+  82:interpretacjaSMS.c ****                       "START", // START (odblokuj)
+  83:interpretacjaSMS.c ****                       "\x04"
+  84:interpretacjaSMS.c ****                       "STOP", // STOP (zablokuj)
+  85:interpretacjaSMS.c ****                       "\x03"
+  86:interpretacjaSMS.c ****                       "SUB", // SUB numer (dodaj do pozycji 795-800)
+  87:interpretacjaSMS.c **** };
+  88:interpretacjaSMS.c **** 
+  89:interpretacjaSMS.c **** enum {
+  90:interpretacjaSMS.c ****   INSTRUKCJA_CODE, // code EFGH [K]
+  91:interpretacjaSMS.c ****   INSTRUKCJA_ADD,
+  92:interpretacjaSMS.c ****   INSTRUKCJA_DEL,
+  93:interpretacjaSMS.c ****   INSTRUKCJA_RESET,
+  94:interpretacjaSMS.c ****   INSTRUKCJA_REPORT, // report
+  95:interpretacjaSMS.c ****   INSTRUKCJA_USER, // user +48505691117 E C B R [K] // user del +48505691117 [K]
+  96:interpretacjaSMS.c ****   INSTRUKCJA_OPEN,
+  97:interpretacjaSMS.c ****   INSTRUKCJA_CLOSE,
+  98:interpretacjaSMS.c ****   INSTRUKCJA_CLIP,
+  99:interpretacjaSMS.c ****   INSTRUKCJA_DTMF,
+ 100:interpretacjaSMS.c ****   INSTRUKCJA_SET,
+ 101:interpretacjaSMS.c ****   INSTRUKCJA_TIME,
+ 102:interpretacjaSMS.c ****   INSTRUKCJA_SKRYBA,
+ 103:interpretacjaSMS.c ****   INSTRUKCJA_DEBUG,
+ 104:interpretacjaSMS.c ****   INSTRUKCJA_START,
+ 105:interpretacjaSMS.c ****   INSTRUKCJA_STOP,
+ 106:interpretacjaSMS.c ****   INSTRUKCJA_SUB,
+ 107:interpretacjaSMS.c **** };
+ 108:interpretacjaSMS.c **** 
+ 109:interpretacjaSMS.c **** uchar interpretuj_instrukcje_sms(const uchar **buf_sms, const uchar start,
+ 110:interpretacjaSMS.c ****                                  const uchar end) {
+ 142               		.loc 1 110 0
  143               		.cfi_startproc
  144               	.LVL7:
  145 0082 6F92      		push r6
@@ -310,8 +314,8 @@
  207 00a2 642E      		mov r6,r20
  208               	.LVL8:
  209               	.L15:
- 107:interpretacjaSMS.c ****   przeskocz_biale_znaki(*buf_sms);
- 210               		.loc 1 107 0 discriminator 1
+ 111:interpretacjaSMS.c ****   przeskocz_biale_znaki(*buf_sms);
+ 210               		.loc 1 111 0 discriminator 1
  211 00a4 F501      		movw r30,r10
  212 00a6 0081      		ld r16,Z
  213 00a8 1181      		ldd r17,Z+1
@@ -326,24 +330,24 @@
  222 00ba 7F9E      		mul r7,r31
  223 00bc C001      		movw r24,r0
  224 00be 1124      		clr __zero_reg__
- 225               		.loc 1 107 0 is_stmt 0
+ 225               		.loc 1 111 0 is_stmt 0
  226 00c0 D12C      		mov r13,__zero_reg__
  227 00c2 C12C      		mov r12,__zero_reg__
  228               	.LBB2:
  229               	.LBB3:
- 108:interpretacjaSMS.c ****   uchar i;
- 109:interpretacjaSMS.c ****   for (i = start; i < end; ++i) {
- 110:interpretacjaSMS.c ****     const void *p =
- 111:interpretacjaSMS.c ****         &instrukcja_sms[0][0] + i * MAX_LICZBA_ZNAKOW_INSTRUKCJI_SMS;
- 112:interpretacjaSMS.c ****     const uchar l = pgm_read_byte(p);
- 230               		.loc 1 112 0 is_stmt 1
+ 112:interpretacjaSMS.c ****   uchar i;
+ 113:interpretacjaSMS.c ****   for (i = start; i < end; ++i) {
+ 114:interpretacjaSMS.c ****     const void *p =
+ 115:interpretacjaSMS.c ****         &instrukcja_sms[0][0] + i * MAX_LICZBA_ZNAKOW_INSTRUKCJI_SMS;
+ 116:interpretacjaSMS.c ****     const uchar l = pgm_read_byte(p);
+ 230               		.loc 1 116 0 is_stmt 1
  231 00c4 9C01      		movw r18,r24
  232 00c6 2050      		subi r18,lo8(-(instrukcja_sms))
  233 00c8 3040      		sbci r19,hi8(-(instrukcja_sms))
  234 00ca 4901      		movw r8,r18
  235               	.LBE3:
- 113:interpretacjaSMS.c ****     if (memcmp_P(*buf_sms, p + 1, l) == 0) {
- 236               		.loc 1 113 0
+ 117:interpretacjaSMS.c ****     if (memcmp_P(*buf_sms, p + 1, l) == 0) {
+ 236               		.loc 1 117 0
  237 00cc FC01      		movw r30,r24
  238 00ce E050      		subi r30,lo8(-(instrukcja_sms+1))
  239 00d0 F040      		sbci r31,hi8(-(instrukcja_sms+1))
@@ -351,27 +355,27 @@
  241               	.LVL10:
  242               	.L17:
  243               	.LBE2:
- 109:interpretacjaSMS.c ****     const void *p =
- 244               		.loc 1 109 0 discriminator 1
+ 113:interpretacjaSMS.c ****     const void *p =
+ 244               		.loc 1 113 0 discriminator 1
  245 00d4 7614      		cp r7,r6
  246 00d6 00F4      		brsh .L19
  247               	.LVL11:
  248               	.LBB5:
  249               	.LBB4:
- 112:interpretacjaSMS.c ****     if (memcmp_P(*buf_sms, p + 1, l) == 0) {
- 250               		.loc 1 112 0
+ 116:interpretacjaSMS.c ****     if (memcmp_P(*buf_sms, p + 1, l) == 0) {
+ 250               		.loc 1 116 0
  251 00d8 F401      		movw r30,r8
  252 00da EC0D      		add r30,r12
  253 00dc FD1D      		adc r31,r13
  254               	/* #APP */
- 255               	 ;  112 "interpretacjaSMS.c" 1
+ 255               	 ;  116 "interpretacjaSMS.c" 1
  256 00de E491      		lpm r30, Z
  257               		
  258               	 ;  0 "" 2
  259               	.LVL12:
  260               	/* #NOAPP */
  261               	.LBE4:
- 262               		.loc 1 113 0
+ 262               		.loc 1 117 0
  263 00e0 CE2F      		mov r28,r30
  264 00e2 D0E0      		ldi r29,0
  265 00e4 B701      		movw r22,r14
@@ -387,8 +391,8 @@
  275               	.LVL14:
  276 00f8 892B      		or r24,r25
  277 00fa 01F4      		brne .L18
- 114:interpretacjaSMS.c ****       *buf_sms += l;
- 278               		.loc 1 114 0
+ 118:interpretacjaSMS.c ****       *buf_sms += l;
+ 278               		.loc 1 118 0
  279 00fc C00F      		add r28,r16
  280 00fe D11F      		adc r29,r17
  281               	.LVL15:
@@ -398,12 +402,12 @@
  285               	.LVL16:
  286               	.L19:
  287               	.LBE5:
- 115:interpretacjaSMS.c ****       return i;
- 116:interpretacjaSMS.c ****     }
- 117:interpretacjaSMS.c ****   }
- 118:interpretacjaSMS.c ****   return i;
- 119:interpretacjaSMS.c **** }
- 288               		.loc 1 119 0
+ 119:interpretacjaSMS.c ****       return i;
+ 120:interpretacjaSMS.c ****     }
+ 121:interpretacjaSMS.c ****   }
+ 122:interpretacjaSMS.c ****   return i;
+ 123:interpretacjaSMS.c **** }
+ 288               		.loc 1 123 0
  289 0106 872D      		mov r24,r7
  290               	/* epilogue start */
  291 0108 DF91      		pop r29
@@ -426,8 +430,8 @@
  308 0124 0895      		ret
  309               	.LVL20:
  310               	.L16:
- 107:interpretacjaSMS.c ****   uchar i;
- 311               		.loc 1 107 0 discriminator 2
+ 111:interpretacjaSMS.c ****   uchar i;
+ 311               		.loc 1 111 0 discriminator 2
  312 0126 0F5F      		subi r16,-1
  313 0128 1F4F      		sbci r17,-1
  314 012a F501      		movw r30,r10
@@ -436,8 +440,8 @@
  317 0130 00C0      		rjmp .L15
  318               	.LVL21:
  319               	.L18:
- 109:interpretacjaSMS.c ****     const void *p =
- 320               		.loc 1 109 0 discriminator 2
+ 113:interpretacjaSMS.c ****     const void *p =
+ 320               		.loc 1 113 0 discriminator 2
  321 0132 7394      		inc r7
  322               	.LVL22:
  323 0134 00C0      		rjmp .L17
@@ -446,9 +450,9 @@
  327               	.global	pobierz_long
  329               	pobierz_long:
  330               	.LFB10:
- 120:interpretacjaSMS.c **** 
- 121:interpretacjaSMS.c **** uchar pobierz_long(const uchar **buf_sms, long *wartosc) {
- 331               		.loc 1 121 0
+ 124:interpretacjaSMS.c **** 
+ 125:interpretacjaSMS.c **** uchar pobierz_long(const uchar **buf_sms, long *wartosc) {
+ 331               		.loc 1 125 0
  332               		.cfi_startproc
  333               	.LVL23:
  334 0136 EF92      		push r14
@@ -481,13 +485,13 @@
  361               	.L__stack_usage = 6
  362 0142 EC01      		movw r28,r24
  363 0144 7B01      		movw r14,r22
- 122:interpretacjaSMS.c ****   const uchar *buf_sms_pom = *buf_sms;
- 364               		.loc 1 122 0
+ 126:interpretacjaSMS.c ****   const uchar *buf_sms_pom = *buf_sms;
+ 364               		.loc 1 126 0
  365 0146 0881      		ld r16,Y
  366 0148 1981      		ldd r17,Y+1
  367               	.LVL24:
- 123:interpretacjaSMS.c ****   *wartosc = strtol(*buf_sms, (char **)buf_sms, 10);
- 368               		.loc 1 123 0
+ 127:interpretacjaSMS.c ****   *wartosc = strtol(*buf_sms, (char **)buf_sms, 10);
+ 368               		.loc 1 127 0
  369 014a 4AE0      		ldi r20,lo8(10)
  370 014c 50E0      		ldi r21,0
  371 014e BC01      		movw r22,r24
@@ -501,8 +505,8 @@
  379 015a 7183      		std Z+1,r23
  380 015c 8283      		std Z+2,r24
  381 015e 9383      		std Z+3,r25
- 124:interpretacjaSMS.c ****   return *buf_sms != buf_sms_pom;
- 382               		.loc 1 124 0
+ 128:interpretacjaSMS.c ****   return *buf_sms != buf_sms_pom;
+ 382               		.loc 1 128 0
  383 0160 81E0      		ldi r24,lo8(1)
  384 0162 2881      		ld r18,Y
  385 0164 3981      		ldd r19,Y+1
@@ -512,8 +516,8 @@
  389 016c 80E0      		ldi r24,0
  390               	.L22:
  391               	/* epilogue start */
- 125:interpretacjaSMS.c **** }
- 392               		.loc 1 125 0
+ 129:interpretacjaSMS.c **** }
+ 392               		.loc 1 129 0
  393 016e DF91      		pop r29
  394 0170 CF91      		pop r28
  395               	.LVL28:
@@ -529,9 +533,9 @@
  406               	.global	pomin_znak
  408               	pomin_znak:
  409               	.LFB11:
- 126:interpretacjaSMS.c **** 
- 127:interpretacjaSMS.c **** uchar pomin_znak(const uchar **buf_sms, const uchar wartosc) {
- 410               		.loc 1 127 0
+ 130:interpretacjaSMS.c **** 
+ 131:interpretacjaSMS.c **** uchar pomin_znak(const uchar **buf_sms, const uchar wartosc) {
+ 410               		.loc 1 131 0
  411               		.cfi_startproc
  412               	.LVL31:
  413 017c DF92      		push r13
@@ -570,8 +574,8 @@
  446 018c D62E      		mov r13,r22
  447               	.LVL32:
  448               	.L24:
- 128:interpretacjaSMS.c ****   przeskocz_biale_znaki(*buf_sms);
- 449               		.loc 1 128 0 discriminator 1
+ 132:interpretacjaSMS.c ****   przeskocz_biale_znaki(*buf_sms);
+ 449               		.loc 1 132 0 discriminator 1
  450 018e F701      		movw r30,r14
  451 0190 C081      		ld r28,Z
  452 0192 D181      		ldd r29,Z+1
@@ -582,8 +586,8 @@
  457               	.LVL33:
  458 019e 892B      		or r24,r25
  459 01a0 01F4      		brne .L25
- 129:interpretacjaSMS.c ****   if (**buf_sms == toupper(wartosc)) {
- 460               		.loc 1 129 0
+ 133:interpretacjaSMS.c ****   if (**buf_sms == toupper(wartosc)) {
+ 460               		.loc 1 133 0
  461 01a2 8D2D      		mov r24,r13
  462 01a4 90E0      		ldi r25,0
  463 01a6 0E94 0000 		call toupper
@@ -591,21 +595,21 @@
  465 01aa 0817      		cp r16,r24
  466 01ac 1907      		cpc r17,r25
  467 01ae 01F4      		brne .L27
- 130:interpretacjaSMS.c ****     ++*buf_sms;
- 468               		.loc 1 130 0
+ 134:interpretacjaSMS.c ****     ++*buf_sms;
+ 468               		.loc 1 134 0
  469 01b0 2196      		adiw r28,1
  470 01b2 F701      		movw r30,r14
  471 01b4 D183      		std Z+1,r29
  472 01b6 C083      		st Z,r28
- 131:interpretacjaSMS.c ****     return TRUE;
- 473               		.loc 1 131 0
+ 135:interpretacjaSMS.c ****     return TRUE;
+ 473               		.loc 1 135 0
  474 01b8 8FEF      		ldi r24,lo8(-1)
  475               	.L23:
  476               	/* epilogue start */
- 132:interpretacjaSMS.c ****   } else
- 133:interpretacjaSMS.c ****     return FALSE;
- 134:interpretacjaSMS.c **** }
- 477               		.loc 1 134 0
+ 136:interpretacjaSMS.c ****   } else
+ 137:interpretacjaSMS.c ****     return FALSE;
+ 138:interpretacjaSMS.c **** }
+ 477               		.loc 1 138 0
  478 01ba DF91      		pop r29
  479 01bc CF91      		pop r28
  480 01be 1F91      		pop r17
@@ -618,16 +622,16 @@
  487 01c8 0895      		ret
  488               	.LVL37:
  489               	.L25:
- 128:interpretacjaSMS.c ****   if (**buf_sms == toupper(wartosc)) {
- 490               		.loc 1 128 0 discriminator 2
+ 132:interpretacjaSMS.c ****   if (**buf_sms == toupper(wartosc)) {
+ 490               		.loc 1 132 0 discriminator 2
  491 01ca 2196      		adiw r28,1
  492 01cc F701      		movw r30,r14
  493 01ce D183      		std Z+1,r29
  494 01d0 C083      		st Z,r28
  495 01d2 00C0      		rjmp .L24
  496               	.L27:
- 133:interpretacjaSMS.c **** }
- 497               		.loc 1 133 0
+ 137:interpretacjaSMS.c **** }
+ 497               		.loc 1 137 0
  498 01d4 80E0      		ldi r24,0
  499 01d6 00C0      		rjmp .L23
  500               		.cfi_endproc
@@ -635,9 +639,9 @@
  503               	.global	czy_jest_znak
  505               	czy_jest_znak:
  506               	.LFB12:
- 135:interpretacjaSMS.c **** 
- 136:interpretacjaSMS.c **** uchar czy_jest_znak(const uchar **buf_sms, const uchar wartosc) {
- 507               		.loc 1 136 0
+ 139:interpretacjaSMS.c **** 
+ 140:interpretacjaSMS.c **** uchar czy_jest_znak(const uchar **buf_sms, const uchar wartosc) {
+ 507               		.loc 1 140 0
  508               		.cfi_startproc
  509               	.LVL38:
  510 01d8 DF92      		push r13
@@ -676,8 +680,8 @@
  543 01e8 D62E      		mov r13,r22
  544               	.LVL39:
  545               	.L29:
- 137:interpretacjaSMS.c ****   przeskocz_biale_znaki(*buf_sms);
- 546               		.loc 1 137 0 discriminator 1
+ 141:interpretacjaSMS.c ****   przeskocz_biale_znaki(*buf_sms);
+ 546               		.loc 1 141 0 discriminator 1
  547 01ea F801      		movw r30,r16
  548 01ec C081      		ld r28,Z
  549 01ee D181      		ldd r29,Z+1
@@ -690,9 +694,9 @@
  556 01fc 892B      		or r24,r25
  557 01fe 01F4      		brne .L30
  558               	.LVL41:
- 138:interpretacjaSMS.c ****   const uchar *buf_sms_pom = *buf_sms;
- 139:interpretacjaSMS.c ****   const uchar w = toupper(wartosc);
- 559               		.loc 1 139 0
+ 142:interpretacjaSMS.c ****   const uchar *buf_sms_pom = *buf_sms;
+ 143:interpretacjaSMS.c ****   const uchar w = toupper(wartosc);
+ 559               		.loc 1 143 0
  560 0200 8D2D      		mov r24,r13
  561 0202 90E0      		ldi r25,0
  562 0204 0E94 0000 		call toupper
@@ -700,9 +704,9 @@
  564 0208 982F      		mov r25,r24
  565               	.LVL43:
  566               	.L32:
- 140:interpretacjaSMS.c ****   uchar ch;
- 141:interpretacjaSMS.c ****   while ((ch = *buf_sms_pom++) != '\0' && ch != w)
- 567               		.loc 1 141 0 discriminator 2
+ 144:interpretacjaSMS.c ****   uchar ch;
+ 145:interpretacjaSMS.c ****   while ((ch = *buf_sms_pom++) != '\0' && ch != w)
+ 567               		.loc 1 145 0 discriminator 2
  568 020a 9E01      		movw r18,r28
  569 020c 2F5F      		subi r18,-1
  570 020e 3F4F      		sbci r19,-1
@@ -711,44 +715,44 @@
  573               	.LVL45:
  574 0212 8823      		tst r24
  575 0214 01F0      		breq .L31
- 576               		.loc 1 141 0 is_stmt 0 discriminator 1
+ 576               		.loc 1 145 0 is_stmt 0 discriminator 1
  577 0216 E901      		movw r28,r18
  578 0218 9813      		cpse r25,r24
  579 021a 00C0      		rjmp .L32
  580               	.L33:
- 142:interpretacjaSMS.c ****     ;
- 143:interpretacjaSMS.c ****   if (ch == w) {
- 144:interpretacjaSMS.c ****     *buf_sms = buf_sms_pom;
- 581               		.loc 1 144 0 is_stmt 1
+ 146:interpretacjaSMS.c ****     ;
+ 147:interpretacjaSMS.c ****   if (ch == w) {
+ 148:interpretacjaSMS.c ****     *buf_sms = buf_sms_pom;
+ 581               		.loc 1 148 0 is_stmt 1
  582 021c F801      		movw r30,r16
  583 021e 3183      		std Z+1,r19
  584 0220 2083      		st Z,r18
- 145:interpretacjaSMS.c ****     return TRUE;
- 585               		.loc 1 145 0
+ 149:interpretacjaSMS.c ****     return TRUE;
+ 585               		.loc 1 149 0
  586 0222 8FEF      		ldi r24,lo8(-1)
  587               	.LVL46:
  588 0224 00C0      		rjmp .L28
  589               	.LVL47:
  590               	.L30:
- 137:interpretacjaSMS.c ****   const uchar *buf_sms_pom = *buf_sms;
- 591               		.loc 1 137 0 discriminator 2
+ 141:interpretacjaSMS.c ****   const uchar *buf_sms_pom = *buf_sms;
+ 591               		.loc 1 141 0 discriminator 2
  592 0226 F801      		movw r30,r16
  593 0228 F182      		std Z+1,r15
  594 022a E082      		st Z,r14
  595 022c 00C0      		rjmp .L29
  596               	.LVL48:
  597               	.L31:
- 143:interpretacjaSMS.c ****     *buf_sms = buf_sms_pom;
- 598               		.loc 1 143 0
+ 147:interpretacjaSMS.c ****     *buf_sms = buf_sms_pom;
+ 598               		.loc 1 147 0
  599 022e 9923      		tst r25
  600 0230 01F0      		breq .L33
  601               	.LVL49:
  602               	.L28:
  603               	/* epilogue start */
- 146:interpretacjaSMS.c ****   } else
- 147:interpretacjaSMS.c ****     return FALSE;
- 148:interpretacjaSMS.c **** }
- 604               		.loc 1 148 0
+ 150:interpretacjaSMS.c ****   } else
+ 151:interpretacjaSMS.c ****     return FALSE;
+ 152:interpretacjaSMS.c **** }
+ 604               		.loc 1 152 0
  605 0232 DF91      		pop r29
  606 0234 CF91      		pop r28
  607 0236 1F91      		pop r17
@@ -764,9 +768,9 @@
  618               	.global	pobierz_wyraz
  620               	pobierz_wyraz:
  621               	.LFB13:
- 149:interpretacjaSMS.c **** 
- 150:interpretacjaSMS.c **** void pobierz_wyraz(const uchar **buf_sms, uchar *buf, uchar max_liczba_znakow) {
- 622               		.loc 1 150 0
+ 153:interpretacjaSMS.c **** 
+ 154:interpretacjaSMS.c **** void pobierz_wyraz(const uchar **buf_sms, uchar *buf, uchar max_liczba_znakow) {
+ 622               		.loc 1 154 0
  623               		.cfi_startproc
  624               	.LVL52:
  625 0242 CF92      		push r12
@@ -811,8 +815,8 @@
  664 0258 E42E      		mov r14,r20
  665               	.LVL53:
  666               	.L37:
- 151:interpretacjaSMS.c ****   przeskocz_biale_znaki(*buf_sms);
- 667               		.loc 1 151 0 discriminator 1
+ 155:interpretacjaSMS.c ****   przeskocz_biale_znaki(*buf_sms);
+ 667               		.loc 1 155 0 discriminator 1
  668 025a F801      		movw r30,r16
  669 025c C081      		ld r28,Z
  670 025e D181      		ldd r29,Z+1
@@ -828,23 +832,23 @@
  680               	.L39:
  681 0270 6E01      		movw r12,r28
  682               	.LVL56:
- 152:interpretacjaSMS.c ****   while (max_liczba_znakow-- && !isspace(**buf_sms) &&
- 683               		.loc 1 152 0
+ 156:interpretacjaSMS.c ****   while (max_liczba_znakow-- && !isspace(**buf_sms) &&
+ 683               		.loc 1 156 0
  684 0272 E110      		cpse r14,__zero_reg__
  685 0274 00C0      		rjmp .L40
  686               	.LVL57:
  687               	.L41:
- 153:interpretacjaSMS.c ****          (*buf = **buf_sms) != '\0') {
- 154:interpretacjaSMS.c ****     buf++;
- 155:interpretacjaSMS.c ****     (*buf_sms)++;
- 156:interpretacjaSMS.c ****   }
- 157:interpretacjaSMS.c ****   *buf = '\0';
- 688               		.loc 1 157 0
+ 157:interpretacjaSMS.c ****          (*buf = **buf_sms) != '\0') {
+ 158:interpretacjaSMS.c ****     buf++;
+ 159:interpretacjaSMS.c ****     (*buf_sms)++;
+ 160:interpretacjaSMS.c ****   }
+ 161:interpretacjaSMS.c ****   *buf = '\0';
+ 688               		.loc 1 161 0
  689 0276 F601      		movw r30,r12
  690 0278 1082      		st Z,__zero_reg__
  691               	/* epilogue start */
- 158:interpretacjaSMS.c **** }
- 692               		.loc 1 158 0
+ 162:interpretacjaSMS.c **** }
+ 692               		.loc 1 162 0
  693 027a DF91      		pop r29
  694 027c CF91      		pop r28
  695 027e 1F91      		pop r17
@@ -858,8 +862,8 @@
  703 028a 0895      		ret
  704               	.LVL60:
  705               	.L38:
- 151:interpretacjaSMS.c ****   while (max_liczba_znakow-- && !isspace(**buf_sms) &&
- 706               		.loc 1 151 0 discriminator 2
+ 155:interpretacjaSMS.c ****   while (max_liczba_znakow-- && !isspace(**buf_sms) &&
+ 706               		.loc 1 155 0 discriminator 2
  707 028c 2196      		adiw r28,1
  708 028e D801      		movw r26,r16
  709 0290 CD93      		st X+,r28
@@ -867,8 +871,8 @@
  711 0294 00C0      		rjmp .L37
  712               	.LVL61:
  713               	.L40:
- 152:interpretacjaSMS.c ****          (*buf = **buf_sms) != '\0') {
- 714               		.loc 1 152 0 discriminator 1
+ 156:interpretacjaSMS.c ****          (*buf = **buf_sms) != '\0') {
+ 714               		.loc 1 156 0 discriminator 1
  715 0296 D801      		movw r26,r16
  716 0298 ED91      		ld r30,X+
  717 029a FC91      		ld r31,X
@@ -879,18 +883,18 @@
  722               	.LVL62:
  723 02a6 892B      		or r24,r25
  724 02a8 01F4      		brne .L41
- 153:interpretacjaSMS.c ****     buf++;
- 725               		.loc 1 153 0 discriminator 2
+ 157:interpretacjaSMS.c ****     buf++;
+ 725               		.loc 1 157 0 discriminator 2
  726 02aa F992      		st Y+,r15
  727 02ac EA94      		dec r14
  728               	.LVL63:
- 152:interpretacjaSMS.c ****          (*buf = **buf_sms) != '\0') {
- 729               		.loc 1 152 0 discriminator 2
+ 156:interpretacjaSMS.c ****          (*buf = **buf_sms) != '\0') {
+ 729               		.loc 1 156 0 discriminator 2
  730 02ae FF20      		tst r15
  731 02b0 01F0      		breq .L41
  732               	.LVL64:
- 155:interpretacjaSMS.c ****   }
- 733               		.loc 1 155 0
+ 159:interpretacjaSMS.c ****   }
+ 733               		.loc 1 159 0
  734 02b2 D801      		movw r26,r16
  735 02b4 8D91      		ld r24,X+
  736 02b6 9C91      		ld r25,X
@@ -904,10 +908,10 @@
  745               	.global	pobierz_numer_telefonu
  747               	pobierz_numer_telefonu:
  748               	.LFB14:
- 159:interpretacjaSMS.c **** 
- 160:interpretacjaSMS.c **** uchar pobierz_numer_telefonu(const uchar **buf_sms, uchar *buf_telefon,
- 161:interpretacjaSMS.c ****                              const uchar rozmiar_bufora) {
- 749               		.loc 1 161 0
+ 163:interpretacjaSMS.c **** 
+ 164:interpretacjaSMS.c **** uchar pobierz_numer_telefonu(const uchar **buf_sms, uchar *buf_telefon,
+ 165:interpretacjaSMS.c ****                              const uchar rozmiar_bufora) {
+ 749               		.loc 1 165 0
  750               		.cfi_startproc
  751               	.LVL65:
  752 02c2 8F92      		push r8
@@ -967,8 +971,8 @@
  806 02de 942E      		mov r9,r20
  807               	.LVL66:
  808               	.L45:
- 162:interpretacjaSMS.c ****   przeskocz_biale_znaki(*buf_sms);
- 809               		.loc 1 162 0 discriminator 1
+ 166:interpretacjaSMS.c ****   przeskocz_biale_znaki(*buf_sms);
+ 809               		.loc 1 166 0 discriminator 1
  810 02e0 F701      		movw r30,r14
  811 02e2 0081      		ld r16,Z
  812 02e4 1181      		ldd r17,Z+1
@@ -981,18 +985,18 @@
  819 02f2 01F4      		brne .L46
  820 02f4 802E      		mov r8,r16
  821 02f6 6501      		movw r12,r10
- 822               		.loc 1 162 0 is_stmt 0
+ 822               		.loc 1 166 0 is_stmt 0
  823 02f8 C02F      		mov r28,r16
  824 02fa D12F      		mov r29,r17
  825               	.L47:
  826 02fc 8E01      		movw r16,r28
  827               	.LVL68:
  828 02fe 2196      		adiw r28,1
- 163:interpretacjaSMS.c ****   const uchar *tel = *buf_sms;
- 164:interpretacjaSMS.c ****   uchar *buf = buf_telefon;
- 165:interpretacjaSMS.c ****   uchar l = 0;
- 166:interpretacjaSMS.c ****   while (konwersja_znaku_telefonu(*tel) != ZNAK_NUMERU_TELEFONU_NIEZNANY &&
- 829               		.loc 1 166 0 is_stmt 1
+ 167:interpretacjaSMS.c ****   const uchar *tel = *buf_sms;
+ 168:interpretacjaSMS.c ****   uchar *buf = buf_telefon;
+ 169:interpretacjaSMS.c ****   uchar l = 0;
+ 170:interpretacjaSMS.c ****   while (konwersja_znaku_telefonu(*tel) != ZNAK_NUMERU_TELEFONU_NIEZNANY &&
+ 829               		.loc 1 170 0 is_stmt 1
  830 0300 F801      		movw r30,r16
  831 0302 8081      		ld r24,Z
  832 0304 0E94 0000 		call konwersja_znaku_telefonu
@@ -1000,32 +1004,32 @@
  834 0308 8D30      		cpi r24,lo8(13)
  835 030a 01F4      		brne .L48
  836               	.L52:
- 167:interpretacjaSMS.c ****          ++l < rozmiar_bufora)
- 168:interpretacjaSMS.c ****     *buf++ = *tel++;
- 169:interpretacjaSMS.c ****   *buf = '\0';
- 837               		.loc 1 169 0
+ 171:interpretacjaSMS.c ****          ++l < rozmiar_bufora)
+ 172:interpretacjaSMS.c ****     *buf++ = *tel++;
+ 173:interpretacjaSMS.c ****   *buf = '\0';
+ 837               		.loc 1 173 0
  838 030c F601      		movw r30,r12
  839 030e 1082      		st Z,__zero_reg__
- 170:interpretacjaSMS.c ****   if (buf_telefon[0] != '\0') {
- 840               		.loc 1 170 0
+ 174:interpretacjaSMS.c ****   if (buf_telefon[0] != '\0') {
+ 840               		.loc 1 174 0
  841 0310 F501      		movw r30,r10
  842 0312 8081      		ld r24,Z
  843 0314 8823      		tst r24
  844 0316 01F0      		breq .L44
- 171:interpretacjaSMS.c ****     *buf_sms = tel;
- 845               		.loc 1 171 0
+ 175:interpretacjaSMS.c ****     *buf_sms = tel;
+ 845               		.loc 1 175 0
  846 0318 F701      		movw r30,r14
  847 031a 1183      		std Z+1,r17
  848 031c 0083      		st Z,r16
- 172:interpretacjaSMS.c ****     return TRUE;
- 849               		.loc 1 172 0
+ 176:interpretacjaSMS.c ****     return TRUE;
+ 849               		.loc 1 176 0
  850 031e 8FEF      		ldi r24,lo8(-1)
  851               	.L44:
  852               	/* epilogue start */
- 173:interpretacjaSMS.c ****   } else
- 174:interpretacjaSMS.c ****     return FALSE;
- 175:interpretacjaSMS.c **** }
- 853               		.loc 1 175 0
+ 177:interpretacjaSMS.c ****   } else
+ 178:interpretacjaSMS.c ****     return FALSE;
+ 179:interpretacjaSMS.c **** }
+ 853               		.loc 1 179 0
  854 0320 DF91      		pop r29
  855 0322 CF91      		pop r28
  856 0324 1F91      		pop r17
@@ -1046,8 +1050,8 @@
  871 0338 0895      		ret
  872               	.LVL75:
  873               	.L46:
- 162:interpretacjaSMS.c ****   const uchar *tel = *buf_sms;
- 874               		.loc 1 162 0 discriminator 2
+ 166:interpretacjaSMS.c ****   const uchar *tel = *buf_sms;
+ 874               		.loc 1 166 0 discriminator 2
  875 033a 0F5F      		subi r16,-1
  876 033c 1F4F      		sbci r17,-1
  877 033e F701      		movw r30,r14
@@ -1056,15 +1060,15 @@
  880 0344 00C0      		rjmp .L45
  881               	.LVL76:
  882               	.L48:
- 166:interpretacjaSMS.c ****          ++l < rozmiar_bufora)
- 883               		.loc 1 166 0 discriminator 1
+ 170:interpretacjaSMS.c ****          ++l < rozmiar_bufora)
+ 883               		.loc 1 170 0 discriminator 1
  884 0346 8C2F      		mov r24,r28
  885 0348 8819      		sub r24,r8
  886 034a 8915      		cp r24,r9
  887 034c 00F4      		brsh .L52
  888               	.LVL77:
- 168:interpretacjaSMS.c ****   *buf = '\0';
- 889               		.loc 1 168 0
+ 172:interpretacjaSMS.c ****   *buf = '\0';
+ 889               		.loc 1 172 0
  890 034e FE01      		movw r30,r28
  891 0350 3197      		sbiw r30,1
  892 0352 8081      		ld r24,Z
@@ -1085,9 +1089,9 @@
  904               	.global	interpretuj_wiadomosc_sms
  906               	interpretuj_wiadomosc_sms:
  907               	.LFB15:
- 176:interpretacjaSMS.c **** 
- 177:interpretacjaSMS.c **** uchar interpretuj_wiadomosc_sms(const uchar *sms) {
- 908               		.loc 1 177 0
+ 180:interpretacjaSMS.c **** 
+ 181:interpretacjaSMS.c **** uchar interpretuj_wiadomosc_sms(const uchar *sms) {
+ 908               		.loc 1 181 0
  909               		.cfi_startproc
  910               	.LVL78:
  911 035c EF92      		push r14
@@ -1132,8 +1136,8 @@
  950               	.L__stack_usage = 24
  951 0378 9A8B      		std Y+18,r25
  952 037a 898B      		std Y+17,r24
- 178:interpretacjaSMS.c ****   memcpy(bufor_eeprom, sms, MAX_BUFOR_EEPROM);
- 953               		.loc 1 178 0
+ 182:interpretacjaSMS.c ****   memcpy(bufor_eeprom, sms, MAX_BUFOR_EEPROM);
+ 953               		.loc 1 182 0
  954 037c 7C01      		movw r14,r24
  955 037e 82E3      		ldi r24,lo8(50)
  956               	.LVL79:
@@ -1146,9 +1150,9 @@
  963 038a 8A95      		dec r24
  964 038c 01F4      		brne 0b
  965               	.LVL80:
- 179:interpretacjaSMS.c ****   const uchar *sms_pom = sms;
- 180:interpretacjaSMS.c ****   if (!sprawdz_kod(&sms)) {
- 966               		.loc 1 180 0
+ 183:interpretacjaSMS.c ****   const uchar *sms_pom = sms;
+ 184:interpretacjaSMS.c ****   if (!sprawdz_kod(&sms)) {
+ 966               		.loc 1 184 0
  967 038e CE01      		movw r24,r28
  968 0390 4196      		adiw r24,17
  969 0392 0E94 0000 		call sprawdz_kod
@@ -1157,17 +1161,17 @@
  972 0398 9A89      		ldd r25,Y+18
  973 039a 8111      		cpse r24,__zero_reg__
  974 039c 00C0      		rjmp .L54
- 181:interpretacjaSMS.c ****     if (sprawdz_reset_ustawien(sms))
- 975               		.loc 1 181 0
+ 185:interpretacjaSMS.c ****     if (sprawdz_reset_ustawien(sms))
+ 975               		.loc 1 185 0
  976 039e 822F      		mov r24,r18
  977 03a0 0E94 0000 		call sprawdz_reset_ustawien
  978               	.LVL82:
  979 03a4 8823      		tst r24
  980 03a6 01F4      		brne .+2
  981 03a8 00C0      		rjmp .L53
- 982               	.L104:
- 182:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_RESET_WSZYSTKICH_USTAWIEN;
- 983               		.loc 1 182 0
+ 982               	.L105:
+ 186:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_RESET_WSZYSTKICH_USTAWIEN;
+ 983               		.loc 1 186 0
  984 03aa 8BE0      		ldi r24,lo8(11)
  985 03ac 00C0      		rjmp .L53
  986               	.L54:
@@ -1176,11 +1180,11 @@
  989               	.L56:
  990               	.LVL83:
  991               	.LBB6:
- 183:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_BRAK_KODU;
- 184:interpretacjaSMS.c ****   }
- 185:interpretacjaSMS.c ****   { // mona wstawi ten kod do kolejki i w nastpnym kroku interpretowa
- 186:interpretacjaSMS.c ****     for (uchar *ptr = (uchar *)sms; *ptr != '\0'; ++ptr)
- 992               		.loc 1 186 0 discriminator 1
+ 187:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_BRAK_KODU;
+ 188:interpretacjaSMS.c ****   }
+ 189:interpretacjaSMS.c ****   { // mona wstawi ten kod do kolejki i w nastpnym kroku interpretowa
+ 190:interpretacjaSMS.c ****     for (uchar *ptr = (uchar *)sms; *ptr != '\0'; ++ptr)
+ 992               		.loc 1 190 0 discriminator 1
  993 03b2 F801      		movw r30,r16
  994 03b4 8191      		ld r24,Z+
  995 03b6 8F01      		movw r16,r30
@@ -1188,21 +1192,21 @@
  997 03b8 8111      		cpse r24,__zero_reg__
  998 03ba 00C0      		rjmp .L57
  999               	.LBE6:
- 187:interpretacjaSMS.c ****       *ptr = toupper(*ptr);
- 188:interpretacjaSMS.c ****   }
- 189:interpretacjaSMS.c **** 
- 190:interpretacjaSMS.c ****   switch (
- 191:interpretacjaSMS.c ****       interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CODE, INSTRUKCJA_STOP + 1)) {
- 1000               		.loc 1 191 0
- 1001 03bc 40E1      		ldi r20,lo8(16)
+ 191:interpretacjaSMS.c ****       *ptr = toupper(*ptr);
+ 192:interpretacjaSMS.c ****   }
+ 193:interpretacjaSMS.c **** 
+ 194:interpretacjaSMS.c ****   switch (
+ 195:interpretacjaSMS.c ****       interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CODE, INSTRUKCJA_SUB + 1)) {
+ 1000               		.loc 1 195 0
+ 1001 03bc 41E1      		ldi r20,lo8(17)
  1002 03be 60E0      		ldi r22,0
  1003 03c0 CE01      		movw r24,r28
  1004 03c2 4196      		adiw r24,17
  1005 03c4 0E94 0000 		call interpretuj_instrukcje_sms
  1006               	.LVL85:
- 190:interpretacjaSMS.c ****       interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CODE, INSTRUKCJA_STOP + 1)) {
- 1007               		.loc 1 190 0
- 1008 03c8 8031      		cpi r24,lo8(16)
+ 194:interpretacjaSMS.c ****       interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CODE, INSTRUKCJA_SUB + 1)) {
+ 1007               		.loc 1 194 0
+ 1008 03c8 8131      		cpi r24,lo8(17)
  1009 03ca 00F0      		brlo .+2
  1010 03cc 00C0      		rjmp .L58
  1011 03ce E82F      		mov r30,r24
@@ -1215,8 +1219,8 @@
  1018 03da 0000      		.word gs(.L59)
  1019 03dc 0000      		.word gs(.L61)
  1020 03de 0000      		.word gs(.L62)
- 1021 03e0 0000      		.word gs(.L104)
- 1022 03e2 0000      		.word gs(.L105)
+ 1021 03e0 0000      		.word gs(.L105)
+ 1022 03e2 0000      		.word gs(.L106)
  1023 03e4 0000      		.word gs(.L64)
  1024 03e6 0000      		.word gs(.L65)
  1025 03e8 0000      		.word gs(.L66)
@@ -1228,1460 +1232,1488 @@
  1031 03f4 0000      		.word gs(.L70)
  1032 03f6 0000      		.word gs(.L71)
  1033 03f8 0000      		.word gs(.L72)
- 1034               	.L57:
- 1035               	.LBB7:
- 187:interpretacjaSMS.c ****       *ptr = toupper(*ptr);
- 1036               		.loc 1 187 0 discriminator 3
- 1037 03fa 90E0      		ldi r25,0
- 1038 03fc 0E94 0000 		call toupper
- 1039               	.LVL86:
- 1040 0400 F801      		movw r30,r16
- 1041 0402 3197      		sbiw r30,1
- 1042 0404 8083      		st Z,r24
- 1043               	.LVL87:
- 1044 0406 00C0      		rjmp .L56
- 1045               	.LVL88:
- 1046               	.L73:
- 1047               	.LBE7:
- 192:interpretacjaSMS.c ****   case INSTRUKCJA_CODE: {
- 193:interpretacjaSMS.c ****     przeskocz_biale_znaki(sms);
- 1048               		.loc 1 193 0 discriminator 2
- 1049 0408 0F5F      		subi r16,-1
- 1050 040a 1F4F      		sbci r17,-1
- 1051 040c 1A8B      		std Y+18,r17
- 1052 040e 098B      		std Y+17,r16
- 1053               	.L59:
- 1054               		.loc 1 193 0 is_stmt 0 discriminator 1
- 1055 0410 0989      		ldd r16,Y+17
- 1056 0412 1A89      		ldd r17,Y+18
- 1057 0414 F801      		movw r30,r16
- 1058 0416 8081      		ld r24,Z
- 1059 0418 90E0      		ldi r25,0
- 1060 041a 0E94 0000 		call isspace
- 1061               	.LVL89:
- 1062 041e 892B      		or r24,r25
- 1063 0420 01F4      		brne .L73
- 1064 0422 C801      		movw r24,r16
- 1065 0424 8E19      		sub r24,r14
- 1066 0426 9F09      		sbc r25,r15
- 1067 0428 FC01      		movw r30,r24
- 1068 042a E050      		subi r30,lo8(-(bufor_eeprom))
- 1069 042c F040      		sbci r31,hi8(-(bufor_eeprom))
- 1070               		.loc 1 193 0
- 1071 042e 34E0      		ldi r19,lo8(4)
- 1072               	.L75:
- 1073               	.LVL90:
- 1074               	.LBB8:
- 1075               	.LBB9:
- 194:interpretacjaSMS.c ****     for (uchar i = 0; i < LICZBA_BAJTOW_KODU_DOSTEPU; ++i) {
- 195:interpretacjaSMS.c ****       const uchar znak = bufor_eeprom[(sms - sms_pom) + i];
- 1076               		.loc 1 195 0 is_stmt 1
- 1077 0430 2191      		ld r18,Z+
- 1078               	.LVL91:
- 196:interpretacjaSMS.c ****       if (not((znak >= 'A' && znak <= 'Z') || (znak >= '0' && znak <= '9')))
- 1079               		.loc 1 196 0
- 1080 0432 4FEB      		ldi r20,lo8(-65)
- 1081 0434 420F      		add r20,r18
- 1082 0436 4A31      		cpi r20,lo8(26)
- 1083 0438 00F0      		brlo .L74
- 1084               		.loc 1 196 0 is_stmt 0 discriminator 1
- 1085 043a 2053      		subi r18,lo8(-(-48))
- 1086               	.LVL92:
- 1087 043c 2A30      		cpi r18,lo8(10)
- 1088 043e 00F0      		brlo .L74
- 1089               	.LVL93:
- 1090               	.L99:
- 1091               	.LBE9:
- 1092               	.LBE8:
- 1093               	.LBB10:
- 197:interpretacjaSMS.c ****         return INTERPRETACJA_SMS_BLEDNE_DANE;
- 198:interpretacjaSMS.c ****     }
- 199:interpretacjaSMS.c ****     memcpy(kod_modulu, bufor_eeprom + (sms - sms_pom),
- 200:interpretacjaSMS.c ****            LICZBA_BAJTOW_KODU_DOSTEPU);
- 201:interpretacjaSMS.c ****     zapisz_znaki_w_eeprom(bufor_eeprom + (sms - sms_pom),
- 202:interpretacjaSMS.c ****                           (uint)ADRES_EEPROM_KOD_DOSTEPU,
- 203:interpretacjaSMS.c ****                           LICZBA_BAJTOW_KODU_DOSTEPU);
- 204:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 205:interpretacjaSMS.c ****   }
- 206:interpretacjaSMS.c ****   case INSTRUKCJA_REPORT: {
- 207:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_RAPORT;
- 208:interpretacjaSMS.c ****   }
- 209:interpretacjaSMS.c ****   case INSTRUKCJA_USER: {
- 210:interpretacjaSMS.c ****     // Komenda USER ma działać wyłącznie z podanym numerem.
- 211:interpretacjaSMS.c ****     // Przykład: USER +48505691117 E C B R [K]
- 212:interpretacjaSMS.c ****     if (pobierz_numer_telefonu(&sms, &numer_telefonu_do_ktorego_dzwonic[0], 14))
- 213:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_USER;
- 214:interpretacjaSMS.c **** 
- 215:interpretacjaSMS.c ****     // Brak numeru po "USER" – wyślij informację z instrukcją użycia,
- 216:interpretacjaSMS.c ****     // zamiast pełnej listy użytkowników.
- 217:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_USER_BEZ_NUMERU;
- 218:interpretacjaSMS.c ****   }
- 219:interpretacjaSMS.c ****   case INSTRUKCJA_ADD: {
- 220:interpretacjaSMS.c ****     if (not pobierz_numer_telefonu(&sms, &numer_telefonu_do_ktorego_dzwonic[0],
- 221:interpretacjaSMS.c ****                                    14))
- 222:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
- 223:interpretacjaSMS.c ****     dodaj_komende(KOMENDA_KOLEJKI_DODAJ_UZYTKOWNIKA_BRAMA);
- 224:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 225:interpretacjaSMS.c ****   }
- 226:interpretacjaSMS.c ****   case INSTRUKCJA_DEL: {
- 227:interpretacjaSMS.c ****     if (not pobierz_numer_telefonu(&sms, &numer_telefonu_do_ktorego_dzwonic[0],
- 228:interpretacjaSMS.c ****                                    14))
- 229:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
- 230:interpretacjaSMS.c ****     dodaj_komende(KOMENDA_KOLEJKI_USUN_UZYTKOWNIKA_BRAMA);
- 231:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 232:interpretacjaSMS.c ****   }
- 233:interpretacjaSMS.c ****   case INSTRUKCJA_RESET: {
- 234:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_RESET_WSZYSTKICH_USTAWIEN;
- 235:interpretacjaSMS.c ****   }
- 236:interpretacjaSMS.c ****   case INSTRUKCJA_OPEN: {
- 237:interpretacjaSMS.c ****     const uchar podtryb =
- 238:interpretacjaSMS.c ****         interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CLIP, INSTRUKCJA_DTMF + 1);
- 239:interpretacjaSMS.c ****     if (podtryb == INSTRUKCJA_CLIP) {
- 240:interpretacjaSMS.c ****       tryb_pracy = 1; // Publiczny
- 241:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
- 242:interpretacjaSMS.c **** 
- 243:interpretacjaSMS.c ****       tryb_clip = TRUE;
- 244:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_CLIP_DTMF);
- 245:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
- 246:interpretacjaSMS.c ****     } else if (podtryb == INSTRUKCJA_DTMF) {
- 247:interpretacjaSMS.c ****       tryb_pracy = 1; // Publiczny
- 248:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
- 249:interpretacjaSMS.c **** 
- 250:interpretacjaSMS.c ****       tryb_clip = FALSE; // DTMF
- 251:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_CLIP_DTMF);
- 252:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
- 253:interpretacjaSMS.c ****     } else {
- 254:interpretacjaSMS.c ****       // Domyślne zachowanie (stare OPEN): Tylko tryb publiczny, nie zmieniaj
- 255:interpretacjaSMS.c ****       // sub-trybu (chyba ze wymusimy CLIP?) Dla kompatybilnosci wstecznej OPEN
- 256:interpretacjaSMS.c ****       // = OPEN CLIP Lub zostawiamy stary sub-tryb? AC200 wymusza CLIP przy
- 257:interpretacjaSMS.c ****       // samym OPEN? Nie, AC200 zwraca BLEDNE_DANE jesli brak podtrybu! Ale my
- 258:interpretacjaSMS.c ****       // chcemy kompatybilnosc. Zrobmy tak: OPEN bez parametru = OPEN (zachowaj
- 259:interpretacjaSMS.c ****       // obecny podtryb) + Publiczny
- 260:interpretacjaSMS.c **** 
- 261:interpretacjaSMS.c ****       // Jednak w AC200 kod:
- 262:interpretacjaSMS.c ****       // if ( podtryb == INSTRUKCJA_CLIP ) ...
- 263:interpretacjaSMS.c ****       // else if ( podtryb == INSTRUKCJA_DTMF ) ...
- 264:interpretacjaSMS.c ****       // else return INTERPRETACJA_SMS_BLEDNE_DANE;
- 265:interpretacjaSMS.c **** 
- 266:interpretacjaSMS.c ****       // Decyzja: Zachowujemy kompatybilnosc wsteczna.
- 267:interpretacjaSMS.c ****       // Jesli brak parametru -> tylko zmien tryb_pracy na 1.
- 268:interpretacjaSMS.c ****       tryb_pracy = 1; // Publiczny
- 269:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
- 270:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
- 271:interpretacjaSMS.c ****     }
- 272:interpretacjaSMS.c ****   }
- 273:interpretacjaSMS.c ****   case INSTRUKCJA_CLOSE: {
- 274:interpretacjaSMS.c ****     const uchar podtryb =
- 275:interpretacjaSMS.c ****         interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CLIP, INSTRUKCJA_DTMF + 1);
- 276:interpretacjaSMS.c ****     if (podtryb == INSTRUKCJA_CLIP) {
- 277:interpretacjaSMS.c ****       tryb_pracy = 0; // Prywatny
- 278:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_PRACY);
- 279:interpretacjaSMS.c **** 
- 280:interpretacjaSMS.c ****       tryb_clip = TRUE;
- 281:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_CLIP_DTMF);
- 282:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
- 283:interpretacjaSMS.c ****     } else if (podtryb == INSTRUKCJA_DTMF) {
- 284:interpretacjaSMS.c ****       tryb_pracy = 0; // Prywatny
- 285:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_PRACY);
- 286:interpretacjaSMS.c **** 
- 287:interpretacjaSMS.c ****       tryb_clip = FALSE; // DTMF
- 288:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_CLIP_DTMF);
- 289:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
- 290:interpretacjaSMS.c ****     } else {
- 291:interpretacjaSMS.c ****       // Kompatybilnosc wsteczna: CLOSE bez parametru
- 292:interpretacjaSMS.c ****       tryb_pracy = 0; // Prywatny
- 293:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_PRACY);
- 294:interpretacjaSMS.c **** 
- 295:interpretacjaSMS.c ****       // Jeśli SKRYBA była włączona, wyłącz ją automatycznie
- 296:interpretacjaSMS.c ****       if (skryba_wlaczona) {
- 297:interpretacjaSMS.c ****         zapisz_znak_w_eeprom(0, ADRES_EEPROM_SKRYBA);
- 298:interpretacjaSMS.c ****         skryba_wlaczona = FALSE;
- 299:interpretacjaSMS.c ****       }
- 300:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
- 301:interpretacjaSMS.c ****     }
- 302:interpretacjaSMS.c ****   }
- 303:interpretacjaSMS.c ****   case INSTRUKCJA_SET: {
- 304:interpretacjaSMS.c ****     long h, m, s;
- 305:interpretacjaSMS.c **** 
- 306:interpretacjaSMS.c ****     // Sprawdź czy są parametry (próba parsowania)
- 307:interpretacjaSMS.c ****     uchar ma_parametry = pobierz_long(&sms, &h) && pomin_znak(&sms, ':') &&
- 308:interpretacjaSMS.c ****                          pobierz_long(&sms, &m) && pomin_znak(&sms, ':') &&
- 309:interpretacjaSMS.c ****                          pobierz_long(&sms, &s);
- 310:interpretacjaSMS.c **** 
- 311:interpretacjaSMS.c ****     if (!ma_parametry) {
- 312:interpretacjaSMS.c ****       // ABCD SET bez parametrów - zwróć aktualny czas (bez sync z SMS)
- 313:interpretacjaSMS.c ****       // Blokujemy sync czasu, aby odczytać aktualny RTC przed aktualizacją
- 314:interpretacjaSMS.c ****       extern uchar sms_pomijaj_aktualizacje_czasu;
- 315:interpretacjaSMS.c ****       sms_pomijaj_aktualizacje_czasu = TRUE;
- 316:interpretacjaSMS.c **** 
- 317:interpretacjaSMS.c ****       // Wyślij raport z aktualnym czasem
- 318:interpretacjaSMS.c ****       extern char rtc_czas[12];
- 319:interpretacjaSMS.c ****       uchar *sms_out = tekst_wysylanego_smsa;
- 320:interpretacjaSMS.c ****       strcpy_P((char *)sms_out, PSTR("Time: "));
- 321:interpretacjaSMS.c ****       sms_out += strlen((char *)sms_out);
- 322:interpretacjaSMS.c ****       strcpy((char *)sms_out, rtc_czas);
- 323:interpretacjaSMS.c **** 
- 324:interpretacjaSMS.c ****       // Ustaw numer telefonu odbiorcy
- 325:interpretacjaSMS.c ****       extern uchar numer_telefonu_wysylanego_smsa[];
- 326:interpretacjaSMS.c ****       extern uchar numer_telefonu_odebranego_smsa[];
- 327:interpretacjaSMS.c ****       strcpy((char *)numer_telefonu_wysylanego_smsa,
- 328:interpretacjaSMS.c ****              (char *)numer_telefonu_odebranego_smsa);
- 329:interpretacjaSMS.c **** 
- 330:interpretacjaSMS.c ****       // Dodaj komendę wysłania SMS
- 331:interpretacjaSMS.c ****       dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
- 332:interpretacjaSMS.c **** 
- 333:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
- 334:interpretacjaSMS.c ****     }
- 335:interpretacjaSMS.c **** 
- 336:interpretacjaSMS.c ****     // ABCD SET HH:MM:SS - ustaw czas
- 337:interpretacjaSMS.c ****     if (h < 0 || h > 23 || m < 0 || m > 59 || s < 0 || s > 59)
- 338:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 1034 03fa 0000      		.word gs(.L73)
+ 1035               	.L57:
+ 1036               	.LBB7:
+ 191:interpretacjaSMS.c ****       *ptr = toupper(*ptr);
+ 1037               		.loc 1 191 0 discriminator 3
+ 1038 03fc 90E0      		ldi r25,0
+ 1039 03fe 0E94 0000 		call toupper
+ 1040               	.LVL86:
+ 1041 0402 F801      		movw r30,r16
+ 1042 0404 3197      		sbiw r30,1
+ 1043 0406 8083      		st Z,r24
+ 1044               	.LVL87:
+ 1045 0408 00C0      		rjmp .L56
+ 1046               	.LVL88:
+ 1047               	.L74:
+ 1048               	.LBE7:
+ 196:interpretacjaSMS.c ****   case INSTRUKCJA_CODE: {
+ 197:interpretacjaSMS.c ****     przeskocz_biale_znaki(sms);
+ 1049               		.loc 1 197 0 discriminator 2
+ 1050 040a 0F5F      		subi r16,-1
+ 1051 040c 1F4F      		sbci r17,-1
+ 1052 040e 1A8B      		std Y+18,r17
+ 1053 0410 098B      		std Y+17,r16
+ 1054               	.L59:
+ 1055               		.loc 1 197 0 is_stmt 0 discriminator 1
+ 1056 0412 0989      		ldd r16,Y+17
+ 1057 0414 1A89      		ldd r17,Y+18
+ 1058 0416 F801      		movw r30,r16
+ 1059 0418 8081      		ld r24,Z
+ 1060 041a 90E0      		ldi r25,0
+ 1061 041c 0E94 0000 		call isspace
+ 1062               	.LVL89:
+ 1063 0420 892B      		or r24,r25
+ 1064 0422 01F4      		brne .L74
+ 1065 0424 C801      		movw r24,r16
+ 1066 0426 8E19      		sub r24,r14
+ 1067 0428 9F09      		sbc r25,r15
+ 1068 042a FC01      		movw r30,r24
+ 1069 042c E050      		subi r30,lo8(-(bufor_eeprom))
+ 1070 042e F040      		sbci r31,hi8(-(bufor_eeprom))
+ 1071               		.loc 1 197 0
+ 1072 0430 34E0      		ldi r19,lo8(4)
+ 1073               	.L76:
+ 1074               	.LVL90:
+ 1075               	.LBB8:
+ 1076               	.LBB9:
+ 198:interpretacjaSMS.c ****     for (uchar i = 0; i < LICZBA_BAJTOW_KODU_DOSTEPU; ++i) {
+ 199:interpretacjaSMS.c ****       const uchar znak = bufor_eeprom[(sms - sms_pom) + i];
+ 1077               		.loc 1 199 0 is_stmt 1
+ 1078 0432 2191      		ld r18,Z+
+ 1079               	.LVL91:
+ 200:interpretacjaSMS.c ****       if (not((znak >= 'A' && znak <= 'Z') || (znak >= '0' && znak <= '9')))
+ 1080               		.loc 1 200 0
+ 1081 0434 4FEB      		ldi r20,lo8(-65)
+ 1082 0436 420F      		add r20,r18
+ 1083 0438 4A31      		cpi r20,lo8(26)
+ 1084 043a 00F0      		brlo .L75
+ 1085               		.loc 1 200 0 is_stmt 0 discriminator 1
+ 1086 043c 2053      		subi r18,lo8(-(-48))
+ 1087               	.LVL92:
+ 1088 043e 2A30      		cpi r18,lo8(10)
+ 1089 0440 00F0      		brlo .L75
+ 1090               	.LVL93:
+ 1091               	.L100:
+ 1092               	.LBE9:
+ 1093               	.LBE8:
+ 1094               	.LBB10:
+ 201:interpretacjaSMS.c ****         return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 202:interpretacjaSMS.c ****     }
+ 203:interpretacjaSMS.c ****     memcpy(kod_modulu, bufor_eeprom + (sms - sms_pom),
+ 204:interpretacjaSMS.c ****            LICZBA_BAJTOW_KODU_DOSTEPU);
+ 205:interpretacjaSMS.c ****     zapisz_znaki_w_eeprom(bufor_eeprom + (sms - sms_pom),
+ 206:interpretacjaSMS.c ****                           (uint)ADRES_EEPROM_KOD_DOSTEPU,
+ 207:interpretacjaSMS.c ****                           LICZBA_BAJTOW_KODU_DOSTEPU);
+ 208:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 209:interpretacjaSMS.c ****   }
+ 210:interpretacjaSMS.c ****   case INSTRUKCJA_REPORT: {
+ 211:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_RAPORT;
+ 212:interpretacjaSMS.c ****   }
+ 213:interpretacjaSMS.c ****   case INSTRUKCJA_USER: {
+ 214:interpretacjaSMS.c ****     // Komenda USER ma działać wyłącznie z podanym numerem.
+ 215:interpretacjaSMS.c ****     // Przykład: USER +48505691117 E C B R [K]
+ 216:interpretacjaSMS.c ****     if (pobierz_numer_telefonu(&sms, &numer_telefonu_do_ktorego_dzwonic[0], 14))
+ 217:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_USER;
+ 218:interpretacjaSMS.c **** 
+ 219:interpretacjaSMS.c ****     // Brak numeru po "USER" – wyślij informację z instrukcją użycia,
+ 220:interpretacjaSMS.c ****     // zamiast pełnej listy użytkowników.
+ 221:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_USER_BEZ_NUMERU;
+ 222:interpretacjaSMS.c ****   }
+ 223:interpretacjaSMS.c ****   case INSTRUKCJA_ADD: {
+ 224:interpretacjaSMS.c ****     if (not pobierz_numer_telefonu(&sms, &numer_telefonu_do_ktorego_dzwonic[0],
+ 225:interpretacjaSMS.c ****                                    14))
+ 226:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 227:interpretacjaSMS.c ****     dodaj_komende(KOMENDA_KOLEJKI_DODAJ_UZYTKOWNIKA_BRAMA);
+ 228:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 229:interpretacjaSMS.c ****   }
+ 230:interpretacjaSMS.c ****   case INSTRUKCJA_DEL: {
+ 231:interpretacjaSMS.c ****     if (not pobierz_numer_telefonu(&sms, &numer_telefonu_do_ktorego_dzwonic[0],
+ 232:interpretacjaSMS.c ****                                    14))
+ 233:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 234:interpretacjaSMS.c ****     dodaj_komende(KOMENDA_KOLEJKI_USUN_UZYTKOWNIKA_BRAMA);
+ 235:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 236:interpretacjaSMS.c ****   }
+ 237:interpretacjaSMS.c ****   case INSTRUKCJA_RESET: {
+ 238:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_RESET_WSZYSTKICH_USTAWIEN;
+ 239:interpretacjaSMS.c ****   }
+ 240:interpretacjaSMS.c ****   case INSTRUKCJA_OPEN: {
+ 241:interpretacjaSMS.c ****     const uchar podtryb =
+ 242:interpretacjaSMS.c ****         interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CLIP, INSTRUKCJA_DTMF + 1);
+ 243:interpretacjaSMS.c ****     if (podtryb == INSTRUKCJA_CLIP) {
+ 244:interpretacjaSMS.c ****       tryb_pracy = 1; // Publiczny
+ 245:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
+ 246:interpretacjaSMS.c **** 
+ 247:interpretacjaSMS.c ****       tryb_clip = TRUE;
+ 248:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_CLIP_DTMF);
+ 249:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
+ 250:interpretacjaSMS.c ****     } else if (podtryb == INSTRUKCJA_DTMF) {
+ 251:interpretacjaSMS.c ****       tryb_pracy = 1; // Publiczny
+ 252:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
+ 253:interpretacjaSMS.c **** 
+ 254:interpretacjaSMS.c ****       tryb_clip = FALSE; // DTMF
+ 255:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_CLIP_DTMF);
+ 256:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
+ 257:interpretacjaSMS.c ****     } else {
+ 258:interpretacjaSMS.c ****       // Domyślne zachowanie (stare OPEN): Tylko tryb publiczny, nie zmieniaj
+ 259:interpretacjaSMS.c ****       // sub-trybu (chyba ze wymusimy CLIP?) Dla kompatybilnosci wstecznej OPEN
+ 260:interpretacjaSMS.c ****       // = OPEN CLIP Lub zostawiamy stary sub-tryb? AC200 wymusza CLIP przy
+ 261:interpretacjaSMS.c ****       // samym OPEN? Nie, AC200 zwraca BLEDNE_DANE jesli brak podtrybu! Ale my
+ 262:interpretacjaSMS.c ****       // chcemy kompatybilnosc. Zrobmy tak: OPEN bez parametru = OPEN (zachowaj
+ 263:interpretacjaSMS.c ****       // obecny podtryb) + Publiczny
+ 264:interpretacjaSMS.c **** 
+ 265:interpretacjaSMS.c ****       // Jednak w AC200 kod:
+ 266:interpretacjaSMS.c ****       // if ( podtryb == INSTRUKCJA_CLIP ) ...
+ 267:interpretacjaSMS.c ****       // else if ( podtryb == INSTRUKCJA_DTMF ) ...
+ 268:interpretacjaSMS.c ****       // else return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 269:interpretacjaSMS.c **** 
+ 270:interpretacjaSMS.c ****       // Decyzja: Zachowujemy kompatybilnosc wsteczna.
+ 271:interpretacjaSMS.c ****       // Jesli brak parametru -> tylko zmien tryb_pracy na 1.
+ 272:interpretacjaSMS.c ****       tryb_pracy = 1; // Publiczny
+ 273:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
+ 274:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
+ 275:interpretacjaSMS.c ****     }
+ 276:interpretacjaSMS.c ****   }
+ 277:interpretacjaSMS.c ****   case INSTRUKCJA_CLOSE: {
+ 278:interpretacjaSMS.c ****     const uchar podtryb =
+ 279:interpretacjaSMS.c ****         interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CLIP, INSTRUKCJA_DTMF + 1);
+ 280:interpretacjaSMS.c ****     if (podtryb == INSTRUKCJA_CLIP) {
+ 281:interpretacjaSMS.c ****       tryb_pracy = 0; // Prywatny
+ 282:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_PRACY);
+ 283:interpretacjaSMS.c **** 
+ 284:interpretacjaSMS.c ****       tryb_clip = TRUE;
+ 285:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_CLIP_DTMF);
+ 286:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
+ 287:interpretacjaSMS.c ****     } else if (podtryb == INSTRUKCJA_DTMF) {
+ 288:interpretacjaSMS.c ****       tryb_pracy = 0; // Prywatny
+ 289:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_PRACY);
+ 290:interpretacjaSMS.c **** 
+ 291:interpretacjaSMS.c ****       tryb_clip = FALSE; // DTMF
+ 292:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_CLIP_DTMF);
+ 293:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
+ 294:interpretacjaSMS.c ****     } else {
+ 295:interpretacjaSMS.c ****       // Kompatybilnosc wsteczna: CLOSE bez parametru
+ 296:interpretacjaSMS.c ****       tryb_pracy = 0; // Prywatny
+ 297:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_PRACY);
+ 298:interpretacjaSMS.c **** 
+ 299:interpretacjaSMS.c ****       // Jeśli SKRYBA była włączona, wyłącz ją automatycznie
+ 300:interpretacjaSMS.c ****       if (skryba_wlaczona) {
+ 301:interpretacjaSMS.c ****         zapisz_znak_w_eeprom(0, ADRES_EEPROM_SKRYBA);
+ 302:interpretacjaSMS.c ****         skryba_wlaczona = FALSE;
+ 303:interpretacjaSMS.c ****       }
+ 304:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
+ 305:interpretacjaSMS.c ****     }
+ 306:interpretacjaSMS.c ****   }
+ 307:interpretacjaSMS.c ****   case INSTRUKCJA_SET: {
+ 308:interpretacjaSMS.c ****     long h, m, s;
+ 309:interpretacjaSMS.c **** 
+ 310:interpretacjaSMS.c ****     // Sprawdź czy są parametry (próba parsowania)
+ 311:interpretacjaSMS.c ****     uchar ma_parametry = pobierz_long(&sms, &h) && pomin_znak(&sms, ':') &&
+ 312:interpretacjaSMS.c ****                          pobierz_long(&sms, &m) && pomin_znak(&sms, ':') &&
+ 313:interpretacjaSMS.c ****                          pobierz_long(&sms, &s);
+ 314:interpretacjaSMS.c **** 
+ 315:interpretacjaSMS.c ****     if (!ma_parametry) {
+ 316:interpretacjaSMS.c ****       // ABCD SET bez parametrów - zwróć aktualny czas (bez sync z SMS)
+ 317:interpretacjaSMS.c ****       // Blokujemy sync czasu, aby odczytać aktualny RTC przed aktualizacją
+ 318:interpretacjaSMS.c ****       extern uchar sms_pomijaj_aktualizacje_czasu;
+ 319:interpretacjaSMS.c ****       sms_pomijaj_aktualizacje_czasu = TRUE;
+ 320:interpretacjaSMS.c **** 
+ 321:interpretacjaSMS.c ****       // Wyślij raport z aktualnym czasem
+ 322:interpretacjaSMS.c ****       extern char rtc_czas[12];
+ 323:interpretacjaSMS.c ****       uchar *sms_out = tekst_wysylanego_smsa;
+ 324:interpretacjaSMS.c ****       strcpy_P((char *)sms_out, PSTR("Time: "));
+ 325:interpretacjaSMS.c ****       sms_out += strlen((char *)sms_out);
+ 326:interpretacjaSMS.c ****       strcpy((char *)sms_out, rtc_czas);
+ 327:interpretacjaSMS.c **** 
+ 328:interpretacjaSMS.c ****       // Ustaw numer telefonu odbiorcy
+ 329:interpretacjaSMS.c ****       extern uchar numer_telefonu_wysylanego_smsa[];
+ 330:interpretacjaSMS.c ****       extern uchar numer_telefonu_odebranego_smsa[];
+ 331:interpretacjaSMS.c ****       strcpy((char *)numer_telefonu_wysylanego_smsa,
+ 332:interpretacjaSMS.c ****              (char *)numer_telefonu_odebranego_smsa);
+ 333:interpretacjaSMS.c **** 
+ 334:interpretacjaSMS.c ****       // Dodaj komendę wysłania SMS
+ 335:interpretacjaSMS.c ****       dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
+ 336:interpretacjaSMS.c **** 
+ 337:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
+ 338:interpretacjaSMS.c ****     }
  339:interpretacjaSMS.c **** 
- 340:interpretacjaSMS.c ****     // Format: AT+CCLK="yy/MM/dd,hh:mm:ss+zz"
- 341:interpretacjaSMS.c ****     // Używamy fikcyjnej daty 24/01/01
- 342:interpretacjaSMS.c ****     sprintf(bufor_ustaw_czas, "+CCLK=\"24/01/01,%02d:%02d:%02d+04\"", (int)h,
- 343:interpretacjaSMS.c ****             (int)m, (int)s);
- 344:interpretacjaSMS.c ****     dodaj_komende(KOMENDA_KOLEJKI_USTAW_ZEGAR_SIM900);
- 345:interpretacjaSMS.c **** 
- 346:interpretacjaSMS.c ****     // Wyłącz aktualizację czasu z timestampu SMS dla tej komendy
- 347:interpretacjaSMS.c ****     extern uchar sms_pomijaj_aktualizacje_czasu;
- 348:interpretacjaSMS.c ****     sms_pomijaj_aktualizacje_czasu = TRUE;
+ 340:interpretacjaSMS.c ****     // ABCD SET HH:MM:SS - ustaw czas
+ 341:interpretacjaSMS.c ****     if (h < 0 || h > 23 || m < 0 || m > 59 || s < 0 || s > 59)
+ 342:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 343:interpretacjaSMS.c **** 
+ 344:interpretacjaSMS.c ****     // Format: AT+CCLK="yy/MM/dd,hh:mm:ss+zz"
+ 345:interpretacjaSMS.c ****     // Używamy fikcyjnej daty 24/01/01
+ 346:interpretacjaSMS.c ****     sprintf(bufor_ustaw_czas, "+CCLK=\"24/01/01,%02d:%02d:%02d+04\"", (int)h,
+ 347:interpretacjaSMS.c ****             (int)m, (int)s);
+ 348:interpretacjaSMS.c ****     dodaj_komende(KOMENDA_KOLEJKI_USTAW_ZEGAR_SIM900);
  349:interpretacjaSMS.c **** 
- 350:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 351:interpretacjaSMS.c ****   }
- 352:interpretacjaSMS.c ****   case INSTRUKCJA_TIME: {
- 353:interpretacjaSMS.c ****     // Sprawdzenie czy to komenda OFF
- 354:interpretacjaSMS.c ****     przeskocz_biale_znaki(sms);
- 355:interpretacjaSMS.c ****     if (strncasecmp_P(sms, PSTR("OFF"), 3) == 0) {
- 356:interpretacjaSMS.c ****       // Zapisz wartosci wylaczajace (np. 0xFF)
- 357:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_START_H);
- 358:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_START_M);
- 359:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_STOP_H);
- 360:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_STOP_M);
- 361:interpretacjaSMS.c **** 
- 362:interpretacjaSMS.c ****       // Aktualizuj zmienne w RAM
- 363:interpretacjaSMS.c ****       czas_start_h = 0xFF;
- 364:interpretacjaSMS.c ****       czas_start_m = 0xFF;
- 365:interpretacjaSMS.c ****       czas_stop_h = 0xFF;
- 366:interpretacjaSMS.c ****       czas_stop_m = 0xFF;
- 367:interpretacjaSMS.c ****       blokada_sterowania_czasowa = FALSE;
- 368:interpretacjaSMS.c **** 
- 369:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
- 370:interpretacjaSMS.c ****     }
- 371:interpretacjaSMS.c **** 
- 372:interpretacjaSMS.c ****     long sh, sm, eh, em;
- 373:interpretacjaSMS.c ****     // Pobierz HH:MM (start)
- 374:interpretacjaSMS.c ****     if (!pobierz_long(&sms, &sh) || !pomin_znak(&sms, ':') ||
- 375:interpretacjaSMS.c ****         !pobierz_long(&sms, &sm))
- 376:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
- 377:interpretacjaSMS.c **** 
- 378:interpretacjaSMS.c ****     // Pobierz separator (spacja lub inny bialy znak juz pominiety przez
- 379:interpretacjaSMS.c ****     // pobierz_long/pomin_znak, ale tu moze byc #) Uzytkownik podal przyklad:
- 380:interpretacjaSMS.c ****     // HH:MM #HH:MM Sprawdzmy czy jest opcjonalny separator np '#'
- 381:interpretacjaSMS.c ****     if (czy_jest_znak(&sms, '#')) { /* ok, pominelismy */
- 382:interpretacjaSMS.c ****     }
- 383:interpretacjaSMS.c **** 
- 384:interpretacjaSMS.c ****     // Pobierz HH:MM (stop)
- 385:interpretacjaSMS.c ****     if (!pobierz_long(&sms, &eh) || !pomin_znak(&sms, ':') ||
- 386:interpretacjaSMS.c ****         !pobierz_long(&sms, &em))
- 387:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
- 388:interpretacjaSMS.c **** 
- 389:interpretacjaSMS.c ****     if (sh < 0 || sh > 23 || sm < 0 || sm > 59 || eh < 0 || eh > 23 || em < 0 ||
- 390:interpretacjaSMS.c ****         em > 59)
+ 350:interpretacjaSMS.c ****     // Wyłącz aktualizację czasu z timestampu SMS dla tej komendy
+ 351:interpretacjaSMS.c ****     extern uchar sms_pomijaj_aktualizacje_czasu;
+ 352:interpretacjaSMS.c ****     sms_pomijaj_aktualizacje_czasu = TRUE;
+ 353:interpretacjaSMS.c **** 
+ 354:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 355:interpretacjaSMS.c ****   }
+ 356:interpretacjaSMS.c ****   case INSTRUKCJA_TIME: {
+ 357:interpretacjaSMS.c ****     // Sprawdzenie czy to komenda OFF
+ 358:interpretacjaSMS.c ****     przeskocz_biale_znaki(sms);
+ 359:interpretacjaSMS.c ****     if (strncasecmp_P(sms, PSTR("OFF"), 3) == 0) {
+ 360:interpretacjaSMS.c ****       // Zapisz wartosci wylaczajace (np. 0xFF)
+ 361:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_START_H);
+ 362:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_START_M);
+ 363:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_STOP_H);
+ 364:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_STOP_M);
+ 365:interpretacjaSMS.c **** 
+ 366:interpretacjaSMS.c ****       // Aktualizuj zmienne w RAM
+ 367:interpretacjaSMS.c ****       czas_start_h = 0xFF;
+ 368:interpretacjaSMS.c ****       czas_start_m = 0xFF;
+ 369:interpretacjaSMS.c ****       czas_stop_h = 0xFF;
+ 370:interpretacjaSMS.c ****       czas_stop_m = 0xFF;
+ 371:interpretacjaSMS.c ****       blokada_sterowania_czasowa = FALSE;
+ 372:interpretacjaSMS.c **** 
+ 373:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
+ 374:interpretacjaSMS.c ****     }
+ 375:interpretacjaSMS.c **** 
+ 376:interpretacjaSMS.c ****     long sh, sm, eh, em;
+ 377:interpretacjaSMS.c ****     // Pobierz HH:MM (start)
+ 378:interpretacjaSMS.c ****     if (!pobierz_long(&sms, &sh) || !pomin_znak(&sms, ':') ||
+ 379:interpretacjaSMS.c ****         !pobierz_long(&sms, &sm))
+ 380:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 381:interpretacjaSMS.c **** 
+ 382:interpretacjaSMS.c ****     // Pobierz separator (spacja lub inny bialy znak juz pominiety przez
+ 383:interpretacjaSMS.c ****     // pobierz_long/pomin_znak, ale tu moze byc #) Uzytkownik podal przyklad:
+ 384:interpretacjaSMS.c ****     // HH:MM #HH:MM Sprawdzmy czy jest opcjonalny separator np '#'
+ 385:interpretacjaSMS.c ****     if (czy_jest_znak(&sms, '#')) { /* ok, pominelismy */
+ 386:interpretacjaSMS.c ****     }
+ 387:interpretacjaSMS.c **** 
+ 388:interpretacjaSMS.c ****     // Pobierz HH:MM (stop)
+ 389:interpretacjaSMS.c ****     if (!pobierz_long(&sms, &eh) || !pomin_znak(&sms, ':') ||
+ 390:interpretacjaSMS.c ****         !pobierz_long(&sms, &em))
  391:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
  392:interpretacjaSMS.c **** 
- 393:interpretacjaSMS.c ****     // Zapis do EEPROM
- 394:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)sh, ADRES_EEPROM_CZAS_START_H);
- 395:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)sm, ADRES_EEPROM_CZAS_START_M);
- 396:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)eh, ADRES_EEPROM_CZAS_STOP_H);
- 397:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)em, ADRES_EEPROM_CZAS_STOP_M);
- 398:interpretacjaSMS.c **** 
- 399:interpretacjaSMS.c ****     // Aktualizuj zmienne w RAM
- 400:interpretacjaSMS.c ****     czas_start_h = (uchar)sh;
- 401:interpretacjaSMS.c ****     czas_start_m = (uchar)sm;
- 402:interpretacjaSMS.c ****     czas_stop_h = (uchar)eh;
- 403:interpretacjaSMS.c ****     czas_stop_m = (uchar)em;
- 404:interpretacjaSMS.c **** 
- 405:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 406:interpretacjaSMS.c ****   }
- 407:interpretacjaSMS.c ****   case INSTRUKCJA_SKRYBA: {
- 408:interpretacjaSMS.c ****     przeskocz_biale_znaki(sms);
- 409:interpretacjaSMS.c ****     if (strncasecmp_P(sms, PSTR("ON"), 2) == 0) {
- 410:interpretacjaSMS.c ****       sms += 2; // Przeskocz "ON"
- 411:interpretacjaSMS.c **** 
- 412:interpretacjaSMS.c ****       // Sprawdz czy jest opcjonalny parametr (liczba)
- 413:interpretacjaSMS.c ****       long limit_value = 800; // Domyslny
- 414:interpretacjaSMS.c ****       przeskocz_biale_znaki(sms);
- 415:interpretacjaSMS.c ****       if (*sms >= '0' && *sms <= '9') {
- 416:interpretacjaSMS.c ****         // Jest liczba - sprobuj ja odczytac
- 417:interpretacjaSMS.c ****         if (pobierz_long(&sms, &limit_value)) {
- 418:interpretacjaSMS.c ****           // Walidacja zakresu
- 419:interpretacjaSMS.c ****           if (limit_value < 1 ||
- 420:interpretacjaSMS.c ****               limit_value > MAX_LICZBA_NUMEROW_TELEFONOW_BRAMA) {
- 421:interpretacjaSMS.c ****             return INTERPRETACJA_SMS_BLEDNE_DANE;
- 422:interpretacjaSMS.c ****           }
- 423:interpretacjaSMS.c ****         } else {
- 424:interpretacjaSMS.c ****           return INTERPRETACJA_SMS_BLEDNE_DANE;
- 1094               		.loc 1 424 0 is_stmt 1
- 1095 0440 82E0      		ldi r24,lo8(2)
- 1096 0442 00C0      		rjmp .L53
- 1097               	.LVL94:
- 1098               	.L74:
- 1099 0444 3150      		subi r19,lo8(-(-1))
- 1100               	.LBE10:
- 1101               	.LBB12:
- 194:interpretacjaSMS.c ****       const uchar znak = bufor_eeprom[(sms - sms_pom) + i];
- 1102               		.loc 1 194 0 discriminator 2
- 1103 0446 01F4      		brne .L75
- 1104               	.LBE12:
- 199:interpretacjaSMS.c ****            LICZBA_BAJTOW_KODU_DOSTEPU);
- 1105               		.loc 1 199 0
- 1106 0448 8050      		subi r24,lo8(-(bufor_eeprom))
- 1107 044a 9040      		sbci r25,hi8(-(bufor_eeprom))
- 1108 044c FC01      		movw r30,r24
- 1109               	.LVL95:
- 1110 044e 4081      		ld r20,Z
- 1111 0450 5181      		ldd r21,Z+1
- 1112 0452 6281      		ldd r22,Z+2
- 1113 0454 7381      		ldd r23,Z+3
- 1114 0456 4093 0000 		sts kod_modulu,r20
- 1115 045a 5093 0000 		sts kod_modulu+1,r21
- 1116 045e 6093 0000 		sts kod_modulu+2,r22
- 1117 0462 7093 0000 		sts kod_modulu+3,r23
- 201:interpretacjaSMS.c ****                           (uint)ADRES_EEPROM_KOD_DOSTEPU,
- 1118               		.loc 1 201 0
- 1119 0466 44E0      		ldi r20,lo8(4)
- 1120 0468 61E0      		ldi r22,lo8(1)
- 1121 046a 70E0      		ldi r23,0
- 1122 046c 0E94 0000 		call zapisz_znaki_w_eeprom
- 1123               	.LVL96:
- 1124               	.L152:
- 1125               	.LBB13:
- 425:interpretacjaSMS.c ****         }
- 426:interpretacjaSMS.c ****       }
- 427:interpretacjaSMS.c **** 
- 428:interpretacjaSMS.c ****       // Sprawdz czy jest miejsce na liscie
- 429:interpretacjaSMS.c ****       uchar jest_miejsce = FALSE;
- 430:interpretacjaSMS.c ****       for (uint i = 0; i < MAX_LICZBA_NUMEROW_TELEFONOW_BRAMA; ++i) {
- 431:interpretacjaSMS.c ****         if (!czy_aktywny_numer_telefonu_brama(i)) {
- 432:interpretacjaSMS.c ****           jest_miejsce = TRUE;
- 433:interpretacjaSMS.c ****           break;
- 434:interpretacjaSMS.c ****         }
- 435:interpretacjaSMS.c ****       }
- 436:interpretacjaSMS.c **** 
- 437:interpretacjaSMS.c ****       if (!jest_miejsce) {
- 438:interpretacjaSMS.c ****         // Brak miejsca - nie wlaczaj Skryby
- 439:interpretacjaSMS.c ****         return INTERPRETACJA_SMS_BLEDNE_DANE;
- 440:interpretacjaSMS.c ****       }
- 441:interpretacjaSMS.c **** 
- 442:interpretacjaSMS.c ****       // Zapisz obecny tryb przed włączeniem SKRYBA
- 443:interpretacjaSMS.c ****       uchar obecny_tryb =
- 444:interpretacjaSMS.c ****           eeprom_read_byte((const uint8_t *)ADRES_EEPROM_TRYB_PRACY);
- 445:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(obecny_tryb, ADRES_EEPROM_SKRYBA_TRYB_BACKUP);
- 446:interpretacjaSMS.c **** 
- 447:interpretacjaSMS.c ****       // Zapisz limit do EEPROM (2 bajty)
- 448:interpretacjaSMS.c ****       zapisz_znak_w_eeprom((uchar)(limit_value & 0xFF),
- 449:interpretacjaSMS.c ****                            ADRES_EEPROM_SKRYBA_LIMIT_L);
- 450:interpretacjaSMS.c ****       zapisz_znak_w_eeprom((uchar)((limit_value >> 8) & 0xFF),
- 451:interpretacjaSMS.c ****                            ADRES_EEPROM_SKRYBA_LIMIT_H);
- 452:interpretacjaSMS.c ****       skryba_limit = (uint)limit_value; // Aktualizuj RAM
- 453:interpretacjaSMS.c **** 
- 454:interpretacjaSMS.c ****       // Włącz SKRYBA
- 455:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_SKRYBA);
- 456:interpretacjaSMS.c ****       skryba_wlaczona = TRUE; // Aktualizuj RAM natychmiast
- 457:interpretacjaSMS.c **** 
- 458:interpretacjaSMS.c ****       // Automatycznie ustaw OPEN CLIP (tryb publiczny = 1)
- 459:interpretacjaSMS.c ****       tryb_pracy = 1; // Aktualizuj RAM
- 460:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
- 461:interpretacjaSMS.c **** 
- 462:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
- 1126               		.loc 1 462 0
- 1127 0470 83E0      		ldi r24,lo8(3)
- 1128 0472 00C0      		rjmp .L53
- 1129               	.LVL97:
- 1130               	.L64:
- 1131               	.LBE13:
- 212:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_USER;
- 1132               		.loc 1 212 0
- 1133 0474 4EE0      		ldi r20,lo8(14)
- 1134 0476 60E0      		ldi r22,lo8(numer_telefonu_do_ktorego_dzwonic)
- 1135 0478 70E0      		ldi r23,hi8(numer_telefonu_do_ktorego_dzwonic)
- 1136 047a CE01      		movw r24,r28
- 1137 047c 4196      		adiw r24,17
- 1138 047e 0E94 0000 		call pobierz_numer_telefonu
- 1139               	.LVL98:
- 1140 0482 8111      		cpse r24,__zero_reg__
- 1141 0484 00C0      		rjmp .L106
- 217:interpretacjaSMS.c ****   }
- 1142               		.loc 1 217 0
- 1143 0486 86E0      		ldi r24,lo8(6)
- 1144               	.LVL99:
- 1145               	.L53:
- 1146               	/* epilogue start */
- 463:interpretacjaSMS.c ****     } else if (strncasecmp_P(sms, PSTR("OFF"), 3) == 0) {
- 464:interpretacjaSMS.c ****       // Wyłącz SKRYBA
- 465:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_SKRYBA);
- 466:interpretacjaSMS.c ****       skryba_wlaczona = FALSE; // Aktualizuj RAM natychmiast
- 467:interpretacjaSMS.c **** 
- 468:interpretacjaSMS.c ****       // Przywróć poprzedni tryb
- 469:interpretacjaSMS.c ****       uchar poprzedni_tryb =
- 470:interpretacjaSMS.c ****           eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA_TRYB_BACKUP);
- 471:interpretacjaSMS.c ****       if (poprzedni_tryb != 0xFF) {  // Jeśli był zapisany
- 472:interpretacjaSMS.c ****         tryb_pracy = poprzedni_tryb; // Aktualizuj RAM
- 473:interpretacjaSMS.c ****         zapisz_znak_w_eeprom(poprzedni_tryb, ADRES_EEPROM_TRYB_PRACY);
- 474:interpretacjaSMS.c ****       }
- 475:interpretacjaSMS.c **** 
- 476:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
- 477:interpretacjaSMS.c ****     }
- 478:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_BLEDNE_DANE;
- 479:interpretacjaSMS.c ****   }
- 480:interpretacjaSMS.c ****   case INSTRUKCJA_DEBUG: {
- 481:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_DEBUG;
- 482:interpretacjaSMS.c ****   }
- 483:interpretacjaSMS.c ****   case INSTRUKCJA_START: {
- 484:interpretacjaSMS.c ****     blokada_systemu = FALSE;
- 485:interpretacjaSMS.c ****     zapisz_znak_w_eeprom(0, ADRES_EEPROM_BLOKADA_SYSTEMU);
- 486:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 487:interpretacjaSMS.c ****   }
- 488:interpretacjaSMS.c ****   case INSTRUKCJA_STOP: {
- 489:interpretacjaSMS.c ****     blokada_systemu = TRUE;
- 490:interpretacjaSMS.c ****     zapisz_znak_w_eeprom(1, ADRES_EEPROM_BLOKADA_SYSTEMU);
- 491:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 492:interpretacjaSMS.c ****   }
- 493:interpretacjaSMS.c ****   }
- 494:interpretacjaSMS.c ****   return INTERPRETACJA_SMS_ZLY_FORMAT;
- 495:interpretacjaSMS.c **** }
- 1147               		.loc 1 495 0
- 1148 0488 6296      		adiw r28,18
- 1149 048a 0FB6      		in __tmp_reg__,__SREG__
- 1150 048c F894      		cli
- 1151 048e DEBF      		out __SP_H__,r29
- 1152 0490 0FBE      		out __SREG__,__tmp_reg__
- 1153 0492 CDBF      		out __SP_L__,r28
- 1154 0494 DF91      		pop r29
- 1155 0496 CF91      		pop r28
- 1156 0498 1F91      		pop r17
- 1157 049a 0F91      		pop r16
- 1158 049c FF90      		pop r15
- 1159 049e EF90      		pop r14
- 1160 04a0 0895      		ret
- 1161               	.LVL100:
- 1162               	.L61:
- 220:interpretacjaSMS.c ****                                    14))
- 1163               		.loc 1 220 0
- 1164 04a2 4EE0      		ldi r20,lo8(14)
- 1165 04a4 60E0      		ldi r22,lo8(numer_telefonu_do_ktorego_dzwonic)
- 1166 04a6 70E0      		ldi r23,hi8(numer_telefonu_do_ktorego_dzwonic)
- 1167 04a8 CE01      		movw r24,r28
- 1168 04aa 4196      		adiw r24,17
- 1169 04ac 0E94 0000 		call pobierz_numer_telefonu
- 1170               	.LVL101:
- 1171 04b0 8823      		tst r24
- 1172 04b2 01F0      		breq .L99
- 223:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 1173               		.loc 1 223 0
- 1174 04b4 85E8      		ldi r24,lo8(-123)
- 1175               	.L158:
- 230:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 1176               		.loc 1 230 0
- 1177 04b6 0E94 0000 		call dodaj_komende
- 1178               	.LVL102:
- 1179 04ba 00C0      		rjmp .L152
- 1180               	.L62:
- 227:interpretacjaSMS.c ****                                    14))
- 1181               		.loc 1 227 0
- 1182 04bc 4EE0      		ldi r20,lo8(14)
- 1183 04be 60E0      		ldi r22,lo8(numer_telefonu_do_ktorego_dzwonic)
- 1184 04c0 70E0      		ldi r23,hi8(numer_telefonu_do_ktorego_dzwonic)
- 1185 04c2 CE01      		movw r24,r28
- 1186 04c4 4196      		adiw r24,17
- 1187 04c6 0E94 0000 		call pobierz_numer_telefonu
- 1188               	.LVL103:
- 1189 04ca 8823      		tst r24
- 1190 04cc 01F4      		brne .+2
- 1191 04ce 00C0      		rjmp .L99
- 230:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 1192               		.loc 1 230 0
- 1193 04d0 87E8      		ldi r24,lo8(-121)
- 1194 04d2 00C0      		rjmp .L158
- 1195               	.L65:
- 1196               	.LBB14:
- 237:interpretacjaSMS.c ****         interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CLIP, INSTRUKCJA_DTMF + 1);
- 1197               		.loc 1 237 0
- 1198 04d4 4AE0      		ldi r20,lo8(10)
- 1199 04d6 68E0      		ldi r22,lo8(8)
- 1200 04d8 CE01      		movw r24,r28
- 1201 04da 4196      		adiw r24,17
- 1202 04dc 0E94 0000 		call interpretuj_instrukcje_sms
- 1203               	.LVL104:
- 239:interpretacjaSMS.c ****       tryb_pracy = 1; // Publiczny
- 1204               		.loc 1 239 0
- 1205 04e0 8830      		cpi r24,lo8(8)
- 1206 04e2 01F4      		brne .L77
- 240:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
- 1207               		.loc 1 240 0
- 1208 04e4 81E0      		ldi r24,lo8(1)
- 1209               	.LVL105:
- 1210 04e6 8093 0000 		sts tryb_pracy,r24
- 241:interpretacjaSMS.c **** 
- 1211               		.loc 1 241 0
- 1212 04ea 6EEF      		ldi r22,lo8(-2)
- 1213 04ec 7FE0      		ldi r23,lo8(15)
- 1214               	.L160:
- 1215               	.LBE14:
- 1216               	.LBB15:
- 278:interpretacjaSMS.c **** 
- 1217               		.loc 1 278 0
- 1218 04ee 0E94 0000 		call zapisz_znak_w_eeprom
- 1219               	.LVL106:
- 280:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_CLIP_DTMF);
- 1220               		.loc 1 280 0
- 1221 04f2 8FEF      		ldi r24,lo8(-1)
- 1222 04f4 8093 0000 		sts tryb_clip,r24
- 281:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
- 1223               		.loc 1 281 0
- 1224 04f8 6FEF      		ldi r22,lo8(-1)
- 1225 04fa 7FE0      		ldi r23,lo8(15)
- 1226               	.L156:
- 1227               	.LBE15:
- 490:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 1228               		.loc 1 490 0
- 1229 04fc 81E0      		ldi r24,lo8(1)
- 1230 04fe 00C0      		rjmp .L153
- 1231               	.LVL107:
- 1232               	.L77:
- 1233               	.LBB16:
- 246:interpretacjaSMS.c ****       tryb_pracy = 1; // Publiczny
- 1234               		.loc 1 246 0
- 1235 0500 8930      		cpi r24,lo8(9)
- 1236 0502 01F0      		breq .+2
- 1237 0504 00C0      		rjmp .L155
- 247:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
- 1238               		.loc 1 247 0
- 1239 0506 81E0      		ldi r24,lo8(1)
- 1240               	.LVL108:
- 1241 0508 8093 0000 		sts tryb_pracy,r24
- 248:interpretacjaSMS.c **** 
- 1242               		.loc 1 248 0
- 1243 050c 6EEF      		ldi r22,lo8(-2)
- 1244 050e 7FE0      		ldi r23,lo8(15)
- 1245               	.L159:
- 1246               	.LBE16:
- 1247               	.LBB17:
- 285:interpretacjaSMS.c **** 
- 1248               		.loc 1 285 0
- 1249 0510 0E94 0000 		call zapisz_znak_w_eeprom
- 1250               	.LVL109:
- 287:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_CLIP_DTMF);
- 1251               		.loc 1 287 0
- 1252 0514 1092 0000 		sts tryb_clip,__zero_reg__
- 288:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
- 1253               		.loc 1 288 0
- 1254 0518 6FEF      		ldi r22,lo8(-1)
- 1255 051a 7FE0      		ldi r23,lo8(15)
- 1256               	.L157:
- 1257               	.LBE17:
- 485:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 1258               		.loc 1 485 0
- 1259 051c 80E0      		ldi r24,0
- 1260               	.LVL110:
- 1261               	.L153:
- 1262               	.LBB18:
- 460:interpretacjaSMS.c **** 
- 1263               		.loc 1 460 0
- 1264 051e 0E94 0000 		call zapisz_znak_w_eeprom
- 1265               	.LVL111:
- 1266 0522 00C0      		rjmp .L152
- 1267               	.LVL112:
- 1268               	.L66:
- 1269               	.LBE18:
- 1270               	.LBB19:
- 274:interpretacjaSMS.c ****         interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CLIP, INSTRUKCJA_DTMF + 1);
- 1271               		.loc 1 274 0
- 1272 0524 4AE0      		ldi r20,lo8(10)
- 1273 0526 68E0      		ldi r22,lo8(8)
- 1274 0528 CE01      		movw r24,r28
- 1275 052a 4196      		adiw r24,17
- 1276 052c 0E94 0000 		call interpretuj_instrukcje_sms
- 1277               	.LVL113:
- 277:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_PRACY);
- 1278               		.loc 1 277 0
- 1279 0530 1092 0000 		sts tryb_pracy,__zero_reg__
- 278:interpretacjaSMS.c **** 
- 1280               		.loc 1 278 0
- 1281 0534 6EEF      		ldi r22,lo8(-2)
- 1282 0536 7FE0      		ldi r23,lo8(15)
- 276:interpretacjaSMS.c ****       tryb_pracy = 0; // Prywatny
- 1283               		.loc 1 276 0
- 1284 0538 8830      		cpi r24,lo8(8)
- 1285 053a 01F4      		brne .L79
- 278:interpretacjaSMS.c **** 
- 1286               		.loc 1 278 0
- 1287 053c 80E0      		ldi r24,0
- 1288               	.LVL114:
- 1289 053e 00C0      		rjmp .L160
- 1290               	.LVL115:
- 1291               	.L79:
- 283:interpretacjaSMS.c ****       tryb_pracy = 0; // Prywatny
- 1292               		.loc 1 283 0
- 1293 0540 8930      		cpi r24,lo8(9)
- 1294 0542 01F4      		brne .L80
- 285:interpretacjaSMS.c **** 
- 1295               		.loc 1 285 0
- 1296 0544 80E0      		ldi r24,0
- 1297               	.LVL116:
- 1298 0546 00C0      		rjmp .L159
- 1299               	.LVL117:
- 1300               	.L80:
- 293:interpretacjaSMS.c **** 
- 1301               		.loc 1 293 0
- 1302 0548 80E0      		ldi r24,0
- 1303               	.LVL118:
- 1304 054a 0E94 0000 		call zapisz_znak_w_eeprom
- 1305               	.LVL119:
- 296:interpretacjaSMS.c ****         zapisz_znak_w_eeprom(0, ADRES_EEPROM_SKRYBA);
- 1306               		.loc 1 296 0
- 1307 054e 8091 0000 		lds r24,skryba_wlaczona
- 1308 0552 8823      		tst r24
- 1309 0554 01F4      		brne .+2
- 1310 0556 00C0      		rjmp .L152
- 297:interpretacjaSMS.c ****         skryba_wlaczona = FALSE;
- 1311               		.loc 1 297 0
- 1312 0558 69EF      		ldi r22,lo8(-7)
- 1313 055a 7FE0      		ldi r23,lo8(15)
- 1314 055c 80E0      		ldi r24,0
- 1315 055e 0E94 0000 		call zapisz_znak_w_eeprom
- 1316               	.LVL120:
- 298:interpretacjaSMS.c ****       }
- 1317               		.loc 1 298 0
- 1318 0562 1092 0000 		sts skryba_wlaczona,__zero_reg__
- 1319 0566 00C0      		rjmp .L152
- 1320               	.L67:
- 1321               	.LBE19:
- 1322               	.LBB20:
- 307:interpretacjaSMS.c ****                          pobierz_long(&sms, &m) && pomin_znak(&sms, ':') &&
- 1323               		.loc 1 307 0
- 1324 0568 BE01      		movw r22,r28
- 1325 056a 675F      		subi r22,-9
- 1326 056c 7F4F      		sbci r23,-1
- 1327 056e CE01      		movw r24,r28
- 1328 0570 4196      		adiw r24,17
- 1329 0572 0E94 0000 		call pobierz_long
- 1330               	.LVL121:
- 308:interpretacjaSMS.c ****                          pobierz_long(&sms, &s);
- 1331               		.loc 1 308 0
- 1332 0576 8823      		tst r24
- 1333 0578 01F0      		breq .L134
- 307:interpretacjaSMS.c ****                          pobierz_long(&sms, &m) && pomin_znak(&sms, ':') &&
- 1334               		.loc 1 307 0
- 1335 057a 6AE3      		ldi r22,lo8(58)
- 1336 057c CE01      		movw r24,r28
- 1337 057e 4196      		adiw r24,17
- 1338 0580 0E94 0000 		call pomin_znak
- 1339               	.LVL122:
- 1340 0584 8823      		tst r24
- 1341 0586 01F0      		breq .L134
- 308:interpretacjaSMS.c ****                          pobierz_long(&sms, &s);
- 1342               		.loc 1 308 0 discriminator 1
- 1343 0588 BE01      		movw r22,r28
- 1344 058a 6B5F      		subi r22,-5
- 1345 058c 7F4F      		sbci r23,-1
- 1346 058e CE01      		movw r24,r28
- 1347 0590 4196      		adiw r24,17
- 1348 0592 0E94 0000 		call pobierz_long
- 1349               	.LVL123:
- 307:interpretacjaSMS.c ****                          pobierz_long(&sms, &m) && pomin_znak(&sms, ':') &&
- 1350               		.loc 1 307 0 discriminator 1
- 1351 0596 8823      		tst r24
- 1352 0598 01F0      		breq .L134
- 308:interpretacjaSMS.c ****                          pobierz_long(&sms, &s);
- 1353               		.loc 1 308 0 discriminator 3
- 1354 059a 6AE3      		ldi r22,lo8(58)
- 1355 059c CE01      		movw r24,r28
- 1356 059e 4196      		adiw r24,17
- 1357 05a0 0E94 0000 		call pomin_znak
- 1358               	.LVL124:
- 1359 05a4 8823      		tst r24
- 1360 05a6 01F0      		breq .L134
- 309:interpretacjaSMS.c **** 
- 1361               		.loc 1 309 0 discriminator 2
- 1362 05a8 BE01      		movw r22,r28
- 1363 05aa 6F5F      		subi r22,-1
- 1364 05ac 7F4F      		sbci r23,-1
- 1365 05ae CE01      		movw r24,r28
- 1366 05b0 4196      		adiw r24,17
- 1367 05b2 0E94 0000 		call pobierz_long
- 1368               	.LVL125:
- 308:interpretacjaSMS.c ****                          pobierz_long(&sms, &s);
- 1369               		.loc 1 308 0 discriminator 2
- 1370 05b6 21E0      		ldi r18,lo8(1)
- 1371 05b8 30E0      		ldi r19,0
- 1372 05ba 8111      		cpse r24,__zero_reg__
- 1373 05bc 00C0      		rjmp .L85
- 1374 05be 30E0      		ldi r19,0
- 1375 05c0 20E0      		ldi r18,0
- 1376               	.L85:
- 1377               	.LVL126:
- 311:interpretacjaSMS.c ****       // ABCD SET bez parametrów - zwróć aktualny czas (bez sync z SMS)
- 1378               		.loc 1 311 0 discriminator 2
- 1379 05c2 232B      		or r18,r19
- 1380 05c4 01F4      		brne .L86
- 1381               	.LVL127:
- 1382               	.L134:
- 1383               	.LBB21:
- 315:interpretacjaSMS.c **** 
- 1384               		.loc 1 315 0
- 1385 05c6 8FEF      		ldi r24,lo8(-1)
- 1386 05c8 8093 0000 		sts sms_pomijaj_aktualizacje_czasu,r24
- 1387               	.LVL128:
- 320:interpretacjaSMS.c ****       sms_out += strlen((char *)sms_out);
- 1388               		.loc 1 320 0
- 1389 05cc 60E0      		ldi r22,lo8(__c.2770)
- 1390 05ce 70E0      		ldi r23,hi8(__c.2770)
- 1391 05d0 80E0      		ldi r24,lo8(tekst_wysylanego_smsa)
- 1392 05d2 90E0      		ldi r25,hi8(tekst_wysylanego_smsa)
- 1393 05d4 0E94 0000 		call strcpy_P
- 1394               	.LVL129:
- 321:interpretacjaSMS.c ****       strcpy((char *)sms_out, rtc_czas);
- 1395               		.loc 1 321 0
- 1396 05d8 80E0      		ldi r24,lo8(tekst_wysylanego_smsa)
- 1397 05da 90E0      		ldi r25,hi8(tekst_wysylanego_smsa)
- 1398 05dc FC01      		movw r30,r24
- 1399               		0:
- 1400 05de 0190      		ld __tmp_reg__,Z+
- 1401 05e0 0020      		tst __tmp_reg__
- 1402 05e2 01F4      		brne 0b
- 1403 05e4 CF01      		movw r24,r30
- 1404               	.LVL130:
- 322:interpretacjaSMS.c **** 
- 1405               		.loc 1 322 0
- 1406 05e6 60E0      		ldi r22,lo8(rtc_czas)
- 1407 05e8 70E0      		ldi r23,hi8(rtc_czas)
- 1408 05ea 0197      		sbiw r24,1
- 1409               	.LVL131:
- 1410 05ec 0E94 0000 		call strcpy
- 1411               	.LVL132:
- 327:interpretacjaSMS.c ****              (char *)numer_telefonu_odebranego_smsa);
- 1412               		.loc 1 327 0
- 1413 05f0 60E0      		ldi r22,lo8(numer_telefonu_odebranego_smsa)
- 1414 05f2 70E0      		ldi r23,hi8(numer_telefonu_odebranego_smsa)
- 1415 05f4 80E0      		ldi r24,lo8(numer_telefonu_wysylanego_smsa)
- 1416 05f6 90E0      		ldi r25,hi8(numer_telefonu_wysylanego_smsa)
- 1417 05f8 0E94 0000 		call strcpy
- 1418               	.LVL133:
- 331:interpretacjaSMS.c **** 
- 1419               		.loc 1 331 0
- 1420 05fc 82ED      		ldi r24,lo8(-46)
- 1421 05fe 00C0      		rjmp .L158
- 1422               	.LVL134:
- 1423               	.L86:
- 1424               	.LBE21:
- 337:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
- 1425               		.loc 1 337 0
- 1426 0600 8985      		ldd r24,Y+9
- 1427 0602 9A85      		ldd r25,Y+10
- 1428 0604 AB85      		ldd r26,Y+11
- 1429 0606 BC85      		ldd r27,Y+12
- 1430 0608 8831      		cpi r24,24
- 1431 060a 9105      		cpc r25,__zero_reg__
- 1432 060c A105      		cpc r26,__zero_reg__
- 1433 060e B105      		cpc r27,__zero_reg__
- 1434 0610 00F0      		brlo .+2
- 1435 0612 00C0      		rjmp .L99
- 337:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
- 1436               		.loc 1 337 0 is_stmt 0 discriminator 1
- 1437 0614 4D81      		ldd r20,Y+5
- 1438 0616 5E81      		ldd r21,Y+6
- 1439 0618 6F81      		ldd r22,Y+7
- 1440 061a 7885      		ldd r23,Y+8
- 1441 061c 4C33      		cpi r20,60
- 1442 061e 5105      		cpc r21,__zero_reg__
- 1443 0620 6105      		cpc r22,__zero_reg__
- 1444 0622 7105      		cpc r23,__zero_reg__
- 1445 0624 00F0      		brlo .+2
- 1446 0626 00C0      		rjmp .L99
- 337:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
- 1447               		.loc 1 337 0 discriminator 3
- 1448 0628 0981      		ldd r16,Y+1
- 1449 062a 1A81      		ldd r17,Y+2
- 1450 062c 2B81      		ldd r18,Y+3
- 1451 062e 3C81      		ldd r19,Y+4
- 1452               	.LVL135:
- 1453 0630 0C33      		cpi r16,60
- 1454 0632 1105      		cpc r17,__zero_reg__
- 1455 0634 2105      		cpc r18,__zero_reg__
- 1456 0636 3105      		cpc r19,__zero_reg__
- 1457 0638 00F0      		brlo .+2
- 1458 063a 00C0      		rjmp .L99
- 342:interpretacjaSMS.c ****             (int)m, (int)s);
- 1459               		.loc 1 342 0 is_stmt 1
- 1460 063c 1F93      		push r17
- 1461 063e 0F93      		push r16
- 1462 0640 5F93      		push r21
- 1463 0642 4F93      		push r20
- 1464 0644 9F93      		push r25
- 1465 0646 8F93      		push r24
- 1466 0648 80E0      		ldi r24,lo8(.LC0)
- 1467 064a 90E0      		ldi r25,hi8(.LC0)
- 1468 064c 9F93      		push r25
- 1469 064e 8F93      		push r24
- 1470 0650 80E0      		ldi r24,lo8(bufor_ustaw_czas)
- 1471 0652 90E0      		ldi r25,hi8(bufor_ustaw_czas)
- 1472 0654 9F93      		push r25
- 1473 0656 8F93      		push r24
- 1474 0658 0E94 0000 		call sprintf
- 1475               	.LVL136:
- 344:interpretacjaSMS.c **** 
- 1476               		.loc 1 344 0
- 1477 065c 8DEF      		ldi r24,lo8(-3)
- 1478 065e 0E94 0000 		call dodaj_komende
- 1479               	.LVL137:
- 348:interpretacjaSMS.c **** 
- 1480               		.loc 1 348 0
- 1481 0662 8FEF      		ldi r24,lo8(-1)
- 1482 0664 8093 0000 		sts sms_pomijaj_aktualizacje_czasu,r24
- 350:interpretacjaSMS.c ****   }
- 1483               		.loc 1 350 0
- 1484 0668 0FB6      		in __tmp_reg__,__SREG__
- 1485 066a F894      		cli
- 1486 066c DEBF      		out __SP_H__,r29
- 1487 066e 0FBE      		out __SREG__,__tmp_reg__
- 1488 0670 CDBF      		out __SP_L__,r28
- 1489 0672 00C0      		rjmp .L152
- 1490               	.LVL138:
- 1491               	.L88:
- 1492               	.LBE20:
- 1493               	.LBB22:
- 354:interpretacjaSMS.c ****     if (strncasecmp_P(sms, PSTR("OFF"), 3) == 0) {
- 1494               		.loc 1 354 0 discriminator 2
- 1495 0674 0F5F      		subi r16,-1
- 1496 0676 1F4F      		sbci r17,-1
- 1497 0678 1A8B      		std Y+18,r17
- 1498 067a 098B      		std Y+17,r16
- 1499               	.L68:
- 354:interpretacjaSMS.c ****     if (strncasecmp_P(sms, PSTR("OFF"), 3) == 0) {
- 1500               		.loc 1 354 0 is_stmt 0 discriminator 1
- 1501 067c 0989      		ldd r16,Y+17
- 1502 067e 1A89      		ldd r17,Y+18
- 1503 0680 F801      		movw r30,r16
- 1504 0682 8081      		ld r24,Z
- 1505 0684 90E0      		ldi r25,0
- 1506 0686 0E94 0000 		call isspace
- 1507               	.LVL139:
- 1508 068a 892B      		or r24,r25
- 1509 068c 01F4      		brne .L88
- 355:interpretacjaSMS.c ****       // Zapisz wartosci wylaczajace (np. 0xFF)
- 1510               		.loc 1 355 0 is_stmt 1
- 1511 068e 43E0      		ldi r20,lo8(3)
- 1512 0690 50E0      		ldi r21,0
- 1513 0692 60E0      		ldi r22,lo8(__c.2784)
- 1514 0694 70E0      		ldi r23,hi8(__c.2784)
- 1515 0696 C801      		movw r24,r16
- 1516 0698 0E94 0000 		call strncasecmp_P
- 1517               	.LVL140:
- 1518 069c 892B      		or r24,r25
- 1519 069e 01F4      		brne .L89
- 357:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_START_M);
- 1520               		.loc 1 357 0
- 1521 06a0 6AEF      		ldi r22,lo8(-6)
- 1522 06a2 7FE0      		ldi r23,lo8(15)
- 1523 06a4 8FEF      		ldi r24,lo8(-1)
- 1524 06a6 0E94 0000 		call zapisz_znak_w_eeprom
- 1525               	.LVL141:
- 358:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_STOP_H);
- 1526               		.loc 1 358 0
- 1527 06aa 6BEF      		ldi r22,lo8(-5)
- 1528 06ac 7FE0      		ldi r23,lo8(15)
- 1529 06ae 8FEF      		ldi r24,lo8(-1)
- 1530 06b0 0E94 0000 		call zapisz_znak_w_eeprom
- 1531               	.LVL142:
- 359:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_STOP_M);
- 1532               		.loc 1 359 0
- 1533 06b4 6CEF      		ldi r22,lo8(-4)
- 1534 06b6 7FE0      		ldi r23,lo8(15)
- 1535 06b8 8FEF      		ldi r24,lo8(-1)
- 1536 06ba 0E94 0000 		call zapisz_znak_w_eeprom
- 1537               	.LVL143:
- 360:interpretacjaSMS.c **** 
- 1538               		.loc 1 360 0
- 1539 06be 6DEF      		ldi r22,lo8(-3)
- 1540 06c0 7FE0      		ldi r23,lo8(15)
- 1541 06c2 8FEF      		ldi r24,lo8(-1)
- 1542 06c4 0E94 0000 		call zapisz_znak_w_eeprom
- 1543               	.LVL144:
- 363:interpretacjaSMS.c ****       czas_start_m = 0xFF;
- 1544               		.loc 1 363 0
- 1545 06c8 8FEF      		ldi r24,lo8(-1)
- 1546 06ca 8093 0000 		sts czas_start_h,r24
- 364:interpretacjaSMS.c ****       czas_stop_h = 0xFF;
- 1547               		.loc 1 364 0
- 1548 06ce 8093 0000 		sts czas_start_m,r24
- 365:interpretacjaSMS.c ****       czas_stop_m = 0xFF;
- 1549               		.loc 1 365 0
- 1550 06d2 8093 0000 		sts czas_stop_h,r24
- 366:interpretacjaSMS.c ****       blokada_sterowania_czasowa = FALSE;
- 1551               		.loc 1 366 0
- 1552 06d6 8093 0000 		sts czas_stop_m,r24
- 367:interpretacjaSMS.c **** 
- 1553               		.loc 1 367 0
- 1554 06da 1092 0000 		sts blokada_sterowania_czasowa,__zero_reg__
- 1555 06de 00C0      		rjmp .L152
- 1556               	.L89:
- 374:interpretacjaSMS.c ****         !pobierz_long(&sms, &sm))
- 1557               		.loc 1 374 0
- 1558 06e0 BE01      		movw r22,r28
- 1559 06e2 635F      		subi r22,-13
- 1560 06e4 7F4F      		sbci r23,-1
- 1561 06e6 CE01      		movw r24,r28
- 1562 06e8 4196      		adiw r24,17
- 1563 06ea 0E94 0000 		call pobierz_long
- 1564               	.LVL145:
- 1565 06ee 8823      		tst r24
- 1566 06f0 01F4      		brne .+2
- 1567 06f2 00C0      		rjmp .L99
- 374:interpretacjaSMS.c ****         !pobierz_long(&sms, &sm))
- 1568               		.loc 1 374 0 is_stmt 0 discriminator 1
- 1569 06f4 6AE3      		ldi r22,lo8(58)
- 1570 06f6 CE01      		movw r24,r28
- 1571 06f8 4196      		adiw r24,17
- 1572 06fa 0E94 0000 		call pomin_znak
- 1573               	.LVL146:
- 1574 06fe 8823      		tst r24
- 1575 0700 01F4      		brne .+2
- 1576 0702 00C0      		rjmp .L99
- 375:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
- 1577               		.loc 1 375 0 is_stmt 1 discriminator 2
- 1578 0704 BE01      		movw r22,r28
- 1579 0706 675F      		subi r22,-9
- 1580 0708 7F4F      		sbci r23,-1
- 1581 070a CE01      		movw r24,r28
- 1582 070c 4196      		adiw r24,17
- 1583 070e 0E94 0000 		call pobierz_long
- 1584               	.LVL147:
- 374:interpretacjaSMS.c ****         !pobierz_long(&sms, &sm))
- 1585               		.loc 1 374 0 discriminator 2
- 1586 0712 8823      		tst r24
- 1587 0714 01F4      		brne .+2
- 1588 0716 00C0      		rjmp .L99
- 381:interpretacjaSMS.c ****     }
- 1589               		.loc 1 381 0
- 1590 0718 63E2      		ldi r22,lo8(35)
- 1591 071a CE01      		movw r24,r28
- 1592 071c 4196      		adiw r24,17
- 1593 071e 0E94 0000 		call czy_jest_znak
- 1594               	.LVL148:
- 385:interpretacjaSMS.c ****         !pobierz_long(&sms, &em))
- 1595               		.loc 1 385 0
- 1596 0722 BE01      		movw r22,r28
- 1597 0724 6B5F      		subi r22,-5
- 1598 0726 7F4F      		sbci r23,-1
- 1599 0728 CE01      		movw r24,r28
- 1600 072a 4196      		adiw r24,17
- 1601 072c 0E94 0000 		call pobierz_long
- 1602               	.LVL149:
- 1603 0730 8823      		tst r24
- 1604 0732 01F4      		brne .+2
- 1605 0734 00C0      		rjmp .L99
- 385:interpretacjaSMS.c ****         !pobierz_long(&sms, &em))
- 1606               		.loc 1 385 0 is_stmt 0 discriminator 1
- 1607 0736 6AE3      		ldi r22,lo8(58)
- 1608 0738 CE01      		movw r24,r28
- 1609 073a 4196      		adiw r24,17
- 1610 073c 0E94 0000 		call pomin_znak
- 1611               	.LVL150:
- 1612 0740 8823      		tst r24
- 1613 0742 01F4      		brne .+2
- 1614 0744 00C0      		rjmp .L99
- 386:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
- 1615               		.loc 1 386 0 is_stmt 1 discriminator 2
- 1616 0746 BE01      		movw r22,r28
- 1617 0748 6F5F      		subi r22,-1
- 1618 074a 7F4F      		sbci r23,-1
- 1619 074c CE01      		movw r24,r28
- 1620 074e 4196      		adiw r24,17
- 1621 0750 0E94 0000 		call pobierz_long
- 1622               	.LVL151:
- 385:interpretacjaSMS.c ****         !pobierz_long(&sms, &em))
- 1623               		.loc 1 385 0 discriminator 2
- 1624 0754 8823      		tst r24
- 1625 0756 01F4      		brne .+2
- 1626 0758 00C0      		rjmp .L99
- 389:interpretacjaSMS.c ****         em > 59)
- 1627               		.loc 1 389 0
- 1628 075a 8D85      		ldd r24,Y+13
- 1629 075c 9E85      		ldd r25,Y+14
- 1630 075e AF85      		ldd r26,Y+15
- 1631 0760 B889      		ldd r27,Y+16
- 1632 0762 8831      		cpi r24,24
- 1633 0764 9105      		cpc r25,__zero_reg__
- 1634 0766 A105      		cpc r26,__zero_reg__
- 1635 0768 B105      		cpc r27,__zero_reg__
- 1636 076a 00F0      		brlo .+2
- 1637 076c 00C0      		rjmp .L99
- 389:interpretacjaSMS.c ****         em > 59)
- 1638               		.loc 1 389 0 is_stmt 0 discriminator 1
- 1639 076e 4985      		ldd r20,Y+9
- 1640 0770 5A85      		ldd r21,Y+10
- 1641 0772 6B85      		ldd r22,Y+11
- 1642 0774 7C85      		ldd r23,Y+12
- 1643 0776 4C33      		cpi r20,60
- 1644 0778 5105      		cpc r21,__zero_reg__
- 1645 077a 6105      		cpc r22,__zero_reg__
- 1646 077c 7105      		cpc r23,__zero_reg__
- 1647 077e 00F0      		brlo .+2
- 1648 0780 00C0      		rjmp .L99
- 389:interpretacjaSMS.c ****         em > 59)
- 1649               		.loc 1 389 0 discriminator 3
- 1650 0782 4D81      		ldd r20,Y+5
- 1651 0784 5E81      		ldd r21,Y+6
- 1652 0786 6F81      		ldd r22,Y+7
- 1653 0788 7885      		ldd r23,Y+8
- 1654 078a 4831      		cpi r20,24
- 1655 078c 5105      		cpc r21,__zero_reg__
- 1656 078e 6105      		cpc r22,__zero_reg__
- 1657 0790 7105      		cpc r23,__zero_reg__
- 1658 0792 00F0      		brlo .+2
- 1659 0794 00C0      		rjmp .L99
- 389:interpretacjaSMS.c ****         em > 59)
- 1660               		.loc 1 389 0 discriminator 5
- 1661 0796 4981      		ldd r20,Y+1
- 1662 0798 5A81      		ldd r21,Y+2
- 1663 079a 6B81      		ldd r22,Y+3
- 1664 079c 7C81      		ldd r23,Y+4
- 1665 079e 4C33      		cpi r20,60
- 1666 07a0 5105      		cpc r21,__zero_reg__
- 1667 07a2 6105      		cpc r22,__zero_reg__
- 1668 07a4 7105      		cpc r23,__zero_reg__
- 1669 07a6 00F0      		brlo .+2
- 1670 07a8 00C0      		rjmp .L99
- 394:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)sm, ADRES_EEPROM_CZAS_START_M);
- 1671               		.loc 1 394 0 is_stmt 1
- 1672 07aa 6AEF      		ldi r22,lo8(-6)
- 1673 07ac 7FE0      		ldi r23,lo8(15)
- 1674 07ae 0E94 0000 		call zapisz_znak_w_eeprom
- 1675               	.LVL152:
- 395:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)eh, ADRES_EEPROM_CZAS_STOP_H);
- 1676               		.loc 1 395 0
- 1677 07b2 6BEF      		ldi r22,lo8(-5)
- 1678 07b4 7FE0      		ldi r23,lo8(15)
- 1679 07b6 8985      		ldd r24,Y+9
- 1680 07b8 0E94 0000 		call zapisz_znak_w_eeprom
- 1681               	.LVL153:
- 396:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)em, ADRES_EEPROM_CZAS_STOP_M);
- 1682               		.loc 1 396 0
- 1683 07bc 6CEF      		ldi r22,lo8(-4)
- 1684 07be 7FE0      		ldi r23,lo8(15)
- 1685 07c0 8D81      		ldd r24,Y+5
- 1686 07c2 0E94 0000 		call zapisz_znak_w_eeprom
- 1687               	.LVL154:
- 397:interpretacjaSMS.c **** 
- 1688               		.loc 1 397 0
- 1689 07c6 6DEF      		ldi r22,lo8(-3)
- 1690 07c8 7FE0      		ldi r23,lo8(15)
- 1691 07ca 8981      		ldd r24,Y+1
- 1692 07cc 0E94 0000 		call zapisz_znak_w_eeprom
- 1693               	.LVL155:
- 400:interpretacjaSMS.c ****     czas_start_m = (uchar)sm;
- 1694               		.loc 1 400 0
- 1695 07d0 8D85      		ldd r24,Y+13
- 1696 07d2 8093 0000 		sts czas_start_h,r24
- 401:interpretacjaSMS.c ****     czas_stop_h = (uchar)eh;
- 1697               		.loc 1 401 0
- 1698 07d6 8985      		ldd r24,Y+9
- 1699 07d8 8093 0000 		sts czas_start_m,r24
- 402:interpretacjaSMS.c ****     czas_stop_m = (uchar)em;
- 1700               		.loc 1 402 0
- 1701 07dc 8D81      		ldd r24,Y+5
- 1702 07de 8093 0000 		sts czas_stop_h,r24
- 403:interpretacjaSMS.c **** 
- 1703               		.loc 1 403 0
- 1704 07e2 8981      		ldd r24,Y+1
- 1705 07e4 8093 0000 		sts czas_stop_m,r24
- 1706 07e8 00C0      		rjmp .L152
- 1707               	.L93:
- 1708               	.LBE22:
- 408:interpretacjaSMS.c ****     if (strncasecmp_P(sms, PSTR("ON"), 2) == 0) {
- 1709               		.loc 1 408 0 discriminator 2
- 1710 07ea 0F5F      		subi r16,-1
- 1711 07ec 1F4F      		sbci r17,-1
- 1712 07ee 1A8B      		std Y+18,r17
- 1713 07f0 098B      		std Y+17,r16
- 1714               	.L69:
- 408:interpretacjaSMS.c ****     if (strncasecmp_P(sms, PSTR("ON"), 2) == 0) {
- 1715               		.loc 1 408 0 is_stmt 0 discriminator 1
- 1716 07f2 0989      		ldd r16,Y+17
- 1717 07f4 1A89      		ldd r17,Y+18
- 1718 07f6 F801      		movw r30,r16
- 1719 07f8 8081      		ld r24,Z
- 1720 07fa 90E0      		ldi r25,0
- 1721 07fc 0E94 0000 		call isspace
- 1722               	.LVL156:
- 1723 0800 892B      		or r24,r25
- 1724 0802 01F4      		brne .L93
- 409:interpretacjaSMS.c ****       sms += 2; // Przeskocz "ON"
- 1725               		.loc 1 409 0 is_stmt 1
- 1726 0804 42E0      		ldi r20,lo8(2)
- 1727 0806 50E0      		ldi r21,0
- 1728 0808 60E0      		ldi r22,lo8(__c.2794)
- 1729 080a 70E0      		ldi r23,hi8(__c.2794)
- 1730 080c C801      		movw r24,r16
- 1731 080e 0E94 0000 		call strncasecmp_P
- 1732               	.LVL157:
- 1733 0812 892B      		or r24,r25
- 1734 0814 01F0      		breq .+2
- 1735 0816 00C0      		rjmp .L94
- 1736               	.LBB23:
- 410:interpretacjaSMS.c **** 
- 1737               		.loc 1 410 0
- 1738 0818 0E5F      		subi r16,-2
- 1739 081a 1F4F      		sbci r17,-1
- 1740 081c 1A8B      		std Y+18,r17
- 1741 081e 098B      		std Y+17,r16
- 413:interpretacjaSMS.c ****       przeskocz_biale_znaki(sms);
- 1742               		.loc 1 413 0
- 1743 0820 80E2      		ldi r24,lo8(32)
- 1744 0822 93E0      		ldi r25,lo8(3)
- 1745 0824 A0E0      		ldi r26,0
- 1746 0826 B0E0      		ldi r27,0
- 1747 0828 8983      		std Y+1,r24
- 1748 082a 9A83      		std Y+2,r25
- 1749 082c AB83      		std Y+3,r26
- 1750 082e BC83      		std Y+4,r27
- 1751               	.LVL158:
- 1752               	.L95:
- 414:interpretacjaSMS.c ****       if (*sms >= '0' && *sms <= '9') {
- 1753               		.loc 1 414 0 discriminator 1
- 1754 0830 E988      		ldd r14,Y+17
- 1755 0832 FA88      		ldd r15,Y+18
- 1756 0834 F701      		movw r30,r14
- 1757 0836 1081      		ld r17,Z
- 1758 0838 812F      		mov r24,r17
- 1759 083a 90E0      		ldi r25,0
- 1760 083c 0E94 0000 		call isspace
- 1761               	.LVL159:
- 1762 0840 892B      		or r24,r25
- 1763 0842 01F4      		brne .L96
- 415:interpretacjaSMS.c ****         // Jest liczba - sprobuj ja odczytac
- 1764               		.loc 1 415 0
- 1765 0844 1053      		subi r17,lo8(-(-48))
- 1766 0846 1A30      		cpi r17,lo8(10)
- 1767 0848 00F0      		brlo .L97
- 1768               	.L100:
- 1769               	.LBE23:
- 1770               	.LBB24:
- 405:interpretacjaSMS.c ****   }
- 1771               		.loc 1 405 0
- 1772 084a 08E0      		ldi r16,lo8(8)
- 1773 084c 10E0      		ldi r17,0
- 1774               	.L98:
- 1775               	.LBE24:
- 1776               	.LBB25:
- 1777               	.LBB11:
- 431:interpretacjaSMS.c ****           jest_miejsce = TRUE;
- 1778               		.loc 1 431 0
- 1779 084e C801      		movw r24,r16
- 1780 0850 0E94 0000 		call eeprom_read_byte
- 1781               	.LVL160:
- 1782 0854 F82E      		mov r15,r24
- 1783 0856 2FEF      		ldi r18,lo8(-1)
- 1784 0858 8217      		cp r24,r18
- 1785 085a 01F4      		brne .+2
- 1786 085c 00C0      		rjmp .L101
- 1787               	.LVL161:
- 1788 085e 0B5F      		subi r16,-5
- 1789 0860 1F4F      		sbci r17,-1
- 430:interpretacjaSMS.c ****         if (!czy_aktywny_numer_telefonu_brama(i)) {
- 1790               		.loc 1 430 0 discriminator 2
- 1791 0862 083A      		cpi r16,-88
- 1792 0864 8FE0      		ldi r24,15
- 1793 0866 1807      		cpc r17,r24
- 1794 0868 01F4      		brne .L98
- 1795 086a 00C0      		rjmp .L99
- 1796               	.L96:
- 1797               	.LBE11:
- 414:interpretacjaSMS.c ****       if (*sms >= '0' && *sms <= '9') {
- 1798               		.loc 1 414 0 discriminator 2
- 1799 086c FFEF      		ldi r31,-1
- 1800 086e EF1A      		sub r14,r31
- 1801 0870 FF0A      		sbc r15,r31
- 1802 0872 FA8A      		std Y+18,r15
- 1803 0874 E98A      		std Y+17,r14
- 1804 0876 00C0      		rjmp .L95
- 1805               	.L97:
- 417:interpretacjaSMS.c ****           // Walidacja zakresu
- 1806               		.loc 1 417 0
- 1807 0878 BE01      		movw r22,r28
- 1808 087a 6F5F      		subi r22,-1
- 1809 087c 7F4F      		sbci r23,-1
- 1810 087e CE01      		movw r24,r28
- 1811 0880 4196      		adiw r24,17
- 1812 0882 0E94 0000 		call pobierz_long
- 1813               	.LVL162:
- 1814 0886 8823      		tst r24
- 1815 0888 01F4      		brne .+2
- 1816 088a 00C0      		rjmp .L99
- 419:interpretacjaSMS.c ****               limit_value > MAX_LICZBA_NUMEROW_TELEFONOW_BRAMA) {
- 1817               		.loc 1 419 0
- 1818 088c 8981      		ldd r24,Y+1
- 1819 088e 9A81      		ldd r25,Y+2
- 1820 0890 AB81      		ldd r26,Y+3
- 1821 0892 BC81      		ldd r27,Y+4
- 1822 0894 0197      		sbiw r24,1
- 1823 0896 A109      		sbc r26,__zero_reg__
- 1824 0898 B109      		sbc r27,__zero_reg__
- 1825 089a 8032      		cpi r24,32
- 1826 089c 9340      		sbci r25,3
- 1827 089e A105      		cpc r26,__zero_reg__
- 1828 08a0 B105      		cpc r27,__zero_reg__
- 1829 08a2 00F0      		brlo .L100
- 1830 08a4 00C0      		rjmp .L99
- 1831               	.LVL163:
- 1832               	.L94:
- 1833               	.LBE25:
- 463:interpretacjaSMS.c ****       // Wyłącz SKRYBA
- 1834               		.loc 1 463 0
- 1835 08a6 43E0      		ldi r20,lo8(3)
- 1836 08a8 50E0      		ldi r21,0
- 1837 08aa 60E0      		ldi r22,lo8(__c.2806)
- 1838 08ac 70E0      		ldi r23,hi8(__c.2806)
- 1839 08ae C801      		movw r24,r16
- 1840 08b0 0E94 0000 		call strncasecmp_P
- 1841               	.LVL164:
- 1842 08b4 892B      		or r24,r25
- 1843 08b6 01F0      		breq .+2
- 1844 08b8 00C0      		rjmp .L99
- 1845               	.LBB26:
- 465:interpretacjaSMS.c ****       skryba_wlaczona = FALSE; // Aktualizuj RAM natychmiast
- 1846               		.loc 1 465 0
- 1847 08ba 69EF      		ldi r22,lo8(-7)
- 1848 08bc 7FE0      		ldi r23,lo8(15)
- 1849 08be 80E0      		ldi r24,0
- 1850 08c0 0E94 0000 		call zapisz_znak_w_eeprom
- 1851               	.LVL165:
- 466:interpretacjaSMS.c **** 
- 1852               		.loc 1 466 0
- 1853 08c4 1092 0000 		sts skryba_wlaczona,__zero_reg__
- 469:interpretacjaSMS.c ****           eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA_TRYB_BACKUP);
- 1854               		.loc 1 469 0
- 1855 08c8 88EF      		ldi r24,lo8(-8)
- 1856 08ca 9FE0      		ldi r25,lo8(15)
- 1857 08cc 0E94 0000 		call eeprom_read_byte
- 1858               	.LVL166:
- 471:interpretacjaSMS.c ****         tryb_pracy = poprzedni_tryb; // Aktualizuj RAM
- 1859               		.loc 1 471 0
- 1860 08d0 8F3F      		cpi r24,lo8(-1)
- 1861 08d2 01F4      		brne .+2
- 1862 08d4 00C0      		rjmp .L152
- 1863               	.LVL167:
- 1864               	.L154:
- 1865               	.LBE26:
- 1866               	.LBB27:
- 459:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
- 1867               		.loc 1 459 0
- 1868 08d6 8093 0000 		sts tryb_pracy,r24
- 460:interpretacjaSMS.c **** 
- 1869               		.loc 1 460 0
- 1870 08da 6EEF      		ldi r22,lo8(-2)
- 1871 08dc 7FE0      		ldi r23,lo8(15)
- 1872 08de 00C0      		rjmp .L153
- 1873               	.LVL168:
- 1874               	.L70:
- 1875               	.LBE27:
- 481:interpretacjaSMS.c ****   }
- 1876               		.loc 1 481 0
- 1877 08e0 88E0      		ldi r24,lo8(8)
- 1878 08e2 00C0      		rjmp .L53
- 1879               	.L71:
- 484:interpretacjaSMS.c ****     zapisz_znak_w_eeprom(0, ADRES_EEPROM_BLOKADA_SYSTEMU);
- 1880               		.loc 1 484 0
- 1881 08e4 1092 0000 		sts blokada_systemu,__zero_reg__
- 485:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 1882               		.loc 1 485 0
- 1883 08e8 67EF      		ldi r22,lo8(-9)
- 1884 08ea 7FE0      		ldi r23,lo8(15)
- 1885 08ec 00C0      		rjmp .L157
- 1886               	.L72:
- 489:interpretacjaSMS.c ****     zapisz_znak_w_eeprom(1, ADRES_EEPROM_BLOKADA_SYSTEMU);
- 1887               		.loc 1 489 0
- 1888 08ee 8FEF      		ldi r24,lo8(-1)
- 1889 08f0 8093 0000 		sts blokada_systemu,r24
- 490:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
- 1890               		.loc 1 490 0
- 1891 08f4 67EF      		ldi r22,lo8(-9)
- 1892 08f6 7FE0      		ldi r23,lo8(15)
- 1893 08f8 00C0      		rjmp .L156
- 1894               	.L58:
- 494:interpretacjaSMS.c **** }
- 1895               		.loc 1 494 0
- 1896 08fa 81E0      		ldi r24,lo8(1)
- 1897 08fc 00C0      		rjmp .L53
- 1898               	.L105:
- 207:interpretacjaSMS.c ****   }
- 1899               		.loc 1 207 0
- 1900 08fe 84E0      		ldi r24,lo8(4)
- 1901 0900 00C0      		rjmp .L53
- 1902               	.L106:
- 213:interpretacjaSMS.c **** 
- 1903               		.loc 1 213 0
- 1904 0902 85E0      		ldi r24,lo8(5)
- 1905 0904 00C0      		rjmp .L53
- 1906               	.LVL169:
- 1907               	.L101:
- 1908               	.LBB28:
- 443:interpretacjaSMS.c ****           eeprom_read_byte((const uint8_t *)ADRES_EEPROM_TRYB_PRACY);
- 1909               		.loc 1 443 0
- 1910 0906 8EEF      		ldi r24,lo8(-2)
- 1911 0908 9FE0      		ldi r25,lo8(15)
- 1912 090a 0E94 0000 		call eeprom_read_byte
- 1913               	.LVL170:
+ 393:interpretacjaSMS.c ****     if (sh < 0 || sh > 23 || sm < 0 || sm > 59 || eh < 0 || eh > 23 || em < 0 ||
+ 394:interpretacjaSMS.c ****         em > 59)
+ 395:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 396:interpretacjaSMS.c **** 
+ 397:interpretacjaSMS.c ****     // Zapis do EEPROM
+ 398:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)sh, ADRES_EEPROM_CZAS_START_H);
+ 399:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)sm, ADRES_EEPROM_CZAS_START_M);
+ 400:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)eh, ADRES_EEPROM_CZAS_STOP_H);
+ 401:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)em, ADRES_EEPROM_CZAS_STOP_M);
+ 402:interpretacjaSMS.c **** 
+ 403:interpretacjaSMS.c ****     // Aktualizuj zmienne w RAM
+ 404:interpretacjaSMS.c ****     czas_start_h = (uchar)sh;
+ 405:interpretacjaSMS.c ****     czas_start_m = (uchar)sm;
+ 406:interpretacjaSMS.c ****     czas_stop_h = (uchar)eh;
+ 407:interpretacjaSMS.c ****     czas_stop_m = (uchar)em;
+ 408:interpretacjaSMS.c **** 
+ 409:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 410:interpretacjaSMS.c ****   }
+ 411:interpretacjaSMS.c ****   case INSTRUKCJA_SKRYBA: {
+ 412:interpretacjaSMS.c ****     przeskocz_biale_znaki(sms);
+ 413:interpretacjaSMS.c ****     if (strncasecmp_P(sms, PSTR("ON"), 2) == 0) {
+ 414:interpretacjaSMS.c ****       sms += 2; // Przeskocz "ON"
+ 415:interpretacjaSMS.c **** 
+ 416:interpretacjaSMS.c ****       // Sprawdz czy jest opcjonalny parametr (liczba)
+ 417:interpretacjaSMS.c ****       long limit_value = 800; // Domyslny
+ 418:interpretacjaSMS.c ****       przeskocz_biale_znaki(sms);
+ 419:interpretacjaSMS.c ****       if (*sms >= '0' && *sms <= '9') {
+ 420:interpretacjaSMS.c ****         // Jest liczba - sprobuj ja odczytac
+ 421:interpretacjaSMS.c ****         if (pobierz_long(&sms, &limit_value)) {
+ 422:interpretacjaSMS.c ****           // Walidacja zakresu
+ 423:interpretacjaSMS.c ****           if (limit_value < 1 ||
+ 424:interpretacjaSMS.c ****               limit_value > MAX_LICZBA_NUMEROW_TELEFONOW_BRAMA) {
+ 425:interpretacjaSMS.c ****             return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 426:interpretacjaSMS.c ****           }
+ 427:interpretacjaSMS.c ****         } else {
+ 428:interpretacjaSMS.c ****           return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 1095               		.loc 1 428 0 is_stmt 1
+ 1096 0442 82E0      		ldi r24,lo8(2)
+ 1097 0444 00C0      		rjmp .L53
+ 1098               	.LVL94:
+ 1099               	.L75:
+ 1100 0446 3150      		subi r19,lo8(-(-1))
+ 1101               	.LBE10:
+ 1102               	.LBB12:
+ 198:interpretacjaSMS.c ****       const uchar znak = bufor_eeprom[(sms - sms_pom) + i];
+ 1103               		.loc 1 198 0 discriminator 2
+ 1104 0448 01F4      		brne .L76
+ 1105               	.LBE12:
+ 203:interpretacjaSMS.c ****            LICZBA_BAJTOW_KODU_DOSTEPU);
+ 1106               		.loc 1 203 0
+ 1107 044a 8050      		subi r24,lo8(-(bufor_eeprom))
+ 1108 044c 9040      		sbci r25,hi8(-(bufor_eeprom))
+ 1109 044e FC01      		movw r30,r24
+ 1110               	.LVL95:
+ 1111 0450 4081      		ld r20,Z
+ 1112 0452 5181      		ldd r21,Z+1
+ 1113 0454 6281      		ldd r22,Z+2
+ 1114 0456 7381      		ldd r23,Z+3
+ 1115 0458 4093 0000 		sts kod_modulu,r20
+ 1116 045c 5093 0000 		sts kod_modulu+1,r21
+ 1117 0460 6093 0000 		sts kod_modulu+2,r22
+ 1118 0464 7093 0000 		sts kod_modulu+3,r23
+ 205:interpretacjaSMS.c ****                           (uint)ADRES_EEPROM_KOD_DOSTEPU,
+ 1119               		.loc 1 205 0
+ 1120 0468 44E0      		ldi r20,lo8(4)
+ 1121 046a 61E0      		ldi r22,lo8(1)
+ 1122 046c 70E0      		ldi r23,0
+ 1123 046e 0E94 0000 		call zapisz_znaki_w_eeprom
+ 1124               	.LVL96:
+ 1125               	.L156:
+ 1126               	.LBB13:
+ 429:interpretacjaSMS.c ****         }
+ 430:interpretacjaSMS.c ****       }
+ 431:interpretacjaSMS.c **** 
+ 432:interpretacjaSMS.c ****       // Sprawdz czy jest miejsce na liscie
+ 433:interpretacjaSMS.c ****       uchar jest_miejsce = FALSE;
+ 434:interpretacjaSMS.c ****       for (uint i = 0; i < MAX_LICZBA_NUMEROW_TELEFONOW_BRAMA; ++i) {
+ 435:interpretacjaSMS.c ****         if (!czy_aktywny_numer_telefonu_brama(i)) {
+ 436:interpretacjaSMS.c ****           jest_miejsce = TRUE;
+ 437:interpretacjaSMS.c ****           break;
+ 438:interpretacjaSMS.c ****         }
+ 439:interpretacjaSMS.c ****       }
+ 440:interpretacjaSMS.c **** 
+ 441:interpretacjaSMS.c ****       if (!jest_miejsce) {
+ 442:interpretacjaSMS.c ****         // Brak miejsca - nie wlaczaj Skryby
+ 443:interpretacjaSMS.c ****         return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 444:interpretacjaSMS.c ****       }
  445:interpretacjaSMS.c **** 
- 1914               		.loc 1 445 0
- 1915 090e 68EF      		ldi r22,lo8(-8)
- 1916 0910 7FE0      		ldi r23,lo8(15)
- 1917 0912 0E94 0000 		call zapisz_znak_w_eeprom
- 1918               	.LVL171:
- 448:interpretacjaSMS.c ****                            ADRES_EEPROM_SKRYBA_LIMIT_L);
- 1919               		.loc 1 448 0
- 1920 0916 65EF      		ldi r22,lo8(-11)
- 1921 0918 7FE0      		ldi r23,lo8(15)
- 1922 091a 8981      		ldd r24,Y+1
- 1923 091c 0E94 0000 		call zapisz_znak_w_eeprom
- 1924               	.LVL172:
- 450:interpretacjaSMS.c ****                            ADRES_EEPROM_SKRYBA_LIMIT_H);
- 1925               		.loc 1 450 0
- 1926 0920 66EF      		ldi r22,lo8(-10)
- 1927 0922 7FE0      		ldi r23,lo8(15)
- 1928 0924 8A81      		ldd r24,Y+2
- 1929 0926 0E94 0000 		call zapisz_znak_w_eeprom
- 1930               	.LVL173:
- 452:interpretacjaSMS.c **** 
- 1931               		.loc 1 452 0
- 1932 092a 8981      		ldd r24,Y+1
- 1933 092c 9A81      		ldd r25,Y+2
- 1934 092e 9093 0000 		sts skryba_limit+1,r25
- 1935 0932 8093 0000 		sts skryba_limit,r24
- 455:interpretacjaSMS.c ****       skryba_wlaczona = TRUE; // Aktualizuj RAM natychmiast
- 1936               		.loc 1 455 0
- 1937 0936 69EF      		ldi r22,lo8(-7)
- 1938 0938 7FE0      		ldi r23,lo8(15)
- 1939 093a 81E0      		ldi r24,lo8(1)
- 1940 093c 0E94 0000 		call zapisz_znak_w_eeprom
- 1941               	.LVL174:
+ 446:interpretacjaSMS.c ****       // Zapisz obecny tryb przed włączeniem SKRYBA
+ 447:interpretacjaSMS.c ****       uchar obecny_tryb =
+ 448:interpretacjaSMS.c ****           eeprom_read_byte((const uint8_t *)ADRES_EEPROM_TRYB_PRACY);
+ 449:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(obecny_tryb, ADRES_EEPROM_SKRYBA_TRYB_BACKUP);
+ 450:interpretacjaSMS.c **** 
+ 451:interpretacjaSMS.c ****       // Zapisz limit do EEPROM (2 bajty)
+ 452:interpretacjaSMS.c ****       zapisz_znak_w_eeprom((uchar)(limit_value & 0xFF),
+ 453:interpretacjaSMS.c ****                            ADRES_EEPROM_SKRYBA_LIMIT_L);
+ 454:interpretacjaSMS.c ****       zapisz_znak_w_eeprom((uchar)((limit_value >> 8) & 0xFF),
+ 455:interpretacjaSMS.c ****                            ADRES_EEPROM_SKRYBA_LIMIT_H);
+ 456:interpretacjaSMS.c ****       skryba_limit = (uint)limit_value; // Aktualizuj RAM
+ 457:interpretacjaSMS.c **** 
+ 458:interpretacjaSMS.c ****       // Włącz SKRYBA
+ 459:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_SKRYBA);
+ 460:interpretacjaSMS.c ****       skryba_wlaczona = TRUE; // Aktualizuj RAM natychmiast
+ 461:interpretacjaSMS.c **** 
+ 462:interpretacjaSMS.c ****       // Automatycznie ustaw OPEN CLIP (tryb publiczny = 1)
+ 463:interpretacjaSMS.c ****       tryb_pracy = 1; // Aktualizuj RAM
+ 464:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
+ 465:interpretacjaSMS.c **** 
+ 466:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
+ 1127               		.loc 1 466 0
+ 1128 0472 83E0      		ldi r24,lo8(3)
+ 1129 0474 00C0      		rjmp .L53
+ 1130               	.LVL97:
+ 1131               	.L64:
+ 1132               	.LBE13:
+ 216:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_USER;
+ 1133               		.loc 1 216 0
+ 1134 0476 4EE0      		ldi r20,lo8(14)
+ 1135 0478 60E0      		ldi r22,lo8(numer_telefonu_do_ktorego_dzwonic)
+ 1136 047a 70E0      		ldi r23,hi8(numer_telefonu_do_ktorego_dzwonic)
+ 1137 047c CE01      		movw r24,r28
+ 1138 047e 4196      		adiw r24,17
+ 1139 0480 0E94 0000 		call pobierz_numer_telefonu
+ 1140               	.LVL98:
+ 1141 0484 8111      		cpse r24,__zero_reg__
+ 1142 0486 00C0      		rjmp .L107
+ 221:interpretacjaSMS.c ****   }
+ 1143               		.loc 1 221 0
+ 1144 0488 86E0      		ldi r24,lo8(6)
+ 1145               	.LVL99:
+ 1146               	.L53:
+ 1147               	/* epilogue start */
+ 467:interpretacjaSMS.c ****     } else if (strncasecmp_P(sms, PSTR("OFF"), 3) == 0) {
+ 468:interpretacjaSMS.c ****       // Wyłącz SKRYBA
+ 469:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_SKRYBA);
+ 470:interpretacjaSMS.c ****       skryba_wlaczona = FALSE; // Aktualizuj RAM natychmiast
+ 471:interpretacjaSMS.c **** 
+ 472:interpretacjaSMS.c ****       // Przywróć poprzedni tryb
+ 473:interpretacjaSMS.c ****       uchar poprzedni_tryb =
+ 474:interpretacjaSMS.c ****           eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA_TRYB_BACKUP);
+ 475:interpretacjaSMS.c ****       if (poprzedni_tryb != 0xFF) {  // Jeśli był zapisany
+ 476:interpretacjaSMS.c ****         tryb_pracy = poprzedni_tryb; // Aktualizuj RAM
+ 477:interpretacjaSMS.c ****         zapisz_znak_w_eeprom(poprzedni_tryb, ADRES_EEPROM_TRYB_PRACY);
+ 478:interpretacjaSMS.c ****       }
+ 479:interpretacjaSMS.c **** 
+ 480:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
+ 481:interpretacjaSMS.c ****     }
+ 482:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 483:interpretacjaSMS.c ****   }
+ 484:interpretacjaSMS.c ****   case INSTRUKCJA_DEBUG: {
+ 485:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_DEBUG;
+ 486:interpretacjaSMS.c ****   }
+ 487:interpretacjaSMS.c ****   case INSTRUKCJA_START: {
+ 488:interpretacjaSMS.c ****     blokada_systemu = FALSE;
+ 489:interpretacjaSMS.c ****     zapisz_znak_w_eeprom(0, ADRES_EEPROM_BLOKADA_SYSTEMU);
+ 490:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 491:interpretacjaSMS.c ****   }
+ 492:interpretacjaSMS.c ****   case INSTRUKCJA_STOP: {
+ 493:interpretacjaSMS.c ****     blokada_systemu = TRUE;
+ 494:interpretacjaSMS.c ****     zapisz_znak_w_eeprom(1, ADRES_EEPROM_BLOKADA_SYSTEMU);
+ 495:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 496:interpretacjaSMS.c ****   }
+ 497:interpretacjaSMS.c ****   case INSTRUKCJA_SUB: {
+ 498:interpretacjaSMS.c ****     if (not pobierz_numer_telefonu(&sms, &numer_telefonu_do_ktorego_dzwonic[0],
+ 499:interpretacjaSMS.c ****                                    14))
+ 500:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 501:interpretacjaSMS.c ****     dodaj_komende(KOMENDA_KOLEJKI_DODAJ_SUPER_USERA);
+ 502:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 503:interpretacjaSMS.c ****   }
+ 504:interpretacjaSMS.c ****   }
+ 505:interpretacjaSMS.c ****   return INTERPRETACJA_SMS_ZLY_FORMAT;
+ 506:interpretacjaSMS.c **** }
+ 1148               		.loc 1 506 0
+ 1149 048a 6296      		adiw r28,18
+ 1150 048c 0FB6      		in __tmp_reg__,__SREG__
+ 1151 048e F894      		cli
+ 1152 0490 DEBF      		out __SP_H__,r29
+ 1153 0492 0FBE      		out __SREG__,__tmp_reg__
+ 1154 0494 CDBF      		out __SP_L__,r28
+ 1155 0496 DF91      		pop r29
+ 1156 0498 CF91      		pop r28
+ 1157 049a 1F91      		pop r17
+ 1158 049c 0F91      		pop r16
+ 1159 049e FF90      		pop r15
+ 1160 04a0 EF90      		pop r14
+ 1161 04a2 0895      		ret
+ 1162               	.LVL100:
+ 1163               	.L61:
+ 224:interpretacjaSMS.c ****                                    14))
+ 1164               		.loc 1 224 0
+ 1165 04a4 4EE0      		ldi r20,lo8(14)
+ 1166 04a6 60E0      		ldi r22,lo8(numer_telefonu_do_ktorego_dzwonic)
+ 1167 04a8 70E0      		ldi r23,hi8(numer_telefonu_do_ktorego_dzwonic)
+ 1168 04aa CE01      		movw r24,r28
+ 1169 04ac 4196      		adiw r24,17
+ 1170 04ae 0E94 0000 		call pobierz_numer_telefonu
+ 1171               	.LVL101:
+ 1172 04b2 8823      		tst r24
+ 1173 04b4 01F0      		breq .L100
+ 227:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 1174               		.loc 1 227 0
+ 1175 04b6 85E8      		ldi r24,lo8(-123)
+ 1176               	.L162:
+ 501:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 1177               		.loc 1 501 0
+ 1178 04b8 0E94 0000 		call dodaj_komende
+ 1179               	.LVL102:
+ 1180 04bc 00C0      		rjmp .L156
+ 1181               	.L62:
+ 231:interpretacjaSMS.c ****                                    14))
+ 1182               		.loc 1 231 0
+ 1183 04be 4EE0      		ldi r20,lo8(14)
+ 1184 04c0 60E0      		ldi r22,lo8(numer_telefonu_do_ktorego_dzwonic)
+ 1185 04c2 70E0      		ldi r23,hi8(numer_telefonu_do_ktorego_dzwonic)
+ 1186 04c4 CE01      		movw r24,r28
+ 1187 04c6 4196      		adiw r24,17
+ 1188 04c8 0E94 0000 		call pobierz_numer_telefonu
+ 1189               	.LVL103:
+ 1190 04cc 8823      		tst r24
+ 1191 04ce 01F4      		brne .+2
+ 1192 04d0 00C0      		rjmp .L100
+ 234:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 1193               		.loc 1 234 0
+ 1194 04d2 88E8      		ldi r24,lo8(-120)
+ 1195 04d4 00C0      		rjmp .L162
+ 1196               	.L65:
+ 1197               	.LBB14:
+ 241:interpretacjaSMS.c ****         interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CLIP, INSTRUKCJA_DTMF + 1);
+ 1198               		.loc 1 241 0
+ 1199 04d6 4AE0      		ldi r20,lo8(10)
+ 1200 04d8 68E0      		ldi r22,lo8(8)
+ 1201 04da CE01      		movw r24,r28
+ 1202 04dc 4196      		adiw r24,17
+ 1203 04de 0E94 0000 		call interpretuj_instrukcje_sms
+ 1204               	.LVL104:
+ 243:interpretacjaSMS.c ****       tryb_pracy = 1; // Publiczny
+ 1205               		.loc 1 243 0
+ 1206 04e2 8830      		cpi r24,lo8(8)
+ 1207 04e4 01F4      		brne .L78
+ 244:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
+ 1208               		.loc 1 244 0
+ 1209 04e6 81E0      		ldi r24,lo8(1)
+ 1210               	.LVL105:
+ 1211 04e8 8093 0000 		sts tryb_pracy,r24
+ 245:interpretacjaSMS.c **** 
+ 1212               		.loc 1 245 0
+ 1213 04ec 6EEF      		ldi r22,lo8(-2)
+ 1214 04ee 7FE0      		ldi r23,lo8(15)
+ 1215               	.L164:
+ 1216               	.LBE14:
+ 1217               	.LBB15:
+ 282:interpretacjaSMS.c **** 
+ 1218               		.loc 1 282 0
+ 1219 04f0 0E94 0000 		call zapisz_znak_w_eeprom
+ 1220               	.LVL106:
+ 284:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_CLIP_DTMF);
+ 1221               		.loc 1 284 0
+ 1222 04f4 8FEF      		ldi r24,lo8(-1)
+ 1223 04f6 8093 0000 		sts tryb_clip,r24
+ 285:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
+ 1224               		.loc 1 285 0
+ 1225 04fa 6FEF      		ldi r22,lo8(-1)
+ 1226 04fc 7FE0      		ldi r23,lo8(15)
+ 1227               	.L160:
+ 1228               	.LBE15:
+ 494:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 1229               		.loc 1 494 0
+ 1230 04fe 81E0      		ldi r24,lo8(1)
+ 1231 0500 00C0      		rjmp .L157
+ 1232               	.LVL107:
+ 1233               	.L78:
+ 1234               	.LBB16:
+ 250:interpretacjaSMS.c ****       tryb_pracy = 1; // Publiczny
+ 1235               		.loc 1 250 0
+ 1236 0502 8930      		cpi r24,lo8(9)
+ 1237 0504 01F0      		breq .+2
+ 1238 0506 00C0      		rjmp .L159
+ 251:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
+ 1239               		.loc 1 251 0
+ 1240 0508 81E0      		ldi r24,lo8(1)
+ 1241               	.LVL108:
+ 1242 050a 8093 0000 		sts tryb_pracy,r24
+ 252:interpretacjaSMS.c **** 
+ 1243               		.loc 1 252 0
+ 1244 050e 6EEF      		ldi r22,lo8(-2)
+ 1245 0510 7FE0      		ldi r23,lo8(15)
+ 1246               	.L163:
+ 1247               	.LBE16:
+ 1248               	.LBB17:
+ 289:interpretacjaSMS.c **** 
+ 1249               		.loc 1 289 0
+ 1250 0512 0E94 0000 		call zapisz_znak_w_eeprom
+ 1251               	.LVL109:
+ 291:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_CLIP_DTMF);
+ 1252               		.loc 1 291 0
+ 1253 0516 1092 0000 		sts tryb_clip,__zero_reg__
+ 292:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_POPRAWNY;
+ 1254               		.loc 1 292 0
+ 1255 051a 6FEF      		ldi r22,lo8(-1)
+ 1256 051c 7FE0      		ldi r23,lo8(15)
+ 1257               	.L161:
+ 1258               	.LBE17:
+ 489:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 1259               		.loc 1 489 0
+ 1260 051e 80E0      		ldi r24,0
+ 1261               	.LVL110:
+ 1262               	.L157:
+ 1263               	.LBB18:
+ 464:interpretacjaSMS.c **** 
+ 1264               		.loc 1 464 0
+ 1265 0520 0E94 0000 		call zapisz_znak_w_eeprom
+ 1266               	.LVL111:
+ 1267 0524 00C0      		rjmp .L156
+ 1268               	.LVL112:
+ 1269               	.L66:
+ 1270               	.LBE18:
+ 1271               	.LBB19:
+ 278:interpretacjaSMS.c ****         interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CLIP, INSTRUKCJA_DTMF + 1);
+ 1272               		.loc 1 278 0
+ 1273 0526 4AE0      		ldi r20,lo8(10)
+ 1274 0528 68E0      		ldi r22,lo8(8)
+ 1275 052a CE01      		movw r24,r28
+ 1276 052c 4196      		adiw r24,17
+ 1277 052e 0E94 0000 		call interpretuj_instrukcje_sms
+ 1278               	.LVL113:
+ 281:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0, ADRES_EEPROM_TRYB_PRACY);
+ 1279               		.loc 1 281 0
+ 1280 0532 1092 0000 		sts tryb_pracy,__zero_reg__
+ 282:interpretacjaSMS.c **** 
+ 1281               		.loc 1 282 0
+ 1282 0536 6EEF      		ldi r22,lo8(-2)
+ 1283 0538 7FE0      		ldi r23,lo8(15)
+ 280:interpretacjaSMS.c ****       tryb_pracy = 0; // Prywatny
+ 1284               		.loc 1 280 0
+ 1285 053a 8830      		cpi r24,lo8(8)
+ 1286 053c 01F4      		brne .L80
+ 282:interpretacjaSMS.c **** 
+ 1287               		.loc 1 282 0
+ 1288 053e 80E0      		ldi r24,0
+ 1289               	.LVL114:
+ 1290 0540 00C0      		rjmp .L164
+ 1291               	.LVL115:
+ 1292               	.L80:
+ 287:interpretacjaSMS.c ****       tryb_pracy = 0; // Prywatny
+ 1293               		.loc 1 287 0
+ 1294 0542 8930      		cpi r24,lo8(9)
+ 1295 0544 01F4      		brne .L81
+ 289:interpretacjaSMS.c **** 
+ 1296               		.loc 1 289 0
+ 1297 0546 80E0      		ldi r24,0
+ 1298               	.LVL116:
+ 1299 0548 00C0      		rjmp .L163
+ 1300               	.LVL117:
+ 1301               	.L81:
+ 297:interpretacjaSMS.c **** 
+ 1302               		.loc 1 297 0
+ 1303 054a 80E0      		ldi r24,0
+ 1304               	.LVL118:
+ 1305 054c 0E94 0000 		call zapisz_znak_w_eeprom
+ 1306               	.LVL119:
+ 300:interpretacjaSMS.c ****         zapisz_znak_w_eeprom(0, ADRES_EEPROM_SKRYBA);
+ 1307               		.loc 1 300 0
+ 1308 0550 8091 0000 		lds r24,skryba_wlaczona
+ 1309 0554 8823      		tst r24
+ 1310 0556 01F4      		brne .+2
+ 1311 0558 00C0      		rjmp .L156
+ 301:interpretacjaSMS.c ****         skryba_wlaczona = FALSE;
+ 1312               		.loc 1 301 0
+ 1313 055a 69EF      		ldi r22,lo8(-7)
+ 1314 055c 7FE0      		ldi r23,lo8(15)
+ 1315 055e 80E0      		ldi r24,0
+ 1316 0560 0E94 0000 		call zapisz_znak_w_eeprom
+ 1317               	.LVL120:
+ 302:interpretacjaSMS.c ****       }
+ 1318               		.loc 1 302 0
+ 1319 0564 1092 0000 		sts skryba_wlaczona,__zero_reg__
+ 1320 0568 00C0      		rjmp .L156
+ 1321               	.L67:
+ 1322               	.LBE19:
+ 1323               	.LBB20:
+ 311:interpretacjaSMS.c ****                          pobierz_long(&sms, &m) && pomin_znak(&sms, ':') &&
+ 1324               		.loc 1 311 0
+ 1325 056a BE01      		movw r22,r28
+ 1326 056c 675F      		subi r22,-9
+ 1327 056e 7F4F      		sbci r23,-1
+ 1328 0570 CE01      		movw r24,r28
+ 1329 0572 4196      		adiw r24,17
+ 1330 0574 0E94 0000 		call pobierz_long
+ 1331               	.LVL121:
+ 312:interpretacjaSMS.c ****                          pobierz_long(&sms, &s);
+ 1332               		.loc 1 312 0
+ 1333 0578 8823      		tst r24
+ 1334 057a 01F0      		breq .L137
+ 311:interpretacjaSMS.c ****                          pobierz_long(&sms, &m) && pomin_znak(&sms, ':') &&
+ 1335               		.loc 1 311 0
+ 1336 057c 6AE3      		ldi r22,lo8(58)
+ 1337 057e CE01      		movw r24,r28
+ 1338 0580 4196      		adiw r24,17
+ 1339 0582 0E94 0000 		call pomin_znak
+ 1340               	.LVL122:
+ 1341 0586 8823      		tst r24
+ 1342 0588 01F0      		breq .L137
+ 312:interpretacjaSMS.c ****                          pobierz_long(&sms, &s);
+ 1343               		.loc 1 312 0 discriminator 1
+ 1344 058a BE01      		movw r22,r28
+ 1345 058c 6B5F      		subi r22,-5
+ 1346 058e 7F4F      		sbci r23,-1
+ 1347 0590 CE01      		movw r24,r28
+ 1348 0592 4196      		adiw r24,17
+ 1349 0594 0E94 0000 		call pobierz_long
+ 1350               	.LVL123:
+ 311:interpretacjaSMS.c ****                          pobierz_long(&sms, &m) && pomin_znak(&sms, ':') &&
+ 1351               		.loc 1 311 0 discriminator 1
+ 1352 0598 8823      		tst r24
+ 1353 059a 01F0      		breq .L137
+ 312:interpretacjaSMS.c ****                          pobierz_long(&sms, &s);
+ 1354               		.loc 1 312 0 discriminator 3
+ 1355 059c 6AE3      		ldi r22,lo8(58)
+ 1356 059e CE01      		movw r24,r28
+ 1357 05a0 4196      		adiw r24,17
+ 1358 05a2 0E94 0000 		call pomin_znak
+ 1359               	.LVL124:
+ 1360 05a6 8823      		tst r24
+ 1361 05a8 01F0      		breq .L137
+ 313:interpretacjaSMS.c **** 
+ 1362               		.loc 1 313 0 discriminator 2
+ 1363 05aa BE01      		movw r22,r28
+ 1364 05ac 6F5F      		subi r22,-1
+ 1365 05ae 7F4F      		sbci r23,-1
+ 1366 05b0 CE01      		movw r24,r28
+ 1367 05b2 4196      		adiw r24,17
+ 1368 05b4 0E94 0000 		call pobierz_long
+ 1369               	.LVL125:
+ 312:interpretacjaSMS.c ****                          pobierz_long(&sms, &s);
+ 1370               		.loc 1 312 0 discriminator 2
+ 1371 05b8 21E0      		ldi r18,lo8(1)
+ 1372 05ba 30E0      		ldi r19,0
+ 1373 05bc 8111      		cpse r24,__zero_reg__
+ 1374 05be 00C0      		rjmp .L86
+ 1375 05c0 30E0      		ldi r19,0
+ 1376 05c2 20E0      		ldi r18,0
+ 1377               	.L86:
+ 1378               	.LVL126:
+ 315:interpretacjaSMS.c ****       // ABCD SET bez parametrów - zwróć aktualny czas (bez sync z SMS)
+ 1379               		.loc 1 315 0 discriminator 2
+ 1380 05c4 232B      		or r18,r19
+ 1381 05c6 01F4      		brne .L87
+ 1382               	.LVL127:
+ 1383               	.L137:
+ 1384               	.LBB21:
+ 319:interpretacjaSMS.c **** 
+ 1385               		.loc 1 319 0
+ 1386 05c8 8FEF      		ldi r24,lo8(-1)
+ 1387 05ca 8093 0000 		sts sms_pomijaj_aktualizacje_czasu,r24
+ 1388               	.LVL128:
+ 324:interpretacjaSMS.c ****       sms_out += strlen((char *)sms_out);
+ 1389               		.loc 1 324 0
+ 1390 05ce 60E0      		ldi r22,lo8(__c.2772)
+ 1391 05d0 70E0      		ldi r23,hi8(__c.2772)
+ 1392 05d2 80E0      		ldi r24,lo8(tekst_wysylanego_smsa)
+ 1393 05d4 90E0      		ldi r25,hi8(tekst_wysylanego_smsa)
+ 1394 05d6 0E94 0000 		call strcpy_P
+ 1395               	.LVL129:
+ 325:interpretacjaSMS.c ****       strcpy((char *)sms_out, rtc_czas);
+ 1396               		.loc 1 325 0
+ 1397 05da 80E0      		ldi r24,lo8(tekst_wysylanego_smsa)
+ 1398 05dc 90E0      		ldi r25,hi8(tekst_wysylanego_smsa)
+ 1399 05de FC01      		movw r30,r24
+ 1400               		0:
+ 1401 05e0 0190      		ld __tmp_reg__,Z+
+ 1402 05e2 0020      		tst __tmp_reg__
+ 1403 05e4 01F4      		brne 0b
+ 1404 05e6 CF01      		movw r24,r30
+ 1405               	.LVL130:
+ 326:interpretacjaSMS.c **** 
+ 1406               		.loc 1 326 0
+ 1407 05e8 60E0      		ldi r22,lo8(rtc_czas)
+ 1408 05ea 70E0      		ldi r23,hi8(rtc_czas)
+ 1409 05ec 0197      		sbiw r24,1
+ 1410               	.LVL131:
+ 1411 05ee 0E94 0000 		call strcpy
+ 1412               	.LVL132:
+ 331:interpretacjaSMS.c ****              (char *)numer_telefonu_odebranego_smsa);
+ 1413               		.loc 1 331 0
+ 1414 05f2 60E0      		ldi r22,lo8(numer_telefonu_odebranego_smsa)
+ 1415 05f4 70E0      		ldi r23,hi8(numer_telefonu_odebranego_smsa)
+ 1416 05f6 80E0      		ldi r24,lo8(numer_telefonu_wysylanego_smsa)
+ 1417 05f8 90E0      		ldi r25,hi8(numer_telefonu_wysylanego_smsa)
+ 1418 05fa 0E94 0000 		call strcpy
+ 1419               	.LVL133:
+ 335:interpretacjaSMS.c **** 
+ 1420               		.loc 1 335 0
+ 1421 05fe 83ED      		ldi r24,lo8(-45)
+ 1422 0600 00C0      		rjmp .L162
+ 1423               	.LVL134:
+ 1424               	.L87:
+ 1425               	.LBE21:
+ 341:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 1426               		.loc 1 341 0
+ 1427 0602 8985      		ldd r24,Y+9
+ 1428 0604 9A85      		ldd r25,Y+10
+ 1429 0606 AB85      		ldd r26,Y+11
+ 1430 0608 BC85      		ldd r27,Y+12
+ 1431 060a 8831      		cpi r24,24
+ 1432 060c 9105      		cpc r25,__zero_reg__
+ 1433 060e A105      		cpc r26,__zero_reg__
+ 1434 0610 B105      		cpc r27,__zero_reg__
+ 1435 0612 00F0      		brlo .+2
+ 1436 0614 00C0      		rjmp .L100
+ 341:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 1437               		.loc 1 341 0 is_stmt 0 discriminator 1
+ 1438 0616 4D81      		ldd r20,Y+5
+ 1439 0618 5E81      		ldd r21,Y+6
+ 1440 061a 6F81      		ldd r22,Y+7
+ 1441 061c 7885      		ldd r23,Y+8
+ 1442 061e 4C33      		cpi r20,60
+ 1443 0620 5105      		cpc r21,__zero_reg__
+ 1444 0622 6105      		cpc r22,__zero_reg__
+ 1445 0624 7105      		cpc r23,__zero_reg__
+ 1446 0626 00F0      		brlo .+2
+ 1447 0628 00C0      		rjmp .L100
+ 341:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 1448               		.loc 1 341 0 discriminator 3
+ 1449 062a 0981      		ldd r16,Y+1
+ 1450 062c 1A81      		ldd r17,Y+2
+ 1451 062e 2B81      		ldd r18,Y+3
+ 1452 0630 3C81      		ldd r19,Y+4
+ 1453               	.LVL135:
+ 1454 0632 0C33      		cpi r16,60
+ 1455 0634 1105      		cpc r17,__zero_reg__
+ 1456 0636 2105      		cpc r18,__zero_reg__
+ 1457 0638 3105      		cpc r19,__zero_reg__
+ 1458 063a 00F0      		brlo .+2
+ 1459 063c 00C0      		rjmp .L100
+ 346:interpretacjaSMS.c ****             (int)m, (int)s);
+ 1460               		.loc 1 346 0 is_stmt 1
+ 1461 063e 1F93      		push r17
+ 1462 0640 0F93      		push r16
+ 1463 0642 5F93      		push r21
+ 1464 0644 4F93      		push r20
+ 1465 0646 9F93      		push r25
+ 1466 0648 8F93      		push r24
+ 1467 064a 80E0      		ldi r24,lo8(.LC0)
+ 1468 064c 90E0      		ldi r25,hi8(.LC0)
+ 1469 064e 9F93      		push r25
+ 1470 0650 8F93      		push r24
+ 1471 0652 80E0      		ldi r24,lo8(bufor_ustaw_czas)
+ 1472 0654 90E0      		ldi r25,hi8(bufor_ustaw_czas)
+ 1473 0656 9F93      		push r25
+ 1474 0658 8F93      		push r24
+ 1475 065a 0E94 0000 		call sprintf
+ 1476               	.LVL136:
+ 348:interpretacjaSMS.c **** 
+ 1477               		.loc 1 348 0
+ 1478 065e 8EEF      		ldi r24,lo8(-2)
+ 1479 0660 0E94 0000 		call dodaj_komende
+ 1480               	.LVL137:
+ 352:interpretacjaSMS.c **** 
+ 1481               		.loc 1 352 0
+ 1482 0664 8FEF      		ldi r24,lo8(-1)
+ 1483 0666 8093 0000 		sts sms_pomijaj_aktualizacje_czasu,r24
+ 354:interpretacjaSMS.c ****   }
+ 1484               		.loc 1 354 0
+ 1485 066a 0FB6      		in __tmp_reg__,__SREG__
+ 1486 066c F894      		cli
+ 1487 066e DEBF      		out __SP_H__,r29
+ 1488 0670 0FBE      		out __SREG__,__tmp_reg__
+ 1489 0672 CDBF      		out __SP_L__,r28
+ 1490 0674 00C0      		rjmp .L156
+ 1491               	.LVL138:
+ 1492               	.L89:
+ 1493               	.LBE20:
+ 1494               	.LBB22:
+ 358:interpretacjaSMS.c ****     if (strncasecmp_P(sms, PSTR("OFF"), 3) == 0) {
+ 1495               		.loc 1 358 0 discriminator 2
+ 1496 0676 0F5F      		subi r16,-1
+ 1497 0678 1F4F      		sbci r17,-1
+ 1498 067a 1A8B      		std Y+18,r17
+ 1499 067c 098B      		std Y+17,r16
+ 1500               	.L68:
+ 358:interpretacjaSMS.c ****     if (strncasecmp_P(sms, PSTR("OFF"), 3) == 0) {
+ 1501               		.loc 1 358 0 is_stmt 0 discriminator 1
+ 1502 067e 0989      		ldd r16,Y+17
+ 1503 0680 1A89      		ldd r17,Y+18
+ 1504 0682 F801      		movw r30,r16
+ 1505 0684 8081      		ld r24,Z
+ 1506 0686 90E0      		ldi r25,0
+ 1507 0688 0E94 0000 		call isspace
+ 1508               	.LVL139:
+ 1509 068c 892B      		or r24,r25
+ 1510 068e 01F4      		brne .L89
+ 359:interpretacjaSMS.c ****       // Zapisz wartosci wylaczajace (np. 0xFF)
+ 1511               		.loc 1 359 0 is_stmt 1
+ 1512 0690 43E0      		ldi r20,lo8(3)
+ 1513 0692 50E0      		ldi r21,0
+ 1514 0694 60E0      		ldi r22,lo8(__c.2786)
+ 1515 0696 70E0      		ldi r23,hi8(__c.2786)
+ 1516 0698 C801      		movw r24,r16
+ 1517 069a 0E94 0000 		call strncasecmp_P
+ 1518               	.LVL140:
+ 1519 069e 892B      		or r24,r25
+ 1520 06a0 01F4      		brne .L90
+ 361:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_START_M);
+ 1521               		.loc 1 361 0
+ 1522 06a2 6AEF      		ldi r22,lo8(-6)
+ 1523 06a4 7FE0      		ldi r23,lo8(15)
+ 1524 06a6 8FEF      		ldi r24,lo8(-1)
+ 1525 06a8 0E94 0000 		call zapisz_znak_w_eeprom
+ 1526               	.LVL141:
+ 362:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_STOP_H);
+ 1527               		.loc 1 362 0
+ 1528 06ac 6BEF      		ldi r22,lo8(-5)
+ 1529 06ae 7FE0      		ldi r23,lo8(15)
+ 1530 06b0 8FEF      		ldi r24,lo8(-1)
+ 1531 06b2 0E94 0000 		call zapisz_znak_w_eeprom
+ 1532               	.LVL142:
+ 363:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(0xFF, ADRES_EEPROM_CZAS_STOP_M);
+ 1533               		.loc 1 363 0
+ 1534 06b6 6CEF      		ldi r22,lo8(-4)
+ 1535 06b8 7FE0      		ldi r23,lo8(15)
+ 1536 06ba 8FEF      		ldi r24,lo8(-1)
+ 1537 06bc 0E94 0000 		call zapisz_znak_w_eeprom
+ 1538               	.LVL143:
+ 364:interpretacjaSMS.c **** 
+ 1539               		.loc 1 364 0
+ 1540 06c0 6DEF      		ldi r22,lo8(-3)
+ 1541 06c2 7FE0      		ldi r23,lo8(15)
+ 1542 06c4 8FEF      		ldi r24,lo8(-1)
+ 1543 06c6 0E94 0000 		call zapisz_znak_w_eeprom
+ 1544               	.LVL144:
+ 367:interpretacjaSMS.c ****       czas_start_m = 0xFF;
+ 1545               		.loc 1 367 0
+ 1546 06ca 8FEF      		ldi r24,lo8(-1)
+ 1547 06cc 8093 0000 		sts czas_start_h,r24
+ 368:interpretacjaSMS.c ****       czas_stop_h = 0xFF;
+ 1548               		.loc 1 368 0
+ 1549 06d0 8093 0000 		sts czas_start_m,r24
+ 369:interpretacjaSMS.c ****       czas_stop_m = 0xFF;
+ 1550               		.loc 1 369 0
+ 1551 06d4 8093 0000 		sts czas_stop_h,r24
+ 370:interpretacjaSMS.c ****       blokada_sterowania_czasowa = FALSE;
+ 1552               		.loc 1 370 0
+ 1553 06d8 8093 0000 		sts czas_stop_m,r24
+ 371:interpretacjaSMS.c **** 
+ 1554               		.loc 1 371 0
+ 1555 06dc 1092 0000 		sts blokada_sterowania_czasowa,__zero_reg__
+ 1556 06e0 00C0      		rjmp .L156
+ 1557               	.L90:
+ 378:interpretacjaSMS.c ****         !pobierz_long(&sms, &sm))
+ 1558               		.loc 1 378 0
+ 1559 06e2 BE01      		movw r22,r28
+ 1560 06e4 635F      		subi r22,-13
+ 1561 06e6 7F4F      		sbci r23,-1
+ 1562 06e8 CE01      		movw r24,r28
+ 1563 06ea 4196      		adiw r24,17
+ 1564 06ec 0E94 0000 		call pobierz_long
+ 1565               	.LVL145:
+ 1566 06f0 8823      		tst r24
+ 1567 06f2 01F4      		brne .+2
+ 1568 06f4 00C0      		rjmp .L100
+ 378:interpretacjaSMS.c ****         !pobierz_long(&sms, &sm))
+ 1569               		.loc 1 378 0 is_stmt 0 discriminator 1
+ 1570 06f6 6AE3      		ldi r22,lo8(58)
+ 1571 06f8 CE01      		movw r24,r28
+ 1572 06fa 4196      		adiw r24,17
+ 1573 06fc 0E94 0000 		call pomin_znak
+ 1574               	.LVL146:
+ 1575 0700 8823      		tst r24
+ 1576 0702 01F4      		brne .+2
+ 1577 0704 00C0      		rjmp .L100
+ 379:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 1578               		.loc 1 379 0 is_stmt 1 discriminator 2
+ 1579 0706 BE01      		movw r22,r28
+ 1580 0708 675F      		subi r22,-9
+ 1581 070a 7F4F      		sbci r23,-1
+ 1582 070c CE01      		movw r24,r28
+ 1583 070e 4196      		adiw r24,17
+ 1584 0710 0E94 0000 		call pobierz_long
+ 1585               	.LVL147:
+ 378:interpretacjaSMS.c ****         !pobierz_long(&sms, &sm))
+ 1586               		.loc 1 378 0 discriminator 2
+ 1587 0714 8823      		tst r24
+ 1588 0716 01F4      		brne .+2
+ 1589 0718 00C0      		rjmp .L100
+ 385:interpretacjaSMS.c ****     }
+ 1590               		.loc 1 385 0
+ 1591 071a 63E2      		ldi r22,lo8(35)
+ 1592 071c CE01      		movw r24,r28
+ 1593 071e 4196      		adiw r24,17
+ 1594 0720 0E94 0000 		call czy_jest_znak
+ 1595               	.LVL148:
+ 389:interpretacjaSMS.c ****         !pobierz_long(&sms, &em))
+ 1596               		.loc 1 389 0
+ 1597 0724 BE01      		movw r22,r28
+ 1598 0726 6B5F      		subi r22,-5
+ 1599 0728 7F4F      		sbci r23,-1
+ 1600 072a CE01      		movw r24,r28
+ 1601 072c 4196      		adiw r24,17
+ 1602 072e 0E94 0000 		call pobierz_long
+ 1603               	.LVL149:
+ 1604 0732 8823      		tst r24
+ 1605 0734 01F4      		brne .+2
+ 1606 0736 00C0      		rjmp .L100
+ 389:interpretacjaSMS.c ****         !pobierz_long(&sms, &em))
+ 1607               		.loc 1 389 0 is_stmt 0 discriminator 1
+ 1608 0738 6AE3      		ldi r22,lo8(58)
+ 1609 073a CE01      		movw r24,r28
+ 1610 073c 4196      		adiw r24,17
+ 1611 073e 0E94 0000 		call pomin_znak
+ 1612               	.LVL150:
+ 1613 0742 8823      		tst r24
+ 1614 0744 01F4      		brne .+2
+ 1615 0746 00C0      		rjmp .L100
+ 390:interpretacjaSMS.c ****       return INTERPRETACJA_SMS_BLEDNE_DANE;
+ 1616               		.loc 1 390 0 is_stmt 1 discriminator 2
+ 1617 0748 BE01      		movw r22,r28
+ 1618 074a 6F5F      		subi r22,-1
+ 1619 074c 7F4F      		sbci r23,-1
+ 1620 074e CE01      		movw r24,r28
+ 1621 0750 4196      		adiw r24,17
+ 1622 0752 0E94 0000 		call pobierz_long
+ 1623               	.LVL151:
+ 389:interpretacjaSMS.c ****         !pobierz_long(&sms, &em))
+ 1624               		.loc 1 389 0 discriminator 2
+ 1625 0756 8823      		tst r24
+ 1626 0758 01F4      		brne .+2
+ 1627 075a 00C0      		rjmp .L100
+ 393:interpretacjaSMS.c ****         em > 59)
+ 1628               		.loc 1 393 0
+ 1629 075c 8D85      		ldd r24,Y+13
+ 1630 075e 9E85      		ldd r25,Y+14
+ 1631 0760 AF85      		ldd r26,Y+15
+ 1632 0762 B889      		ldd r27,Y+16
+ 1633 0764 8831      		cpi r24,24
+ 1634 0766 9105      		cpc r25,__zero_reg__
+ 1635 0768 A105      		cpc r26,__zero_reg__
+ 1636 076a B105      		cpc r27,__zero_reg__
+ 1637 076c 00F0      		brlo .+2
+ 1638 076e 00C0      		rjmp .L100
+ 393:interpretacjaSMS.c ****         em > 59)
+ 1639               		.loc 1 393 0 is_stmt 0 discriminator 1
+ 1640 0770 4985      		ldd r20,Y+9
+ 1641 0772 5A85      		ldd r21,Y+10
+ 1642 0774 6B85      		ldd r22,Y+11
+ 1643 0776 7C85      		ldd r23,Y+12
+ 1644 0778 4C33      		cpi r20,60
+ 1645 077a 5105      		cpc r21,__zero_reg__
+ 1646 077c 6105      		cpc r22,__zero_reg__
+ 1647 077e 7105      		cpc r23,__zero_reg__
+ 1648 0780 00F0      		brlo .+2
+ 1649 0782 00C0      		rjmp .L100
+ 393:interpretacjaSMS.c ****         em > 59)
+ 1650               		.loc 1 393 0 discriminator 3
+ 1651 0784 4D81      		ldd r20,Y+5
+ 1652 0786 5E81      		ldd r21,Y+6
+ 1653 0788 6F81      		ldd r22,Y+7
+ 1654 078a 7885      		ldd r23,Y+8
+ 1655 078c 4831      		cpi r20,24
+ 1656 078e 5105      		cpc r21,__zero_reg__
+ 1657 0790 6105      		cpc r22,__zero_reg__
+ 1658 0792 7105      		cpc r23,__zero_reg__
+ 1659 0794 00F0      		brlo .+2
+ 1660 0796 00C0      		rjmp .L100
+ 393:interpretacjaSMS.c ****         em > 59)
+ 1661               		.loc 1 393 0 discriminator 5
+ 1662 0798 4981      		ldd r20,Y+1
+ 1663 079a 5A81      		ldd r21,Y+2
+ 1664 079c 6B81      		ldd r22,Y+3
+ 1665 079e 7C81      		ldd r23,Y+4
+ 1666 07a0 4C33      		cpi r20,60
+ 1667 07a2 5105      		cpc r21,__zero_reg__
+ 1668 07a4 6105      		cpc r22,__zero_reg__
+ 1669 07a6 7105      		cpc r23,__zero_reg__
+ 1670 07a8 00F0      		brlo .+2
+ 1671 07aa 00C0      		rjmp .L100
+ 398:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)sm, ADRES_EEPROM_CZAS_START_M);
+ 1672               		.loc 1 398 0 is_stmt 1
+ 1673 07ac 6AEF      		ldi r22,lo8(-6)
+ 1674 07ae 7FE0      		ldi r23,lo8(15)
+ 1675 07b0 0E94 0000 		call zapisz_znak_w_eeprom
+ 1676               	.LVL152:
+ 399:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)eh, ADRES_EEPROM_CZAS_STOP_H);
+ 1677               		.loc 1 399 0
+ 1678 07b4 6BEF      		ldi r22,lo8(-5)
+ 1679 07b6 7FE0      		ldi r23,lo8(15)
+ 1680 07b8 8985      		ldd r24,Y+9
+ 1681 07ba 0E94 0000 		call zapisz_znak_w_eeprom
+ 1682               	.LVL153:
+ 400:interpretacjaSMS.c ****     zapisz_znak_w_eeprom((uchar)em, ADRES_EEPROM_CZAS_STOP_M);
+ 1683               		.loc 1 400 0
+ 1684 07be 6CEF      		ldi r22,lo8(-4)
+ 1685 07c0 7FE0      		ldi r23,lo8(15)
+ 1686 07c2 8D81      		ldd r24,Y+5
+ 1687 07c4 0E94 0000 		call zapisz_znak_w_eeprom
+ 1688               	.LVL154:
+ 401:interpretacjaSMS.c **** 
+ 1689               		.loc 1 401 0
+ 1690 07c8 6DEF      		ldi r22,lo8(-3)
+ 1691 07ca 7FE0      		ldi r23,lo8(15)
+ 1692 07cc 8981      		ldd r24,Y+1
+ 1693 07ce 0E94 0000 		call zapisz_znak_w_eeprom
+ 1694               	.LVL155:
+ 404:interpretacjaSMS.c ****     czas_start_m = (uchar)sm;
+ 1695               		.loc 1 404 0
+ 1696 07d2 8D85      		ldd r24,Y+13
+ 1697 07d4 8093 0000 		sts czas_start_h,r24
+ 405:interpretacjaSMS.c ****     czas_stop_h = (uchar)eh;
+ 1698               		.loc 1 405 0
+ 1699 07d8 8985      		ldd r24,Y+9
+ 1700 07da 8093 0000 		sts czas_start_m,r24
+ 406:interpretacjaSMS.c ****     czas_stop_m = (uchar)em;
+ 1701               		.loc 1 406 0
+ 1702 07de 8D81      		ldd r24,Y+5
+ 1703 07e0 8093 0000 		sts czas_stop_h,r24
+ 407:interpretacjaSMS.c **** 
+ 1704               		.loc 1 407 0
+ 1705 07e4 8981      		ldd r24,Y+1
+ 1706 07e6 8093 0000 		sts czas_stop_m,r24
+ 1707 07ea 00C0      		rjmp .L156
+ 1708               	.L94:
+ 1709               	.LBE22:
+ 412:interpretacjaSMS.c ****     if (strncasecmp_P(sms, PSTR("ON"), 2) == 0) {
+ 1710               		.loc 1 412 0 discriminator 2
+ 1711 07ec 0F5F      		subi r16,-1
+ 1712 07ee 1F4F      		sbci r17,-1
+ 1713 07f0 1A8B      		std Y+18,r17
+ 1714 07f2 098B      		std Y+17,r16
+ 1715               	.L69:
+ 412:interpretacjaSMS.c ****     if (strncasecmp_P(sms, PSTR("ON"), 2) == 0) {
+ 1716               		.loc 1 412 0 is_stmt 0 discriminator 1
+ 1717 07f4 0989      		ldd r16,Y+17
+ 1718 07f6 1A89      		ldd r17,Y+18
+ 1719 07f8 F801      		movw r30,r16
+ 1720 07fa 8081      		ld r24,Z
+ 1721 07fc 90E0      		ldi r25,0
+ 1722 07fe 0E94 0000 		call isspace
+ 1723               	.LVL156:
+ 1724 0802 892B      		or r24,r25
+ 1725 0804 01F4      		brne .L94
+ 413:interpretacjaSMS.c ****       sms += 2; // Przeskocz "ON"
+ 1726               		.loc 1 413 0 is_stmt 1
+ 1727 0806 42E0      		ldi r20,lo8(2)
+ 1728 0808 50E0      		ldi r21,0
+ 1729 080a 60E0      		ldi r22,lo8(__c.2796)
+ 1730 080c 70E0      		ldi r23,hi8(__c.2796)
+ 1731 080e C801      		movw r24,r16
+ 1732 0810 0E94 0000 		call strncasecmp_P
+ 1733               	.LVL157:
+ 1734 0814 892B      		or r24,r25
+ 1735 0816 01F0      		breq .+2
+ 1736 0818 00C0      		rjmp .L95
+ 1737               	.LBB23:
+ 414:interpretacjaSMS.c **** 
+ 1738               		.loc 1 414 0
+ 1739 081a 0E5F      		subi r16,-2
+ 1740 081c 1F4F      		sbci r17,-1
+ 1741 081e 1A8B      		std Y+18,r17
+ 1742 0820 098B      		std Y+17,r16
+ 417:interpretacjaSMS.c ****       przeskocz_biale_znaki(sms);
+ 1743               		.loc 1 417 0
+ 1744 0822 80E2      		ldi r24,lo8(32)
+ 1745 0824 93E0      		ldi r25,lo8(3)
+ 1746 0826 A0E0      		ldi r26,0
+ 1747 0828 B0E0      		ldi r27,0
+ 1748 082a 8983      		std Y+1,r24
+ 1749 082c 9A83      		std Y+2,r25
+ 1750 082e AB83      		std Y+3,r26
+ 1751 0830 BC83      		std Y+4,r27
+ 1752               	.LVL158:
+ 1753               	.L96:
+ 418:interpretacjaSMS.c ****       if (*sms >= '0' && *sms <= '9') {
+ 1754               		.loc 1 418 0 discriminator 1
+ 1755 0832 E988      		ldd r14,Y+17
+ 1756 0834 FA88      		ldd r15,Y+18
+ 1757 0836 F701      		movw r30,r14
+ 1758 0838 1081      		ld r17,Z
+ 1759 083a 812F      		mov r24,r17
+ 1760 083c 90E0      		ldi r25,0
+ 1761 083e 0E94 0000 		call isspace
+ 1762               	.LVL159:
+ 1763 0842 892B      		or r24,r25
+ 1764 0844 01F4      		brne .L97
+ 419:interpretacjaSMS.c ****         // Jest liczba - sprobuj ja odczytac
+ 1765               		.loc 1 419 0
+ 1766 0846 1053      		subi r17,lo8(-(-48))
+ 1767 0848 1A30      		cpi r17,lo8(10)
+ 1768 084a 00F0      		brlo .L98
+ 1769               	.L101:
+ 1770               	.LBE23:
+ 1771               	.LBB24:
+ 409:interpretacjaSMS.c ****   }
+ 1772               		.loc 1 409 0
+ 1773 084c 08E0      		ldi r16,lo8(8)
+ 1774 084e 10E0      		ldi r17,0
+ 1775               	.L99:
+ 1776               	.LBE24:
+ 1777               	.LBB25:
+ 1778               	.LBB11:
+ 435:interpretacjaSMS.c ****           jest_miejsce = TRUE;
+ 1779               		.loc 1 435 0
+ 1780 0850 C801      		movw r24,r16
+ 1781 0852 0E94 0000 		call eeprom_read_byte
+ 1782               	.LVL160:
+ 1783 0856 F82E      		mov r15,r24
+ 1784 0858 2FEF      		ldi r18,lo8(-1)
+ 1785 085a 8217      		cp r24,r18
+ 1786 085c 01F4      		brne .+2
+ 1787 085e 00C0      		rjmp .L102
+ 1788               	.LVL161:
+ 1789 0860 0B5F      		subi r16,-5
+ 1790 0862 1F4F      		sbci r17,-1
+ 434:interpretacjaSMS.c ****         if (!czy_aktywny_numer_telefonu_brama(i)) {
+ 1791               		.loc 1 434 0 discriminator 2
+ 1792 0864 083A      		cpi r16,-88
+ 1793 0866 8FE0      		ldi r24,15
+ 1794 0868 1807      		cpc r17,r24
+ 1795 086a 01F4      		brne .L99
+ 1796 086c 00C0      		rjmp .L100
+ 1797               	.L97:
+ 1798               	.LBE11:
+ 418:interpretacjaSMS.c ****       if (*sms >= '0' && *sms <= '9') {
+ 1799               		.loc 1 418 0 discriminator 2
+ 1800 086e FFEF      		ldi r31,-1
+ 1801 0870 EF1A      		sub r14,r31
+ 1802 0872 FF0A      		sbc r15,r31
+ 1803 0874 FA8A      		std Y+18,r15
+ 1804 0876 E98A      		std Y+17,r14
+ 1805 0878 00C0      		rjmp .L96
+ 1806               	.L98:
+ 421:interpretacjaSMS.c ****           // Walidacja zakresu
+ 1807               		.loc 1 421 0
+ 1808 087a BE01      		movw r22,r28
+ 1809 087c 6F5F      		subi r22,-1
+ 1810 087e 7F4F      		sbci r23,-1
+ 1811 0880 CE01      		movw r24,r28
+ 1812 0882 4196      		adiw r24,17
+ 1813 0884 0E94 0000 		call pobierz_long
+ 1814               	.LVL162:
+ 1815 0888 8823      		tst r24
+ 1816 088a 01F4      		brne .+2
+ 1817 088c 00C0      		rjmp .L100
+ 423:interpretacjaSMS.c ****               limit_value > MAX_LICZBA_NUMEROW_TELEFONOW_BRAMA) {
+ 1818               		.loc 1 423 0
+ 1819 088e 8981      		ldd r24,Y+1
+ 1820 0890 9A81      		ldd r25,Y+2
+ 1821 0892 AB81      		ldd r26,Y+3
+ 1822 0894 BC81      		ldd r27,Y+4
+ 1823 0896 0197      		sbiw r24,1
+ 1824 0898 A109      		sbc r26,__zero_reg__
+ 1825 089a B109      		sbc r27,__zero_reg__
+ 1826 089c 8032      		cpi r24,32
+ 1827 089e 9340      		sbci r25,3
+ 1828 08a0 A105      		cpc r26,__zero_reg__
+ 1829 08a2 B105      		cpc r27,__zero_reg__
+ 1830 08a4 00F0      		brlo .L101
+ 1831 08a6 00C0      		rjmp .L100
+ 1832               	.LVL163:
+ 1833               	.L95:
+ 1834               	.LBE25:
+ 467:interpretacjaSMS.c ****       // Wyłącz SKRYBA
+ 1835               		.loc 1 467 0
+ 1836 08a8 43E0      		ldi r20,lo8(3)
+ 1837 08aa 50E0      		ldi r21,0
+ 1838 08ac 60E0      		ldi r22,lo8(__c.2808)
+ 1839 08ae 70E0      		ldi r23,hi8(__c.2808)
+ 1840 08b0 C801      		movw r24,r16
+ 1841 08b2 0E94 0000 		call strncasecmp_P
+ 1842               	.LVL164:
+ 1843 08b6 892B      		or r24,r25
+ 1844 08b8 01F0      		breq .+2
+ 1845 08ba 00C0      		rjmp .L100
+ 1846               	.LBB26:
+ 469:interpretacjaSMS.c ****       skryba_wlaczona = FALSE; // Aktualizuj RAM natychmiast
+ 1847               		.loc 1 469 0
+ 1848 08bc 69EF      		ldi r22,lo8(-7)
+ 1849 08be 7FE0      		ldi r23,lo8(15)
+ 1850 08c0 80E0      		ldi r24,0
+ 1851 08c2 0E94 0000 		call zapisz_znak_w_eeprom
+ 1852               	.LVL165:
+ 470:interpretacjaSMS.c **** 
+ 1853               		.loc 1 470 0
+ 1854 08c6 1092 0000 		sts skryba_wlaczona,__zero_reg__
+ 473:interpretacjaSMS.c ****           eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA_TRYB_BACKUP);
+ 1855               		.loc 1 473 0
+ 1856 08ca 88EF      		ldi r24,lo8(-8)
+ 1857 08cc 9FE0      		ldi r25,lo8(15)
+ 1858 08ce 0E94 0000 		call eeprom_read_byte
+ 1859               	.LVL166:
+ 475:interpretacjaSMS.c ****         tryb_pracy = poprzedni_tryb; // Aktualizuj RAM
+ 1860               		.loc 1 475 0
+ 1861 08d2 8F3F      		cpi r24,lo8(-1)
+ 1862 08d4 01F4      		brne .+2
+ 1863 08d6 00C0      		rjmp .L156
+ 1864               	.LVL167:
+ 1865               	.L158:
+ 1866               	.LBE26:
+ 1867               	.LBB27:
+ 463:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
+ 1868               		.loc 1 463 0
+ 1869 08d8 8093 0000 		sts tryb_pracy,r24
+ 464:interpretacjaSMS.c **** 
+ 1870               		.loc 1 464 0
+ 1871 08dc 6EEF      		ldi r22,lo8(-2)
+ 1872 08de 7FE0      		ldi r23,lo8(15)
+ 1873 08e0 00C0      		rjmp .L157
+ 1874               	.LVL168:
+ 1875               	.L70:
+ 1876               	.LBE27:
+ 485:interpretacjaSMS.c ****   }
+ 1877               		.loc 1 485 0
+ 1878 08e2 88E0      		ldi r24,lo8(8)
+ 1879 08e4 00C0      		rjmp .L53
+ 1880               	.L71:
+ 488:interpretacjaSMS.c ****     zapisz_znak_w_eeprom(0, ADRES_EEPROM_BLOKADA_SYSTEMU);
+ 1881               		.loc 1 488 0
+ 1882 08e6 1092 0000 		sts blokada_systemu,__zero_reg__
+ 489:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 1883               		.loc 1 489 0
+ 1884 08ea 67EF      		ldi r22,lo8(-9)
+ 1885 08ec 7FE0      		ldi r23,lo8(15)
+ 1886 08ee 00C0      		rjmp .L161
+ 1887               	.L72:
+ 493:interpretacjaSMS.c ****     zapisz_znak_w_eeprom(1, ADRES_EEPROM_BLOKADA_SYSTEMU);
+ 1888               		.loc 1 493 0
+ 1889 08f0 8FEF      		ldi r24,lo8(-1)
+ 1890 08f2 8093 0000 		sts blokada_systemu,r24
+ 494:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 1891               		.loc 1 494 0
+ 1892 08f6 67EF      		ldi r22,lo8(-9)
+ 1893 08f8 7FE0      		ldi r23,lo8(15)
+ 1894 08fa 00C0      		rjmp .L160
+ 1895               	.L73:
+ 498:interpretacjaSMS.c ****                                    14))
+ 1896               		.loc 1 498 0
+ 1897 08fc 4EE0      		ldi r20,lo8(14)
+ 1898 08fe 60E0      		ldi r22,lo8(numer_telefonu_do_ktorego_dzwonic)
+ 1899 0900 70E0      		ldi r23,hi8(numer_telefonu_do_ktorego_dzwonic)
+ 1900 0902 CE01      		movw r24,r28
+ 1901 0904 4196      		adiw r24,17
+ 1902 0906 0E94 0000 		call pobierz_numer_telefonu
+ 1903               	.LVL169:
+ 1904 090a 8823      		tst r24
+ 1905 090c 01F4      		brne .+2
+ 1906 090e 00C0      		rjmp .L100
+ 501:interpretacjaSMS.c ****     return INTERPRETACJA_SMS_POPRAWNY;
+ 1907               		.loc 1 501 0
+ 1908 0910 87E8      		ldi r24,lo8(-121)
+ 1909 0912 00C0      		rjmp .L162
+ 1910               	.L58:
+ 505:interpretacjaSMS.c **** }
+ 1911               		.loc 1 505 0
+ 1912 0914 81E0      		ldi r24,lo8(1)
+ 1913 0916 00C0      		rjmp .L53
+ 1914               	.L106:
+ 211:interpretacjaSMS.c ****   }
+ 1915               		.loc 1 211 0
+ 1916 0918 84E0      		ldi r24,lo8(4)
+ 1917 091a 00C0      		rjmp .L53
+ 1918               	.L107:
+ 217:interpretacjaSMS.c **** 
+ 1919               		.loc 1 217 0
+ 1920 091c 85E0      		ldi r24,lo8(5)
+ 1921 091e 00C0      		rjmp .L53
+ 1922               	.LVL170:
+ 1923               	.L102:
+ 1924               	.LBB28:
+ 447:interpretacjaSMS.c ****           eeprom_read_byte((const uint8_t *)ADRES_EEPROM_TRYB_PRACY);
+ 1925               		.loc 1 447 0
+ 1926 0920 8EEF      		ldi r24,lo8(-2)
+ 1927 0922 9FE0      		ldi r25,lo8(15)
+ 1928 0924 0E94 0000 		call eeprom_read_byte
+ 1929               	.LVL171:
+ 449:interpretacjaSMS.c **** 
+ 1930               		.loc 1 449 0
+ 1931 0928 68EF      		ldi r22,lo8(-8)
+ 1932 092a 7FE0      		ldi r23,lo8(15)
+ 1933 092c 0E94 0000 		call zapisz_znak_w_eeprom
+ 1934               	.LVL172:
+ 452:interpretacjaSMS.c ****                            ADRES_EEPROM_SKRYBA_LIMIT_L);
+ 1935               		.loc 1 452 0
+ 1936 0930 65EF      		ldi r22,lo8(-11)
+ 1937 0932 7FE0      		ldi r23,lo8(15)
+ 1938 0934 8981      		ldd r24,Y+1
+ 1939 0936 0E94 0000 		call zapisz_znak_w_eeprom
+ 1940               	.LVL173:
+ 454:interpretacjaSMS.c ****                            ADRES_EEPROM_SKRYBA_LIMIT_H);
+ 1941               		.loc 1 454 0
+ 1942 093a 66EF      		ldi r22,lo8(-10)
+ 1943 093c 7FE0      		ldi r23,lo8(15)
+ 1944 093e 8A81      		ldd r24,Y+2
+ 1945 0940 0E94 0000 		call zapisz_znak_w_eeprom
+ 1946               	.LVL174:
  456:interpretacjaSMS.c **** 
- 1942               		.loc 1 456 0
- 1943 0940 F092 0000 		sts skryba_wlaczona,r15
- 1944               	.LVL175:
- 1945               	.L155:
- 459:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
- 1946               		.loc 1 459 0
- 1947 0944 81E0      		ldi r24,lo8(1)
- 1948 0946 00C0      		rjmp .L154
- 1949               	.LBE28:
- 1950               		.cfi_endproc
- 1951               	.LFE15:
- 1953               		.section	.progmem.data,"a",@progbits
- 1956               	__c.2806:
- 1957 0000 4F46 4600 		.string	"OFF"
- 1960               	__c.2794:
- 1961 0004 4F4E 00   		.string	"ON"
- 1964               	__c.2784:
- 1965 0007 4F46 4600 		.string	"OFF"
- 1968               	__c.2770:
- 1969 000b 5469 6D65 		.string	"Time: "
- 1969      3A20 00
- 1972               	res_ust.2650:
- 1973 0012 4333 4434 		.string	"C3D4"
- 1973      00
- 1976               	instrukcja_sms:
- 1977 0017 0443 4F44 		.string	"\004CODE"
- 1977      4500 
- 1978 001d 0000      		.zero	2
- 1979 001f 0341 4444 		.string	"\003ADD"
- 1979      00
- 1980 0024 0000 00   		.zero	3
- 1981 0027 0344 454C 		.string	"\003DEL"
- 1981      00
- 1982 002c 0000 00   		.zero	3
- 1983 002f 0458 5858 		.string	"\004XXXX"
- 1983      5800 
- 1984 0035 0000      		.zero	2
- 1985 0037 0652 4550 		.string	"\006REPORT"
- 1985      4F52 5400 
- 1986 003f 0455 5345 		.string	"\004USER"
- 1986      5200 
- 1987 0045 0000      		.zero	2
- 1988 0047 044F 5045 		.string	"\004OPEN"
- 1988      4E00 
- 1989 004d 0000      		.zero	2
- 1990 004f 0543 4C4F 		.string	"\005CLOSE"
- 1990      5345 00
- 1991 0056 00        		.zero	1
- 1992 0057 0443 4C49 		.string	"\004CLIP"
- 1992      5000 
- 1993 005d 0000      		.zero	2
- 1994 005f 0444 544D 		.string	"\004DTMF"
- 1994      4600 
- 1995 0065 0000      		.zero	2
- 1996 0067 0353 4554 		.string	"\003SET"
- 1996      00
- 1997 006c 0000 00   		.zero	3
- 1998 006f 0454 494D 		.string	"\004TIME"
- 1998      4500 
- 1999 0075 0000      		.zero	2
- 2000 0077 0653 4B52 		.string	"\006SKRYBA"
- 2000      5942 4100 
- 2001 007f 0544 4542 		.string	"\005DEBUG"
- 2001      5547 00
- 2002 0086 00        		.zero	1
- 2003 0087 0553 5441 		.string	"\005START"
- 2003      5254 00
- 2004 008e 00        		.zero	1
- 2005 008f 0453 544F 		.string	"\004STOP"
- 2005      5000 
- 2006 0095 0000      		.zero	2
- 2007               		.comm	nr_usunietego_uzytkownika_z_smsa,1,1
- 2008               		.comm	stan_wyjscie,1,1
- 2009               		.text
- 2010               	.Letext0:
- 2011               		.file 2 "/usr/local/avr8-gnu-toolchain/avr/include/stdint.h"
- 2012               		.file 3 "/usr/local/avr8-gnu-toolchain/lib/gcc/avr/7.3.0/include/stddef.h"
- 2013               		.file 4 "narzedzia.h"
- 2014               		.file 5 "pamiec_ram.h"
- 2015               		.file 6 "interpretacjaSMS.h"
- 2016               		.file 7 "enumkomendy.h"
- 2017               		.file 8 "komendy.h"
- 2018               		.file 9 "/usr/local/avr8-gnu-toolchain/avr/include/stdio.h"
- 2019               		.file 10 "/usr/local/avr8-gnu-toolchain/avr/include/stdlib.h"
- 2020               		.file 11 "wewy.h"
- 2021               		.file 12 "zapiseeprom.h"
- 2022               		.file 13 "/usr/local/avr8-gnu-toolchain/avr/include/ctype.h"
- 2023               		.file 14 "/usr/local/avr8-gnu-toolchain/avr/include/avr/pgmspace.h"
- 2024               		.file 15 "/usr/local/avr8-gnu-toolchain/avr/include/string.h"
- 2025               		.file 16 "/usr/local/avr8-gnu-toolchain/avr/include/avr/eeprom.h"
- 2026               		.file 17 "konfiguracja.h"
+ 1947               		.loc 1 456 0
+ 1948 0944 8981      		ldd r24,Y+1
+ 1949 0946 9A81      		ldd r25,Y+2
+ 1950 0948 9093 0000 		sts skryba_limit+1,r25
+ 1951 094c 8093 0000 		sts skryba_limit,r24
+ 459:interpretacjaSMS.c ****       skryba_wlaczona = TRUE; // Aktualizuj RAM natychmiast
+ 1952               		.loc 1 459 0
+ 1953 0950 69EF      		ldi r22,lo8(-7)
+ 1954 0952 7FE0      		ldi r23,lo8(15)
+ 1955 0954 81E0      		ldi r24,lo8(1)
+ 1956 0956 0E94 0000 		call zapisz_znak_w_eeprom
+ 1957               	.LVL175:
+ 460:interpretacjaSMS.c **** 
+ 1958               		.loc 1 460 0
+ 1959 095a F092 0000 		sts skryba_wlaczona,r15
+ 1960               	.LVL176:
+ 1961               	.L159:
+ 463:interpretacjaSMS.c ****       zapisz_znak_w_eeprom(1, ADRES_EEPROM_TRYB_PRACY);
+ 1962               		.loc 1 463 0
+ 1963 095e 81E0      		ldi r24,lo8(1)
+ 1964 0960 00C0      		rjmp .L158
+ 1965               	.LBE28:
+ 1966               		.cfi_endproc
+ 1967               	.LFE15:
+ 1969               		.section	.progmem.data,"a",@progbits
+ 1972               	__c.2808:
+ 1973 0000 4F46 4600 		.string	"OFF"
+ 1976               	__c.2796:
+ 1977 0004 4F4E 00   		.string	"ON"
+ 1980               	__c.2786:
+ 1981 0007 4F46 4600 		.string	"OFF"
+ 1984               	__c.2772:
+ 1985 000b 5469 6D65 		.string	"Time: "
+ 1985      3A20 00
+ 1988               	res_ust.2651:
+ 1989 0012 4333 4434 		.string	"C3D4"
+ 1989      00
+ 1992               	instrukcja_sms:
+ 1993 0017 0443 4F44 		.string	"\004CODE"
+ 1993      4500 
+ 1994 001d 0000      		.zero	2
+ 1995 001f 0341 4444 		.string	"\003ADD"
+ 1995      00
+ 1996 0024 0000 00   		.zero	3
+ 1997 0027 0344 454C 		.string	"\003DEL"
+ 1997      00
+ 1998 002c 0000 00   		.zero	3
+ 1999 002f 0458 5858 		.string	"\004XXXX"
+ 1999      5800 
+ 2000 0035 0000      		.zero	2
+ 2001 0037 0652 4550 		.string	"\006REPORT"
+ 2001      4F52 5400 
+ 2002 003f 0455 5345 		.string	"\004USER"
+ 2002      5200 
+ 2003 0045 0000      		.zero	2
+ 2004 0047 044F 5045 		.string	"\004OPEN"
+ 2004      4E00 
+ 2005 004d 0000      		.zero	2
+ 2006 004f 0543 4C4F 		.string	"\005CLOSE"
+ 2006      5345 00
+ 2007 0056 00        		.zero	1
+ 2008 0057 0443 4C49 		.string	"\004CLIP"
+ 2008      5000 
+ 2009 005d 0000      		.zero	2
+ 2010 005f 0444 544D 		.string	"\004DTMF"
+ 2010      4600 
+ 2011 0065 0000      		.zero	2
+ 2012 0067 0353 4554 		.string	"\003SET"
+ 2012      00
+ 2013 006c 0000 00   		.zero	3
+ 2014 006f 0454 494D 		.string	"\004TIME"
+ 2014      4500 
+ 2015 0075 0000      		.zero	2
+ 2016 0077 0653 4B52 		.string	"\006SKRYBA"
+ 2016      5942 4100 
+ 2017 007f 0544 4542 		.string	"\005DEBUG"
+ 2017      5547 00
+ 2018 0086 00        		.zero	1
+ 2019 0087 0553 5441 		.string	"\005START"
+ 2019      5254 00
+ 2020 008e 00        		.zero	1
+ 2021 008f 0453 544F 		.string	"\004STOP"
+ 2021      5000 
+ 2022 0095 0000      		.zero	2
+ 2023 0097 0353 5542 		.string	"\003SUB"
+ 2023      00
+ 2024 009c 0000 00   		.zero	3
+ 2025               		.comm	nr_usunietego_uzytkownika_z_smsa,1,1
+ 2026               		.comm	stan_wyjscie,1,1
+ 2027               		.text
+ 2028               	.Letext0:
+ 2029               		.file 2 "/usr/local/avr8-gnu-toolchain/avr/include/stdint.h"
+ 2030               		.file 3 "/usr/local/avr8-gnu-toolchain/lib/gcc/avr/7.3.0/include/stddef.h"
+ 2031               		.file 4 "narzedzia.h"
+ 2032               		.file 5 "pamiec_ram.h"
+ 2033               		.file 6 "interpretacjaSMS.h"
+ 2034               		.file 7 "enumkomendy.h"
+ 2035               		.file 8 "komendy.h"
+ 2036               		.file 9 "/usr/local/avr8-gnu-toolchain/avr/include/stdio.h"
+ 2037               		.file 10 "/usr/local/avr8-gnu-toolchain/avr/include/stdlib.h"
+ 2038               		.file 11 "wewy.h"
+ 2039               		.file 12 "zapiseeprom.h"
+ 2040               		.file 13 "/usr/local/avr8-gnu-toolchain/avr/include/ctype.h"
+ 2041               		.file 14 "/usr/local/avr8-gnu-toolchain/avr/include/avr/pgmspace.h"
+ 2042               		.file 15 "/usr/local/avr8-gnu-toolchain/avr/include/string.h"
+ 2043               		.file 16 "/usr/local/avr8-gnu-toolchain/avr/include/avr/eeprom.h"
+ 2044               		.file 17 "konfiguracja.h"
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 interpretacjaSMS.c
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:2      *ABS*:000000000000003e __SP_H__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:3      *ABS*:000000000000003d __SP_L__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:4      *ABS*:000000000000003f __SREG__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:5      *ABS*:000000000000003b __RAMPZ__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:6      *ABS*:0000000000000000 __tmp_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:7      *ABS*:0000000000000001 __zero_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:13     .text:0000000000000000 sprawdz_kod
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:110    .text:000000000000006a sprawdz_reset_ustawien
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:1972   .progmem.data:0000000000000012 res_ust.2650
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:140    .text:0000000000000082 interpretuj_instrukcje_sms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:1976   .progmem.data:0000000000000017 instrukcja_sms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:329    .text:0000000000000136 pobierz_long
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:408    .text:000000000000017c pomin_znak
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:505    .text:00000000000001d8 czy_jest_znak
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:620    .text:0000000000000242 pobierz_wyraz
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:747    .text:00000000000002c2 pobierz_numer_telefonu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:906    .text:000000000000035c interpretuj_wiadomosc_sms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:1968   .progmem.data:000000000000000b __c.2770
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:1964   .progmem.data:0000000000000007 __c.2784
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:1960   .progmem.data:0000000000000004 __c.2794
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccw63nNA.s:1956   .progmem.data:0000000000000000 __c.2806
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:13     .text:0000000000000000 sprawdz_kod
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:110    .text:000000000000006a sprawdz_reset_ustawien
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:1988   .progmem.data:0000000000000012 res_ust.2651
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:140    .text:0000000000000082 interpretuj_instrukcje_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:1992   .progmem.data:0000000000000017 instrukcja_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:329    .text:0000000000000136 pobierz_long
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:408    .text:000000000000017c pomin_znak
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:505    .text:00000000000001d8 czy_jest_znak
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:620    .text:0000000000000242 pobierz_wyraz
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:747    .text:00000000000002c2 pobierz_numer_telefonu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:906    .text:000000000000035c interpretuj_wiadomosc_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:1984   .progmem.data:000000000000000b __c.2772
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:1980   .progmem.data:0000000000000007 __c.2786
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:1976   .progmem.data:0000000000000004 __c.2796
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cccohMMk.s:1972   .progmem.data:0000000000000000 __c.2808
                             *COM*:0000000000000001 nr_usunietego_uzytkownika_z_smsa
                             *COM*:0000000000000001 stan_wyjscie
 
