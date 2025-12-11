@@ -590,7 +590,7 @@ void wykonanie_polecenia_sms(void) {
            (char *)numer_telefonu_odebranego_smsa);
 
     // Uzyj lokalnego bufora aby uniknac konfliktow z EEPROM
-    uchar temp_buf[10];
+    uchar temp_buf[LICZBA_BAJTOW_NUMERU_TELEFONU_W_EEPROM];
 
     // Konwertuj numer na format EEPROM
     konwertuj_telefon_na_blok_eeprom(
@@ -610,9 +610,13 @@ void wykonanie_polecenia_sms(void) {
       }
     }
 
-    // Przygotuj odpowiedz z numerem telefonu i statusem
-    strcpy((char *)tekst_wysylanego_smsa,
-           (char *)numer_telefonu_do_ktorego_dzwonic);
+    // Przygotuj odpowiedz - pokaz FAKTYCZNY numer z EEPROM (max 9 cyfr)
+    // zamiast numeru wpisanego w komendzie (ktory moze miec prefiks +48)
+    uchar numer_z_eeprom[MAX_LICZBA_ZNAKOW_TELEFON + 1];
+    konwertuj_blok_eeprom_na_telefon(temp_buf, numer_z_eeprom,
+                                     MAX_LICZBA_ZNAKOW_TELEFON + 1);
+
+    strcpy((char *)tekst_wysylanego_smsa, (char *)numer_z_eeprom);
     strcat((char *)tekst_wysylanego_smsa, ": ");
     if (znaleziono) {
       strcat((char *)tekst_wysylanego_smsa, "OK");

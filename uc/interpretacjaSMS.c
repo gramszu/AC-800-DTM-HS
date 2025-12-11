@@ -165,12 +165,40 @@ uchar pobierz_numer_telefonu(const uchar **buf_sms, uchar *buf_telefon,
                              const uchar rozmiar_bufora) {
   przeskocz_biale_znaki(*buf_sms);
   const uchar *tel = *buf_sms;
-  uchar *buf = buf_telefon;
-  uchar l = 0;
-  while (konwersja_znaku_telefonu(*tel) != ZNAK_NUMERU_TELEFONU_NIEZNANY &&
-         ++l < rozmiar_bufora)
-    *buf++ = *tel++;
-  *buf = '\0';
+
+  // Bufor tymczasowy dla wszystkich cyfr
+  uchar temp_digits[20];
+  uchar digit_count = 0;
+
+  // Zbierz wszystkie cyfry (0-9), pomijając +, #, *, spacje
+  while (*tel != '\0' && digit_count < 20) {
+    // Pomiń spacje
+    if (*tel == ' ') {
+      tel++;
+      continue;
+    }
+
+    // Sprawdź czy to poprawny znak numeru
+    if (konwersja_znaku_telefonu(*tel) == ZNAK_NUMERU_TELEFONU_NIEZNANY) {
+      break; // Koniec numeru
+    }
+
+    // Zapisz TYLKO cyfry (0-9)
+    if (*tel >= '0' && *tel <= '9') {
+      temp_digits[digit_count++] = *tel;
+    }
+    tel++;
+  }
+
+  // Skopiuj OSTATNIE 9 cyfr do bufora wyjściowego
+  uchar start_pos = (digit_count > 9) ? (digit_count - 9) : 0;
+  uchar copy_count = (digit_count > 9) ? 9 : digit_count;
+
+  for (uchar i = 0; i < copy_count && i < rozmiar_bufora - 1; i++) {
+    buf_telefon[i] = temp_digits[start_pos + i];
+  }
+  buf_telefon[copy_count] = '\0';
+
   if (buf_telefon[0] != '\0') {
     *buf_sms = tel;
     return TRUE;

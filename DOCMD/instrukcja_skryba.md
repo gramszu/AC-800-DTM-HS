@@ -29,6 +29,29 @@ Wyłącza automatyczne dodawanie nowych numerów.
    - Używane są ostatnie 9 cyfr numeru (format skrócony)
    - Numer jest zapisywany na pozycjach **1-795**
 
+### Ważne: Jak System Zapisuje Numery
+
+**System zapisuje TYLKO ostatnie 9 cyfr (0-9) z numeru telefonu.**
+
+**Znaki pomijane:**
+- `+` (prefiks międzynarodowy)
+- `#` (kratka)
+- `*` (gwiazdka)
+- Spacje
+
+**Przykłady:**
+
+| Co przychodzi | Co się zapisuje |
+|---------------|-----------------|
+| `+48 793557357` | `793557357` (9 cyfr) |
+| `48793557357` | `793557357` (ostatnie 9) |
+| `+48793557357` | `793557357` (ostatnie 9) |
+| `123456789` | `123456789` (9 cyfr) |
+| `+000#777777` | `000777777` (tylko cyfry) |
+
+⚠️ **Uwaga:** Jeśli numer ma więcej niż 9 cyfr, system zapisze **tylko ostatnie 9**!
+
+
 ### Ograniczenia
 
 #### Limit Pozycji
