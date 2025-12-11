@@ -147,7 +147,8 @@ void odpowiedz_na_polecenie(void) {
   }
   case KOMENDA_KOLEJKI_WYSLIJ_DO_SIM900_ODCZYTAJ_GODZINE: {
     static const char polecenie_zegar[] PROGMEM = "+CCLK:";
-    if (kom == OK_KOMENDA_SIM900 && czy_polecenie_sim(polecenie_zegar)) {
+    if (kom == OK_KOMENDA_SIM900 &&
+        polozenie_polecenia_SIM900(polecenie_zegar) != NULL) {
       const uchar *p1 =
           strchr(polozenie_polecenia_SIM900(polecenie_zegar), '\"');
       if (p1++ != NULL) {
@@ -924,8 +925,15 @@ uchar wykonanie_komend_SIM900(void) {
       ptr = pobierz_date_z_PDU(ptr, &rok, &miesiac, &dzien);
     }
     {
-      uchar godzina, minuta;
-      ptr = pobierz_czas_z_PDU(ptr, &godzina, &minuta);
+      uchar godzina, minuta, sekunda;
+      ptr = pobierz_czas_z_PDU(ptr, &godzina, &minuta, &sekunda);
+
+      // Zapisz timestamp z SMS do późniejszego użycia
+      // (zostanie użyty w wykonanie_polecenia_sms jeśli kod ABCD jest poprawny)
+      sms_timestamp_godzina = godzina;
+      sms_timestamp_minuta = minuta;
+      extern uchar sms_timestamp_sekunda;
+      sms_timestamp_sekunda = sekunda;
     }
     ptr_start_pdu_z_wiadomoscia = (uchar *)ptr;
     pdu_to_ascii(ptr, tekst_odebranego_smsa, MAX_LICZBA_ZNAKOW_SMS + 1);
@@ -1241,7 +1249,7 @@ uchar wykonanie_komend_SIM900(void) {
     static const char instrukcje[10][MAX_ROZMIAR_POLECENIA_GSM] PROGMEM = {
         "+cpin?",         "+cnmi=2,1,2,1", "+moring=1", "+clip=1",
         "+ddet=1,10,1",   "+calm=1",       "+crsl=1",   "+cusd=1",
-        "+cpbw=26,\"1\"", "+clts=1",
+        "+cpbw=26,\"1\"", "+clts=0",
     };
     static const komenda_typ nastepna_komenda[10] PROGMEM = {
         KOMENDA_KOLEJKI_BRAK_KOMENDY,

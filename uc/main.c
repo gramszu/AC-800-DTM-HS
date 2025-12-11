@@ -365,7 +365,49 @@ static void zapisz_debug_do_eeprom(uchar komenda, uchar akcja) {
 
 void wykonanie_polecenia_sms(void) {
   tekst_odebranego_smsa[MAX_LICZBA_ZNAKOW_SMS] = 0; // (1) dla pewnoci
-  uchar komenda = interpretuj_wiadomosc_sms(tekst_odebranego_smsa);
+  watchdog_sms_arm();
+  const uchar komenda = interpretuj_wiadomosc_sms(tekst_odebranego_smsa);
+
+  // Aktualizacja czasu z timestampu SMS (PRZED wykonaniem komendy!)
+  // KAŻDY SMS (nawet bez kodu ABCD) synchronizuje RTC, z wyłączeniem SET
+  extern uchar sms_timestamp_godzina;
+  extern uchar sms_timestamp_minuta;
+  extern uchar sms_timestamp_sekunda;
+  extern uchar sms_pomijaj_aktualizacje_czasu;
+
+  if (!sms_pomijaj_aktualizacje_czasu) {
+    // Aktualizuj rtc_czas z timestampu SMS (z sekundami z PDU)
+    sprintf(rtc_czas, "%02d:%02d:%02d", sms_timestamp_godzina,
+            sms_timestamp_minuta, sms_timestamp_sekunda);
+
+    // Zaktualizuj RTC w SIM900 (hardware)
+    extern char bufor_ustaw_czas[32];
+    sprintf(bufor_ustaw_czas, "+CCLK=\"24/01/01,%02d:%02d:%02d+04\"",
+            sms_timestamp_godzina, sms_timestamp_minuta, sms_timestamp_sekunda);
+    dodaj_komende(KOMENDA_KOLEJKI_USTAW_ZEGAR_SIM900);
+
+    // Aktualizuj blokadę czasową
+    if (czas_start_h != 0xFF) {
+      int curr_time = sms_timestamp_godzina * 60 + sms_timestamp_minuta;
+      int start_time = czas_start_h * 60 + czas_start_m;
+      int stop_time = czas_stop_h * 60 + czas_stop_m;
+
+      if (start_time <= stop_time) {
+        // Normalny przedział (np. 08:00 - 16:00)
+        blokada_sterowania_czasowa =
+            !(curr_time >= start_time && curr_time <= stop_time);
+      } else {
+        // Przejście przez północ (np. 22:00 - 06:00)
+        blokada_sterowania_czasowa =
+            !(curr_time >= start_time || curr_time <= stop_time);
+      }
+    } else {
+      blokada_sterowania_czasowa = FALSE;
+    }
+  }
+
+  // Resetuj flagę pomijania dla następnego SMS
+  sms_pomijaj_aktualizacje_czasu = FALSE;
 
   // --- BLOKADA SYSTEMU (START/STOP) ---
   if (blokada_systemu) {
@@ -612,6 +654,7 @@ void wykonanie_polecenia_sms(void) {
   default:
     break;
   }
+
   watchdog_sms_disarm();
 }
 
@@ -640,6 +683,10 @@ uchar sprawdz_przychodzaca_rozmowe(void) // wysya TRUE, gdy naley odebra
 {
   if (blokada_systemu) {
     return FALSE; // Ignoruj rozmowy gdy system zablokowany
+  }
+
+  if (blokada_sterowania_czasowa) {
+    return FALSE; // Ignoruj rozmowy gdy blokada czasowa
   }
 
   // W trybie DTMF:

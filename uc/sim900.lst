@@ -1321,36 +1321,36 @@
  1021               		.file 6 "sim900.h"
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 sim900.c
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:2      *ABS*:000000000000003e __SP_H__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:3      *ABS*:000000000000003d __SP_L__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:4      *ABS*:000000000000003f __SREG__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:5      *ABS*:000000000000003b __RAMPZ__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:6      *ABS*:0000000000000000 __tmp_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:7      *ABS*:0000000000000001 __zero_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:13     .text:0000000000000000 wyslij_znaki_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:13     .text:0000000000000000 wyslij_znaki_SIM900
                             *COM*:0000000000000002 liczba_wysylanych_znakow_SIM900
                             *COM*:0000000000000002 nr_wyslanego_znaku_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:1009   .bss:0000000000000003 sprawdzaj_wejscie_CTS_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:66     .text:0000000000000032 wyslij_polecenie_ROM_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:143    .text:000000000000006a wyslij_polecenie_RAM_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:186    .text:0000000000000094 __vector_22
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:305    .text:000000000000011c __vector_20
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:1009   .bss:0000000000000003 sprawdzaj_wejscie_CTS_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:66     .text:0000000000000032 wyslij_polecenie_ROM_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:143    .text:000000000000006a wyslij_polecenie_RAM_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:186    .text:0000000000000094 __vector_22
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:305    .text:000000000000011c __vector_20
                             *COM*:0000000000000002 liczba_odebranych_znakow_SIM900
                             *COM*:0000000000000191 odebrany_blok_SIM900
                             *COM*:0000000000000001 czy_jest_nowe_polecenie_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:1003   .bss:0000000000000002 komenda_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:1003   .bss:0000000000000002 komenda_SIM900
                             *COM*:0000000000000002 poczatek_polecenia_SIM900
                             *COM*:0000000000000002 zakonczenie_polecenia_SIM900
                             *COM*:000000000000000a polozenie_otrzymanych_komend_SIM900
                             *COM*:0000000000000001 czekanie_na_odebranie_zachety
                             *COM*:0000000000000001 flaga_odebrany_znak_zachety
                             *COM*:0000000000000001 licznik_opoznienie_oczekiwania_na_bajt_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:789    .text:000000000000035e inicjalizacja_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:832    .text:0000000000000382 zakonczenie_procedury_inicjalizacyjnej
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:979    .data:0000000000000000 licznik_100ms_procedura_inicjalizacyjna_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:879    .text:00000000000003a8 procedura_inicjalizacyjna_SIM900_100MS
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:998    .bss:0000000000000001 podlaczony_modul_gsm_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccdhKQnM.s:993    .bss:0000000000000000 podlaczona_karta_SIM_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:789    .text:000000000000035e inicjalizacja_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:832    .text:0000000000000382 zakonczenie_procedury_inicjalizacyjnej
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:979    .data:0000000000000000 licznik_100ms_procedura_inicjalizacyjna_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:879    .text:00000000000003a8 procedura_inicjalizacyjna_SIM900_100MS
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:998    .bss:0000000000000001 podlaczony_modul_gsm_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuJJCjv.s:993    .bss:0000000000000000 podlaczona_karta_SIM_SIM900
                             *COM*:0000000000000002 liczba_znakow_pdu_do_odebrania
                             *COM*:0000000000000001 wykonywanie_rozmowy_telefonicznej
 

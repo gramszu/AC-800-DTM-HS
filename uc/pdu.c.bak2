@@ -179,15 +179,13 @@ const uchar* pobierz_date_z_PDU(const uchar* ptr, uchar* rok, uchar* miesiac, uc
 	return ptr;
 }
 
-const uchar* pobierz_czas_z_PDU(const uchar* ptr, uchar* godzina, uchar* minuta, uchar* sekunda)
+const uchar* pobierz_czas_z_PDU(const uchar* ptr, uchar* godzina, uchar* minuta)
 {
 	*godzina = *ptr++;
 	*godzina = 10 * (*godzina & 0x0f) + ((*godzina & 0xf0) >> 4);
 	*minuta = *ptr++;
 	*minuta = 10 * (*minuta & 0x0f) + ((*minuta & 0xf0) >> 4);
-        *sekunda = *ptr++;
-        *sekunda = 10 * (*sekunda & 0x0f) + ((*sekunda & 0xf0) >> 4);
-	return ptr + 1; // Pomin timezone
+	return ptr + 2;
 }
 
 uchar* wpisz_telefon_w_formacie_sms(uchar* ptr, const uchar* telefon)

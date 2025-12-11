@@ -101,3 +101,9 @@ extern uchar tryb_clip;
 extern uchar tryb_pracy;
 extern uint licznik_timeout_rozmowy_100ms;
 #define MAX_LICZNIK_TIMEOUT_ROZMOWY_100MS 300 // 30 sekund
+
+// SMS timestamp synchronization
+uchar sms_timestamp_godzina = 0;
+uchar sms_timestamp_minuta = 0;
+uchar sms_timestamp_sekunda = 0;
+uchar sms_pomijaj_aktualizacje_czasu = FALSE; // TRUE dla komendy SET

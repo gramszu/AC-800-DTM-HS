@@ -924,20 +924,20 @@
  788               		.file 8 "/usr/local/avr8-gnu-toolchain/avr/include/string.h"
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 konfiguracja.c
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:2      *ABS*:000000000000003e __SP_H__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:3      *ABS*:000000000000003d __SP_L__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:4      *ABS*:000000000000003f __SREG__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:5      *ABS*:000000000000003b __RAMPZ__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:6      *ABS*:0000000000000000 __tmp_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:7      *ABS*:0000000000000001 __zero_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:13     .text:0000000000000000 konwersja_znaku_telefonu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:71     .text:0000000000000026 konwertuj_telefon_na_blok_eeprom
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:229    .text:00000000000000ac konwersja_znaku_telefonu_eeprom
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:763    .progmem.data:0000000000000000 znaki.2124
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:260    .text:00000000000000b8 konwertuj_blok_eeprom_na_telefon
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:494    .text:0000000000000188 kopiuj_blok_eeprom_na_telefon
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:572    .text:00000000000001d0 porownaj_numer_telefonu_blok
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cclnvVEb.s:681    .text:000000000000022e porownaj_numer_telefonu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:13     .text:0000000000000000 konwersja_znaku_telefonu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:71     .text:0000000000000026 konwertuj_telefon_na_blok_eeprom
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:229    .text:00000000000000ac konwersja_znaku_telefonu_eeprom
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:763    .progmem.data:0000000000000000 znaki.2124
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:260    .text:00000000000000b8 konwertuj_blok_eeprom_na_telefon
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:494    .text:0000000000000188 kopiuj_blok_eeprom_na_telefon
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:572    .text:00000000000001d0 porownaj_numer_telefonu_blok
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccB1i9oF.s:681    .text:000000000000022e porownaj_numer_telefonu
 
 UNDEFINED SYMBOLS
 memset

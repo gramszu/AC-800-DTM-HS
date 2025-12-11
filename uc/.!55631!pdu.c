@@ -187,7 +187,7 @@ const uchar* pobierz_czas_z_PDU(const uchar* ptr, uchar* godzina, uchar* minuta,
 	*minuta = 10 * (*minuta & 0x0f) + ((*minuta & 0xf0) >> 4);
         *sekunda = *ptr++;
         *sekunda = 10 * (*sekunda & 0x0f) + ((*sekunda & 0xf0) >> 4);
-	return ptr + 1; // Pomin timezone
+	return ptr + 1; // Pomin timezone (1 bajt)
 }
 
 uchar* wpisz_telefon_w_formacie_sms(uchar* ptr, const uchar* telefon)
@@ -272,10 +272,3 @@ void konwertuj_pdu_na_blok_wysylany(uchar* buf, const uchar* pdu_ptr,
 	for (uchar i = 0; i < dlugosc_pdu; ++i)
 	{
 		uchar znak = *pdu_ptr++;
-		volatile uchar pom = znak & 0xf0;	// bardzo wa¿ne jst s³owo volatile, bo kompilator Ÿle generuje kod!!
-		SWAP(pom);
-		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + pom);
-		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + (znak & 0x0f));
-	}
-}
-

@@ -302,19 +302,50 @@ uchar interpretuj_wiadomosc_sms(const uchar *sms) {
   }
   case INSTRUKCJA_SET: {
     long h, m, s;
-    if (!pobierz_long(&sms, &h) || !pomin_znak(&sms, ':') ||
-        !pobierz_long(&sms, &m) || !pomin_znak(&sms, ':') ||
-        !pobierz_long(&sms, &s))
-      return INTERPRETACJA_SMS_BLEDNE_DANE;
 
+    // Sprawdź czy są parametry (próba parsowania)
+    uchar ma_parametry = pobierz_long(&sms, &h) && pomin_znak(&sms, ':') &&
+                         pobierz_long(&sms, &m) && pomin_znak(&sms, ':') &&
+                         pobierz_long(&sms, &s);
+
+    if (!ma_parametry) {
+      // ABCD SET bez parametrów - zwróć aktualny czas (bez sync z SMS)
+      // Blokujemy sync czasu, aby odczytać aktualny RTC przed aktualizacją
+      extern uchar sms_pomijaj_aktualizacje_czasu;
+      sms_pomijaj_aktualizacje_czasu = TRUE;
+
+      // Wyślij raport z aktualnym czasem
+      extern char rtc_czas[12];
+      uchar *sms_out = tekst_wysylanego_smsa;
+      strcpy_P((char *)sms_out, PSTR("Time: "));
+      sms_out += strlen((char *)sms_out);
+      strcpy((char *)sms_out, rtc_czas);
+
+      // Ustaw numer telefonu odbiorcy
+      extern uchar numer_telefonu_wysylanego_smsa[];
+      extern uchar numer_telefonu_odebranego_smsa[];
+      strcpy((char *)numer_telefonu_wysylanego_smsa,
+             (char *)numer_telefonu_odebranego_smsa);
+
+      // Dodaj komendę wysłania SMS
+      dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
+
+      return INTERPRETACJA_SMS_POPRAWNY;
+    }
+
+    // ABCD SET HH:MM:SS - ustaw czas
     if (h < 0 || h > 23 || m < 0 || m > 59 || s < 0 || s > 59)
       return INTERPRETACJA_SMS_BLEDNE_DANE;
 
     // Format: AT+CCLK="yy/MM/dd,hh:mm:ss+zz"
-    // Uywamy fikcyjnej daty 24/01/01
+    // Używamy fikcyjnej daty 24/01/01
     sprintf(bufor_ustaw_czas, "+CCLK=\"24/01/01,%02d:%02d:%02d+04\"", (int)h,
             (int)m, (int)s);
     dodaj_komende(KOMENDA_KOLEJKI_USTAW_ZEGAR_SIM900);
+
+    // Wyłącz aktualizację czasu z timestampu SMS dla tej komendy
+    extern uchar sms_pomijaj_aktualizacje_czasu;
+    sms_pomijaj_aktualizacje_czasu = TRUE;
 
     return INTERPRETACJA_SMS_POPRAWNY;
   }

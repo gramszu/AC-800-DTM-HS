@@ -1023,7 +1023,7 @@
  794               	pobierz_czas_z_PDU:
  795               	.LFB6:
  181:pdu.c         **** 
- 182:pdu.c         **** const uchar* pobierz_czas_z_PDU(const uchar* ptr, uchar* godzina, uchar* minuta)
+ 182:pdu.c         **** const uchar* pobierz_czas_z_PDU(const uchar* ptr, uchar* godzina, uchar* minuta, uchar* sekunda)
  183:pdu.c         **** {
  796               		.loc 1 183 0
  797               		.cfi_startproc
@@ -1039,13 +1039,13 @@
  806 02cc 9081      		ld r25,Z
  185:pdu.c         **** 	*godzina = 10 * (*godzina & 0x0f) + ((*godzina & 0xf0) >> 4);
  807               		.loc 1 185 0
- 808 02ce 292F      		mov r18,r25
- 809 02d0 2F70      		andi r18,lo8(15)
+ 808 02ce A92F      		mov r26,r25
+ 809 02d0 AF70      		andi r26,lo8(15)
  810 02d2 8AE0      		ldi r24,lo8(10)
  811               	.LVL108:
  812 02d4 9295      		swap r25
  813 02d6 9F70      		andi r25,lo8(15)
- 814 02d8 289F      		mul r18,r24
+ 814 02d8 A89F      		mul r26,r24
  815 02da 900D      		add r25,r0
  816 02dc 1124      		clr __zero_reg__
  817 02de DB01      		movw r26,r22
@@ -1056,1018 +1056,1037 @@
  821 02e2 9181      		ldd r25,Z+1
  187:pdu.c         **** 	*minuta = 10 * (*minuta & 0x0f) + ((*minuta & 0xf0) >> 4);
  822               		.loc 1 187 0
- 823 02e4 292F      		mov r18,r25
- 824 02e6 2F70      		andi r18,lo8(15)
- 825 02e8 9295      		swap r25
- 826 02ea 9F70      		andi r25,lo8(15)
- 827 02ec 289F      		mul r18,r24
- 828 02ee 900D      		add r25,r0
- 829 02f0 1124      		clr __zero_reg__
- 830 02f2 DA01      		movw r26,r20
- 831 02f4 9C93      		st X,r25
- 188:pdu.c         **** 	return ptr + 2;
- 189:pdu.c         **** }
- 832               		.loc 1 189 0
- 833 02f6 CF01      		movw r24,r30
- 834 02f8 0496      		adiw r24,4
- 835               	/* epilogue start */
- 836 02fa 0895      		ret
- 837               		.cfi_endproc
- 838               	.LFE6:
- 840               	.global	wpisz_telefon_w_formacie_sms
- 842               	wpisz_telefon_w_formacie_sms:
- 843               	.LFB7:
- 190:pdu.c         **** 
- 191:pdu.c         **** uchar* wpisz_telefon_w_formacie_sms(uchar* ptr, const uchar* telefon)
- 192:pdu.c         **** {
- 844               		.loc 1 192 0
- 845               		.cfi_startproc
- 846               	.LVL110:
- 847 02fc CF93      		push r28
- 848               	.LCFI19:
- 849               		.cfi_def_cfa_offset 3
- 850               		.cfi_offset 28, -2
- 851 02fe DF93      		push r29
- 852               	.LCFI20:
- 853               		.cfi_def_cfa_offset 4
- 854               		.cfi_offset 29, -3
- 855               	/* prologue: function */
- 856               	/* frame size = 0 */
- 857               	/* stack size = 2 */
- 858               	.L__stack_usage = 2
- 859 0300 DC01      		movw r26,r24
- 860 0302 FB01      		movw r30,r22
- 193:pdu.c         **** 	uchar typ_telefonu;
- 194:pdu.c         **** 	if ( *telefon == '+' )
+ 823 02e4 692F      		mov r22,r25
+ 824               	.LVL110:
+ 825 02e6 6F70      		andi r22,lo8(15)
+ 826 02e8 9295      		swap r25
+ 827 02ea 9F70      		andi r25,lo8(15)
+ 828 02ec 689F      		mul r22,r24
+ 829 02ee 900D      		add r25,r0
+ 830 02f0 1124      		clr __zero_reg__
+ 831 02f2 DA01      		movw r26,r20
+ 832               	.LVL111:
+ 833 02f4 9C93      		st X,r25
+ 834               	.LVL112:
+ 188:pdu.c         ****         *sekunda = *ptr++;
+ 835               		.loc 1 188 0
+ 836 02f6 9281      		ldd r25,Z+2
+ 189:pdu.c         ****         *sekunda = 10 * (*sekunda & 0x0f) + ((*sekunda & 0xf0) >> 4);
+ 837               		.loc 1 189 0
+ 838 02f8 492F      		mov r20,r25
+ 839               	.LVL113:
+ 840 02fa 4F70      		andi r20,lo8(15)
+ 841 02fc 9295      		swap r25
+ 842 02fe 9F70      		andi r25,lo8(15)
+ 843 0300 489F      		mul r20,r24
+ 844 0302 900D      		add r25,r0
+ 845 0304 1124      		clr __zero_reg__
+ 846 0306 D901      		movw r26,r18
+ 847               	.LVL114:
+ 848 0308 9C93      		st X,r25
+ 190:pdu.c         **** 	return ptr + 1; // Pomin timezone
+ 191:pdu.c         **** }
+ 849               		.loc 1 191 0
+ 850 030a CF01      		movw r24,r30
+ 851 030c 0496      		adiw r24,4
+ 852               	/* epilogue start */
+ 853 030e 0895      		ret
+ 854               		.cfi_endproc
+ 855               	.LFE6:
+ 857               	.global	wpisz_telefon_w_formacie_sms
+ 859               	wpisz_telefon_w_formacie_sms:
+ 860               	.LFB7:
+ 192:pdu.c         **** 
+ 193:pdu.c         **** uchar* wpisz_telefon_w_formacie_sms(uchar* ptr, const uchar* telefon)
+ 194:pdu.c         **** {
  861               		.loc 1 194 0
- 862 0304 8081      		ld r24,Z
- 863               	.LVL111:
- 864 0306 8B32      		cpi r24,lo8(43)
- 865 0308 01F4      		brne .L58
- 195:pdu.c         **** 	{
- 196:pdu.c         **** 		++telefon;
- 866               		.loc 1 196 0
- 867 030a 3196      		adiw r30,1
- 868               	.LVL112:
- 197:pdu.c         **** 		typ_telefonu = 145;
- 869               		.loc 1 197 0
- 870 030c 81E9      		ldi r24,lo8(-111)
- 871               	.LVL113:
- 872               	.L51:
- 198:pdu.c         **** 	}
- 199:pdu.c         **** 	else
- 200:pdu.c         **** 		typ_telefonu = 129;
- 201:pdu.c         **** 	const uchar liczba_cyfr_telefonu = strlen(telefon);
- 873               		.loc 1 201 0
- 874 030e EF01      		movw r28,r30
- 875               		0:
- 876 0310 0990      		ld __tmp_reg__,Y+
- 877 0312 0020      		tst __tmp_reg__
- 878 0314 01F4      		brne 0b
- 879 0316 9E01      		movw r18,r28
- 880 0318 2150      		subi r18,1
- 881 031a 3109      		sbc r19,__zero_reg__
- 882 031c 2E1B      		sub r18,r30
- 883 031e 3F0B      		sbc r19,r31
- 884               	.LVL114:
- 202:pdu.c         **** 	if ( liczba_cyfr_telefonu == 0 )
- 885               		.loc 1 202 0
- 886 0320 2111      		cpse r18,__zero_reg__
- 887 0322 00C0      		rjmp .L52
- 203:pdu.c         **** 	{
- 204:pdu.c         **** 		*ptr++ = liczba_cyfr_telefonu;
- 888               		.loc 1 204 0
- 889 0324 CD01      		movw r24,r26
- 890               	.LVL115:
- 891 0326 0196      		adiw r24,1
- 892               	.LVL116:
- 893 0328 1C92      		st X,__zero_reg__
- 894               	.LVL117:
- 895               	.L50:
- 896               	/* epilogue start */
- 205:pdu.c         **** 		return ptr;
- 206:pdu.c         **** 	}
- 207:pdu.c         **** 	*ptr++ = liczba_cyfr_telefonu;
- 208:pdu.c         **** 	*ptr++ = typ_telefonu;
- 209:pdu.c         **** 	const uchar k = (liczba_cyfr_telefonu + 1) / 2;
- 210:pdu.c         **** 	for (uchar i = 0; i < k; ++i)
- 211:pdu.c         **** 	{
- 212:pdu.c         **** 		uchar ch = (*telefon++ - '0');
- 213:pdu.c         **** 		if ( *telefon != '\0' )
- 214:pdu.c         **** 			ch |= (*telefon++ - '0') << 4;
- 215:pdu.c         **** 		else
- 216:pdu.c         **** 			ch |= 0xf0;
- 217:pdu.c         **** 		*ptr++ = ch;
- 218:pdu.c         **** 	}
- 219:pdu.c         **** 	return ptr;
- 220:pdu.c         **** }
- 897               		.loc 1 220 0
- 898 032a DF91      		pop r29
- 899 032c CF91      		pop r28
- 900 032e 0895      		ret
- 901               	.LVL118:
- 902               	.L58:
- 200:pdu.c         **** 	const uchar liczba_cyfr_telefonu = strlen(telefon);
- 903               		.loc 1 200 0
- 904 0330 81E8      		ldi r24,lo8(-127)
- 905 0332 00C0      		rjmp .L51
- 906               	.LVL119:
- 907               	.L52:
- 207:pdu.c         **** 	*ptr++ = typ_telefonu;
- 908               		.loc 1 207 0
- 909 0334 2C93      		st X,r18
- 208:pdu.c         **** 	const uchar k = (liczba_cyfr_telefonu + 1) / 2;
- 910               		.loc 1 208 0
- 911 0336 AD01      		movw r20,r26
- 912 0338 4E5F      		subi r20,-2
- 913 033a 5F4F      		sbci r21,-1
- 914               	.LVL120:
- 915 033c 1196      		adiw r26,1
- 916 033e 8C93      		st X,r24
- 209:pdu.c         **** 	for (uchar i = 0; i < k; ++i)
- 917               		.loc 1 209 0
- 918 0340 C901      		movw r24,r18
- 919               	.LVL121:
- 920 0342 9927      		clr r25
- 921 0344 0196      		adiw r24,1
- 922 0346 9595      		asr r25
- 923 0348 8795      		ror r24
- 924               	.LVL122:
- 925 034a 682F      		mov r22,r24
- 926               	.LVL123:
- 927 034c 742F      		mov r23,r20
- 928               	.LBB18:
- 210:pdu.c         **** 	{
- 929               		.loc 1 210 0
- 930 034e DA01      		movw r26,r20
- 931               	.LVL124:
- 932               	.L54:
- 210:pdu.c         **** 	{
- 933               		.loc 1 210 0 is_stmt 0 discriminator 1
- 934 0350 2A2F      		mov r18,r26
- 935 0352 271B      		sub r18,r23
- 936 0354 2617      		cp r18,r22
- 937 0356 00F0      		brlo .L57
- 938 0358 840F      		add r24,r20
- 939 035a 951F      		adc r25,r21
- 940               	.LVL125:
- 941 035c 00C0      		rjmp .L50
- 942               	.LVL126:
- 943               	.L57:
- 944               	.LBB19:
- 212:pdu.c         **** 		if ( *telefon != '\0' )
- 945               		.loc 1 212 0 is_stmt 1
- 946 035e 2081      		ld r18,Z
- 947 0360 2053      		subi r18,lo8(-(-48))
- 948               	.LVL127:
- 213:pdu.c         **** 			ch |= (*telefon++ - '0') << 4;
- 949               		.loc 1 213 0
- 950 0362 3181      		ldd r19,Z+1
- 951 0364 3323      		tst r19
- 952 0366 01F0      		breq .L55
- 214:pdu.c         **** 		else
- 953               		.loc 1 214 0
- 954 0368 3296      		adiw r30,2
- 955               	.LVL128:
- 956 036a 3295      		swap r19
- 957 036c 307F      		andi r19,lo8(-16)
- 958 036e 232B      		or r18,r19
- 959               	.LVL129:
- 960               	.L56:
- 217:pdu.c         **** 	}
- 961               		.loc 1 217 0 discriminator 2
- 962 0370 2D93      		st X+,r18
- 963               	.LVL130:
- 964 0372 00C0      		rjmp .L54
- 965               	.LVL131:
- 966               	.L55:
- 212:pdu.c         **** 		if ( *telefon != '\0' )
- 967               		.loc 1 212 0
- 968 0374 3196      		adiw r30,1
- 969               	.LVL132:
- 216:pdu.c         **** 		*ptr++ = ch;
+ 862               		.cfi_startproc
+ 863               	.LVL115:
+ 864 0310 CF93      		push r28
+ 865               	.LCFI19:
+ 866               		.cfi_def_cfa_offset 3
+ 867               		.cfi_offset 28, -2
+ 868 0312 DF93      		push r29
+ 869               	.LCFI20:
+ 870               		.cfi_def_cfa_offset 4
+ 871               		.cfi_offset 29, -3
+ 872               	/* prologue: function */
+ 873               	/* frame size = 0 */
+ 874               	/* stack size = 2 */
+ 875               	.L__stack_usage = 2
+ 876 0314 DC01      		movw r26,r24
+ 877 0316 FB01      		movw r30,r22
+ 195:pdu.c         **** 	uchar typ_telefonu;
+ 196:pdu.c         **** 	if ( *telefon == '+' )
+ 878               		.loc 1 196 0
+ 879 0318 8081      		ld r24,Z
+ 880               	.LVL116:
+ 881 031a 8B32      		cpi r24,lo8(43)
+ 882 031c 01F4      		brne .L58
+ 197:pdu.c         **** 	{
+ 198:pdu.c         **** 		++telefon;
+ 883               		.loc 1 198 0
+ 884 031e 3196      		adiw r30,1
+ 885               	.LVL117:
+ 199:pdu.c         **** 		typ_telefonu = 145;
+ 886               		.loc 1 199 0
+ 887 0320 81E9      		ldi r24,lo8(-111)
+ 888               	.LVL118:
+ 889               	.L51:
+ 200:pdu.c         **** 	}
+ 201:pdu.c         **** 	else
+ 202:pdu.c         **** 		typ_telefonu = 129;
+ 203:pdu.c         **** 	const uchar liczba_cyfr_telefonu = strlen(telefon);
+ 890               		.loc 1 203 0
+ 891 0322 EF01      		movw r28,r30
+ 892               		0:
+ 893 0324 0990      		ld __tmp_reg__,Y+
+ 894 0326 0020      		tst __tmp_reg__
+ 895 0328 01F4      		brne 0b
+ 896 032a 9E01      		movw r18,r28
+ 897 032c 2150      		subi r18,1
+ 898 032e 3109      		sbc r19,__zero_reg__
+ 899 0330 2E1B      		sub r18,r30
+ 900 0332 3F0B      		sbc r19,r31
+ 901               	.LVL119:
+ 204:pdu.c         **** 	if ( liczba_cyfr_telefonu == 0 )
+ 902               		.loc 1 204 0
+ 903 0334 2111      		cpse r18,__zero_reg__
+ 904 0336 00C0      		rjmp .L52
+ 205:pdu.c         **** 	{
+ 206:pdu.c         **** 		*ptr++ = liczba_cyfr_telefonu;
+ 905               		.loc 1 206 0
+ 906 0338 CD01      		movw r24,r26
+ 907               	.LVL120:
+ 908 033a 0196      		adiw r24,1
+ 909               	.LVL121:
+ 910 033c 1C92      		st X,__zero_reg__
+ 911               	.LVL122:
+ 912               	.L50:
+ 913               	/* epilogue start */
+ 207:pdu.c         **** 		return ptr;
+ 208:pdu.c         **** 	}
+ 209:pdu.c         **** 	*ptr++ = liczba_cyfr_telefonu;
+ 210:pdu.c         **** 	*ptr++ = typ_telefonu;
+ 211:pdu.c         **** 	const uchar k = (liczba_cyfr_telefonu + 1) / 2;
+ 212:pdu.c         **** 	for (uchar i = 0; i < k; ++i)
+ 213:pdu.c         **** 	{
+ 214:pdu.c         **** 		uchar ch = (*telefon++ - '0');
+ 215:pdu.c         **** 		if ( *telefon != '\0' )
+ 216:pdu.c         **** 			ch |= (*telefon++ - '0') << 4;
+ 217:pdu.c         **** 		else
+ 218:pdu.c         **** 			ch |= 0xf0;
+ 219:pdu.c         **** 		*ptr++ = ch;
+ 220:pdu.c         **** 	}
+ 221:pdu.c         **** 	return ptr;
+ 222:pdu.c         **** }
+ 914               		.loc 1 222 0
+ 915 033e DF91      		pop r29
+ 916 0340 CF91      		pop r28
+ 917 0342 0895      		ret
+ 918               	.LVL123:
+ 919               	.L58:
+ 202:pdu.c         **** 	const uchar liczba_cyfr_telefonu = strlen(telefon);
+ 920               		.loc 1 202 0
+ 921 0344 81E8      		ldi r24,lo8(-127)
+ 922 0346 00C0      		rjmp .L51
+ 923               	.LVL124:
+ 924               	.L52:
+ 209:pdu.c         **** 	*ptr++ = typ_telefonu;
+ 925               		.loc 1 209 0
+ 926 0348 2C93      		st X,r18
+ 210:pdu.c         **** 	const uchar k = (liczba_cyfr_telefonu + 1) / 2;
+ 927               		.loc 1 210 0
+ 928 034a AD01      		movw r20,r26
+ 929 034c 4E5F      		subi r20,-2
+ 930 034e 5F4F      		sbci r21,-1
+ 931               	.LVL125:
+ 932 0350 1196      		adiw r26,1
+ 933 0352 8C93      		st X,r24
+ 211:pdu.c         **** 	for (uchar i = 0; i < k; ++i)
+ 934               		.loc 1 211 0
+ 935 0354 C901      		movw r24,r18
+ 936               	.LVL126:
+ 937 0356 9927      		clr r25
+ 938 0358 0196      		adiw r24,1
+ 939 035a 9595      		asr r25
+ 940 035c 8795      		ror r24
+ 941               	.LVL127:
+ 942 035e 682F      		mov r22,r24
+ 943               	.LVL128:
+ 944 0360 742F      		mov r23,r20
+ 945               	.LBB18:
+ 212:pdu.c         **** 	{
+ 946               		.loc 1 212 0
+ 947 0362 DA01      		movw r26,r20
+ 948               	.LVL129:
+ 949               	.L54:
+ 212:pdu.c         **** 	{
+ 950               		.loc 1 212 0 is_stmt 0 discriminator 1
+ 951 0364 2A2F      		mov r18,r26
+ 952 0366 271B      		sub r18,r23
+ 953 0368 2617      		cp r18,r22
+ 954 036a 00F0      		brlo .L57
+ 955 036c 840F      		add r24,r20
+ 956 036e 951F      		adc r25,r21
+ 957               	.LVL130:
+ 958 0370 00C0      		rjmp .L50
+ 959               	.LVL131:
+ 960               	.L57:
+ 961               	.LBB19:
+ 214:pdu.c         **** 		if ( *telefon != '\0' )
+ 962               		.loc 1 214 0 is_stmt 1
+ 963 0372 2081      		ld r18,Z
+ 964 0374 2053      		subi r18,lo8(-(-48))
+ 965               	.LVL132:
+ 215:pdu.c         **** 			ch |= (*telefon++ - '0') << 4;
+ 966               		.loc 1 215 0
+ 967 0376 3181      		ldd r19,Z+1
+ 968 0378 3323      		tst r19
+ 969 037a 01F0      		breq .L55
+ 216:pdu.c         **** 		else
  970               		.loc 1 216 0
- 971 0376 206F      		ori r18,lo8(-16)
+ 971 037c 3296      		adiw r30,2
  972               	.LVL133:
- 973 0378 00C0      		rjmp .L56
- 974               	.LBE19:
- 975               	.LBE18:
- 976               		.cfi_endproc
- 977               	.LFE7:
- 979               	.global	wpisz_centrum_sms_w_formacie_sms
- 981               	wpisz_centrum_sms_w_formacie_sms:
- 982               	.LFB8:
- 221:pdu.c         **** 
- 222:pdu.c         **** uchar* wpisz_centrum_sms_w_formacie_sms(uchar* ptr, const uchar* telefon)
- 223:pdu.c         **** {
- 983               		.loc 1 223 0
- 984               		.cfi_startproc
- 985               	.LVL134:
- 986 037a CF93      		push r28
- 987               	.LCFI21:
- 988               		.cfi_def_cfa_offset 3
- 989               		.cfi_offset 28, -2
- 990 037c DF93      		push r29
- 991               	.LCFI22:
- 992               		.cfi_def_cfa_offset 4
- 993               		.cfi_offset 29, -3
- 994               	/* prologue: function */
- 995               	/* frame size = 0 */
- 996               	/* stack size = 2 */
- 997               	.L__stack_usage = 2
- 998 037e EC01      		movw r28,r24
- 999 0380 DB01      		movw r26,r22
- 224:pdu.c         **** 	if ( *telefon == '\0' )
- 1000               		.loc 1 224 0
- 1001 0382 8C91      		ld r24,X
- 1002               	.LVL135:
- 1003 0384 8111      		cpse r24,__zero_reg__
- 1004 0386 00C0      		rjmp .L60
- 225:pdu.c         **** 	{
- 226:pdu.c         **** 		*ptr++ = 0x00;
- 1005               		.loc 1 226 0
- 1006 0388 CE01      		movw r24,r28
- 1007 038a 0196      		adiw r24,1
- 1008               	.LVL136:
- 1009 038c 1882      		st Y,__zero_reg__
- 1010               	.LVL137:
- 1011               	.L59:
- 1012               	/* epilogue start */
- 227:pdu.c         **** 		return ptr;
- 228:pdu.c         **** 	}
- 229:pdu.c         **** 	uchar typ_telefonu;
- 230:pdu.c         **** 	if ( *telefon == '+' )
- 231:pdu.c         **** 	{
- 232:pdu.c         **** 		++telefon;
- 233:pdu.c         **** 		typ_telefonu = 145;
- 234:pdu.c         **** 	}
- 235:pdu.c         **** 	else
- 236:pdu.c         **** 		typ_telefonu = 129;
- 237:pdu.c         **** 	const uchar liczba_cyfr_telefonu = strlen(telefon);
- 238:pdu.c         **** 	*ptr++ = (liczba_cyfr_telefonu + 1) / 2 + 1;
- 239:pdu.c         **** 	*ptr++ = typ_telefonu;
- 240:pdu.c         **** 	const uchar k = (liczba_cyfr_telefonu + 1) / 2;
- 241:pdu.c         **** 	for (uchar i = 0; i < k; ++i)
- 242:pdu.c         **** 	{
- 243:pdu.c         **** 		uchar ch = (*telefon++ - '0');
- 244:pdu.c         **** 		if ( *telefon != '\0' )
- 245:pdu.c         **** 			ch |= (*telefon++ - '0') << 4;
- 246:pdu.c         **** 		else
- 247:pdu.c         **** 			ch |= 0xf0;
- 248:pdu.c         **** 		*ptr++ = ch;
- 249:pdu.c         **** 	}
- 250:pdu.c         **** 	return ptr;
- 251:pdu.c         **** }
- 1013               		.loc 1 251 0
- 1014 038e DF91      		pop r29
- 1015 0390 CF91      		pop r28
- 1016 0392 0895      		ret
- 1017               	.LVL138:
- 1018               	.L60:
- 230:pdu.c         **** 	{
- 1019               		.loc 1 230 0
- 1020 0394 8B32      		cpi r24,lo8(43)
- 1021 0396 01F4      		brne .L67
- 232:pdu.c         **** 		typ_telefonu = 145;
- 1022               		.loc 1 232 0
- 1023 0398 1196      		adiw r26,1
- 1024               	.LVL139:
- 233:pdu.c         **** 	}
- 1025               		.loc 1 233 0
- 1026 039a 81E9      		ldi r24,lo8(-111)
- 1027               	.LVL140:
- 1028               	.L62:
- 237:pdu.c         **** 	*ptr++ = (liczba_cyfr_telefonu + 1) / 2 + 1;
- 1029               		.loc 1 237 0
- 1030 039c FD01      		movw r30,r26
- 1031               		0:
- 1032 039e 0190      		ld __tmp_reg__,Z+
- 1033 03a0 0020      		tst __tmp_reg__
- 1034 03a2 01F4      		brne 0b
- 1035 03a4 3197      		sbiw r30,1
- 1036 03a6 9F01      		movw r18,r30
- 1037 03a8 2A1B      		sub r18,r26
- 1038 03aa 3B0B      		sbc r19,r27
- 1039               	.LVL141:
- 238:pdu.c         **** 	*ptr++ = typ_telefonu;
- 1040               		.loc 1 238 0
- 1041 03ac 3327      		clr r19
- 1042               	.LVL142:
- 1043 03ae 2F5F      		subi r18,-1
- 1044 03b0 3F4F      		sbci r19,-1
- 1045 03b2 3595      		asr r19
- 1046 03b4 2795      		ror r18
- 1047 03b6 622F      		mov r22,r18
- 1048               	.LVL143:
- 1049 03b8 91E0      		ldi r25,lo8(1)
- 1050 03ba 920F      		add r25,r18
- 1051 03bc 9883      		st Y,r25
- 239:pdu.c         **** 	const uchar k = (liczba_cyfr_telefonu + 1) / 2;
- 1052               		.loc 1 239 0
- 1053 03be AE01      		movw r20,r28
- 1054 03c0 4E5F      		subi r20,-2
- 1055 03c2 5F4F      		sbci r21,-1
- 1056               	.LVL144:
- 1057 03c4 8983      		std Y+1,r24
- 1058               	.LVL145:
- 1059 03c6 742F      		mov r23,r20
- 1060               	.LBB20:
- 241:pdu.c         **** 	{
- 1061               		.loc 1 241 0
- 1062 03c8 FA01      		movw r30,r20
- 1063               	.LVL146:
- 1064               	.L63:
- 241:pdu.c         **** 	{
- 1065               		.loc 1 241 0 is_stmt 0 discriminator 1
- 1066 03ca 8E2F      		mov r24,r30
- 1067 03cc 871B      		sub r24,r23
- 1068 03ce 8617      		cp r24,r22
- 1069 03d0 00F0      		brlo .L66
- 1070 03d2 CA01      		movw r24,r20
- 1071 03d4 820F      		add r24,r18
- 1072 03d6 931F      		adc r25,r19
- 1073 03d8 00C0      		rjmp .L59
- 1074               	.LVL147:
- 1075               	.L67:
- 1076               	.LBE20:
- 236:pdu.c         **** 	const uchar liczba_cyfr_telefonu = strlen(telefon);
- 1077               		.loc 1 236 0 is_stmt 1
- 1078 03da 81E8      		ldi r24,lo8(-127)
- 1079 03dc 00C0      		rjmp .L62
- 1080               	.LVL148:
- 1081               	.L66:
- 1082               	.LBB22:
- 1083               	.LBB21:
- 243:pdu.c         **** 		if ( *telefon != '\0' )
- 1084               		.loc 1 243 0
- 1085 03de 8C91      		ld r24,X
- 1086 03e0 8053      		subi r24,lo8(-(-48))
- 1087               	.LVL149:
- 244:pdu.c         **** 			ch |= (*telefon++ - '0') << 4;
- 1088               		.loc 1 244 0
- 1089 03e2 1196      		adiw r26,1
- 1090 03e4 9C91      		ld r25,X
- 1091 03e6 1197      		sbiw r26,1
- 1092 03e8 9923      		tst r25
- 1093 03ea 01F0      		breq .L64
- 245:pdu.c         **** 		else
- 1094               		.loc 1 245 0
- 1095 03ec 1296      		adiw r26,2
- 1096               	.LVL150:
- 1097 03ee 9295      		swap r25
- 1098 03f0 907F      		andi r25,lo8(-16)
- 1099 03f2 892B      		or r24,r25
- 1100               	.LVL151:
- 1101               	.L65:
- 248:pdu.c         **** 	}
- 1102               		.loc 1 248 0 discriminator 2
- 1103 03f4 8193      		st Z+,r24
- 1104               	.LVL152:
- 1105 03f6 00C0      		rjmp .L63
- 1106               	.LVL153:
- 1107               	.L64:
- 243:pdu.c         **** 		if ( *telefon != '\0' )
- 1108               		.loc 1 243 0
- 1109 03f8 1196      		adiw r26,1
- 1110               	.LVL154:
- 247:pdu.c         **** 		*ptr++ = ch;
+ 973 037e 3295      		swap r19
+ 974 0380 307F      		andi r19,lo8(-16)
+ 975 0382 232B      		or r18,r19
+ 976               	.LVL134:
+ 977               	.L56:
+ 219:pdu.c         **** 	}
+ 978               		.loc 1 219 0 discriminator 2
+ 979 0384 2D93      		st X+,r18
+ 980               	.LVL135:
+ 981 0386 00C0      		rjmp .L54
+ 982               	.LVL136:
+ 983               	.L55:
+ 214:pdu.c         **** 		if ( *telefon != '\0' )
+ 984               		.loc 1 214 0
+ 985 0388 3196      		adiw r30,1
+ 986               	.LVL137:
+ 218:pdu.c         **** 		*ptr++ = ch;
+ 987               		.loc 1 218 0
+ 988 038a 206F      		ori r18,lo8(-16)
+ 989               	.LVL138:
+ 990 038c 00C0      		rjmp .L56
+ 991               	.LBE19:
+ 992               	.LBE18:
+ 993               		.cfi_endproc
+ 994               	.LFE7:
+ 996               	.global	wpisz_centrum_sms_w_formacie_sms
+ 998               	wpisz_centrum_sms_w_formacie_sms:
+ 999               	.LFB8:
+ 223:pdu.c         **** 
+ 224:pdu.c         **** uchar* wpisz_centrum_sms_w_formacie_sms(uchar* ptr, const uchar* telefon)
+ 225:pdu.c         **** {
+ 1000               		.loc 1 225 0
+ 1001               		.cfi_startproc
+ 1002               	.LVL139:
+ 1003 038e CF93      		push r28
+ 1004               	.LCFI21:
+ 1005               		.cfi_def_cfa_offset 3
+ 1006               		.cfi_offset 28, -2
+ 1007 0390 DF93      		push r29
+ 1008               	.LCFI22:
+ 1009               		.cfi_def_cfa_offset 4
+ 1010               		.cfi_offset 29, -3
+ 1011               	/* prologue: function */
+ 1012               	/* frame size = 0 */
+ 1013               	/* stack size = 2 */
+ 1014               	.L__stack_usage = 2
+ 1015 0392 EC01      		movw r28,r24
+ 1016 0394 DB01      		movw r26,r22
+ 226:pdu.c         **** 	if ( *telefon == '\0' )
+ 1017               		.loc 1 226 0
+ 1018 0396 8C91      		ld r24,X
+ 1019               	.LVL140:
+ 1020 0398 8111      		cpse r24,__zero_reg__
+ 1021 039a 00C0      		rjmp .L60
+ 227:pdu.c         **** 	{
+ 228:pdu.c         **** 		*ptr++ = 0x00;
+ 1022               		.loc 1 228 0
+ 1023 039c CE01      		movw r24,r28
+ 1024 039e 0196      		adiw r24,1
+ 1025               	.LVL141:
+ 1026 03a0 1882      		st Y,__zero_reg__
+ 1027               	.LVL142:
+ 1028               	.L59:
+ 1029               	/* epilogue start */
+ 229:pdu.c         **** 		return ptr;
+ 230:pdu.c         **** 	}
+ 231:pdu.c         **** 	uchar typ_telefonu;
+ 232:pdu.c         **** 	if ( *telefon == '+' )
+ 233:pdu.c         **** 	{
+ 234:pdu.c         **** 		++telefon;
+ 235:pdu.c         **** 		typ_telefonu = 145;
+ 236:pdu.c         **** 	}
+ 237:pdu.c         **** 	else
+ 238:pdu.c         **** 		typ_telefonu = 129;
+ 239:pdu.c         **** 	const uchar liczba_cyfr_telefonu = strlen(telefon);
+ 240:pdu.c         **** 	*ptr++ = (liczba_cyfr_telefonu + 1) / 2 + 1;
+ 241:pdu.c         **** 	*ptr++ = typ_telefonu;
+ 242:pdu.c         **** 	const uchar k = (liczba_cyfr_telefonu + 1) / 2;
+ 243:pdu.c         **** 	for (uchar i = 0; i < k; ++i)
+ 244:pdu.c         **** 	{
+ 245:pdu.c         **** 		uchar ch = (*telefon++ - '0');
+ 246:pdu.c         **** 		if ( *telefon != '\0' )
+ 247:pdu.c         **** 			ch |= (*telefon++ - '0') << 4;
+ 248:pdu.c         **** 		else
+ 249:pdu.c         **** 			ch |= 0xf0;
+ 250:pdu.c         **** 		*ptr++ = ch;
+ 251:pdu.c         **** 	}
+ 252:pdu.c         **** 	return ptr;
+ 253:pdu.c         **** }
+ 1030               		.loc 1 253 0
+ 1031 03a2 DF91      		pop r29
+ 1032 03a4 CF91      		pop r28
+ 1033 03a6 0895      		ret
+ 1034               	.LVL143:
+ 1035               	.L60:
+ 232:pdu.c         **** 	{
+ 1036               		.loc 1 232 0
+ 1037 03a8 8B32      		cpi r24,lo8(43)
+ 1038 03aa 01F4      		brne .L67
+ 234:pdu.c         **** 		typ_telefonu = 145;
+ 1039               		.loc 1 234 0
+ 1040 03ac 1196      		adiw r26,1
+ 1041               	.LVL144:
+ 235:pdu.c         **** 	}
+ 1042               		.loc 1 235 0
+ 1043 03ae 81E9      		ldi r24,lo8(-111)
+ 1044               	.LVL145:
+ 1045               	.L62:
+ 239:pdu.c         **** 	*ptr++ = (liczba_cyfr_telefonu + 1) / 2 + 1;
+ 1046               		.loc 1 239 0
+ 1047 03b0 FD01      		movw r30,r26
+ 1048               		0:
+ 1049 03b2 0190      		ld __tmp_reg__,Z+
+ 1050 03b4 0020      		tst __tmp_reg__
+ 1051 03b6 01F4      		brne 0b
+ 1052 03b8 3197      		sbiw r30,1
+ 1053 03ba 9F01      		movw r18,r30
+ 1054 03bc 2A1B      		sub r18,r26
+ 1055 03be 3B0B      		sbc r19,r27
+ 1056               	.LVL146:
+ 240:pdu.c         **** 	*ptr++ = typ_telefonu;
+ 1057               		.loc 1 240 0
+ 1058 03c0 3327      		clr r19
+ 1059               	.LVL147:
+ 1060 03c2 2F5F      		subi r18,-1
+ 1061 03c4 3F4F      		sbci r19,-1
+ 1062 03c6 3595      		asr r19
+ 1063 03c8 2795      		ror r18
+ 1064 03ca 622F      		mov r22,r18
+ 1065               	.LVL148:
+ 1066 03cc 91E0      		ldi r25,lo8(1)
+ 1067 03ce 920F      		add r25,r18
+ 1068 03d0 9883      		st Y,r25
+ 241:pdu.c         **** 	const uchar k = (liczba_cyfr_telefonu + 1) / 2;
+ 1069               		.loc 1 241 0
+ 1070 03d2 AE01      		movw r20,r28
+ 1071 03d4 4E5F      		subi r20,-2
+ 1072 03d6 5F4F      		sbci r21,-1
+ 1073               	.LVL149:
+ 1074 03d8 8983      		std Y+1,r24
+ 1075               	.LVL150:
+ 1076 03da 742F      		mov r23,r20
+ 1077               	.LBB20:
+ 243:pdu.c         **** 	{
+ 1078               		.loc 1 243 0
+ 1079 03dc FA01      		movw r30,r20
+ 1080               	.LVL151:
+ 1081               	.L63:
+ 243:pdu.c         **** 	{
+ 1082               		.loc 1 243 0 is_stmt 0 discriminator 1
+ 1083 03de 8E2F      		mov r24,r30
+ 1084 03e0 871B      		sub r24,r23
+ 1085 03e2 8617      		cp r24,r22
+ 1086 03e4 00F0      		brlo .L66
+ 1087 03e6 CA01      		movw r24,r20
+ 1088 03e8 820F      		add r24,r18
+ 1089 03ea 931F      		adc r25,r19
+ 1090 03ec 00C0      		rjmp .L59
+ 1091               	.LVL152:
+ 1092               	.L67:
+ 1093               	.LBE20:
+ 238:pdu.c         **** 	const uchar liczba_cyfr_telefonu = strlen(telefon);
+ 1094               		.loc 1 238 0 is_stmt 1
+ 1095 03ee 81E8      		ldi r24,lo8(-127)
+ 1096 03f0 00C0      		rjmp .L62
+ 1097               	.LVL153:
+ 1098               	.L66:
+ 1099               	.LBB22:
+ 1100               	.LBB21:
+ 245:pdu.c         **** 		if ( *telefon != '\0' )
+ 1101               		.loc 1 245 0
+ 1102 03f2 8C91      		ld r24,X
+ 1103 03f4 8053      		subi r24,lo8(-(-48))
+ 1104               	.LVL154:
+ 246:pdu.c         **** 			ch |= (*telefon++ - '0') << 4;
+ 1105               		.loc 1 246 0
+ 1106 03f6 1196      		adiw r26,1
+ 1107 03f8 9C91      		ld r25,X
+ 1108 03fa 1197      		sbiw r26,1
+ 1109 03fc 9923      		tst r25
+ 1110 03fe 01F0      		breq .L64
+ 247:pdu.c         **** 		else
  1111               		.loc 1 247 0
- 1112 03fa 806F      		ori r24,lo8(-16)
+ 1112 0400 1296      		adiw r26,2
  1113               	.LVL155:
- 1114 03fc 00C0      		rjmp .L65
- 1115               	.LBE21:
- 1116               	.LBE22:
- 1117               		.cfi_endproc
- 1118               	.LFE8:
- 1120               	.global	zapisz_naglowek_pdu
- 1122               	zapisz_naglowek_pdu:
- 1123               	.LFB9:
- 252:pdu.c         **** 
- 253:pdu.c         **** uchar* zapisz_naglowek_pdu(uchar* ptr, const uchar* telefon_odbiorcy, 
- 254:pdu.c         **** 	const uchar* telefon_centrum_sms, const uchar TP_PID, const uchar TP_DCS)
- 255:pdu.c         **** {
- 1124               		.loc 1 255 0
- 1125               		.cfi_startproc
- 1126               	.LVL156:
- 1127 03fe EF92      		push r14
- 1128               	.LCFI23:
- 1129               		.cfi_def_cfa_offset 3
- 1130               		.cfi_offset 14, -2
- 1131 0400 FF92      		push r15
- 1132               	.LCFI24:
- 1133               		.cfi_def_cfa_offset 4
- 1134               		.cfi_offset 15, -3
- 1135 0402 0F93      		push r16
- 1136               	.LCFI25:
- 1137               		.cfi_def_cfa_offset 5
- 1138               		.cfi_offset 16, -4
- 1139 0404 CF93      		push r28
- 1140               	.LCFI26:
- 1141               		.cfi_def_cfa_offset 6
- 1142               		.cfi_offset 28, -5
- 1143               	/* prologue: function */
- 1144               	/* frame size = 0 */
- 1145               	/* stack size = 4 */
- 1146               	.L__stack_usage = 4
- 1147 0406 7B01      		movw r14,r22
- 1148 0408 C22F      		mov r28,r18
- 256:pdu.c         **** 	ptr = wpisz_centrum_sms_w_formacie_sms(ptr, telefon_centrum_sms);
- 1149               		.loc 1 256 0
- 1150 040a BA01      		movw r22,r20
- 1151               	.LVL157:
- 1152 040c 0E94 0000 		call wpisz_centrum_sms_w_formacie_sms
- 1153               	.LVL158:
- 257:pdu.c         **** 	*ptr++ = 0x11;
- 1154               		.loc 1 257 0
- 1155 0410 21E1      		ldi r18,lo8(17)
- 1156 0412 FC01      		movw r30,r24
- 1157 0414 2083      		st Z,r18
- 1158               	.LVL159:
- 258:pdu.c         **** 	*ptr++ = 0x00;
- 1159               		.loc 1 258 0
- 1160 0416 1182      		std Z+1,__zero_reg__
- 259:pdu.c         **** 	ptr = wpisz_telefon_w_formacie_sms(ptr, telefon_odbiorcy);
- 1161               		.loc 1 259 0
- 1162 0418 B701      		movw r22,r14
- 1163 041a 0296      		adiw r24,2
- 1164               	.LVL160:
- 1165 041c 0E94 0000 		call wpisz_telefon_w_formacie_sms
- 1166               	.LVL161:
- 260:pdu.c         **** 	*ptr++ = TP_PID;	// TP-PID. Protocol identifier 
- 1167               		.loc 1 260 0
- 1168 0420 FC01      		movw r30,r24
- 1169 0422 C083      		st Z,r28
- 1170               	.LVL162:
- 261:pdu.c         **** 	*ptr++ = TP_DCS;	// TP-DCS. Data coding scheme (7-bit, 8-bit, UCS2)
- 1171               		.loc 1 261 0
- 1172 0424 0183      		std Z+1,r16
- 1173               	.LVL163:
- 262:pdu.c         **** 	*ptr++ = 0xAA;	// TP-Validity-Period. "AA" means 4 days
- 1174               		.loc 1 262 0
- 1175 0426 2AEA      		ldi r18,lo8(-86)
- 1176 0428 2283      		std Z+2,r18
- 263:pdu.c         **** 	return ptr;
- 264:pdu.c         **** }
- 1177               		.loc 1 264 0
- 1178 042a 0396      		adiw r24,3
- 1179               	.LVL164:
- 1180               	/* epilogue start */
- 1181 042c CF91      		pop r28
- 1182               	.LVL165:
- 1183 042e 0F91      		pop r16
- 1184               	.LVL166:
- 1185 0430 FF90      		pop r15
- 1186 0432 EF90      		pop r14
+ 1114 0402 9295      		swap r25
+ 1115 0404 907F      		andi r25,lo8(-16)
+ 1116 0406 892B      		or r24,r25
+ 1117               	.LVL156:
+ 1118               	.L65:
+ 250:pdu.c         **** 	}
+ 1119               		.loc 1 250 0 discriminator 2
+ 1120 0408 8193      		st Z+,r24
+ 1121               	.LVL157:
+ 1122 040a 00C0      		rjmp .L63
+ 1123               	.LVL158:
+ 1124               	.L64:
+ 245:pdu.c         **** 		if ( *telefon != '\0' )
+ 1125               		.loc 1 245 0
+ 1126 040c 1196      		adiw r26,1
+ 1127               	.LVL159:
+ 249:pdu.c         **** 		*ptr++ = ch;
+ 1128               		.loc 1 249 0
+ 1129 040e 806F      		ori r24,lo8(-16)
+ 1130               	.LVL160:
+ 1131 0410 00C0      		rjmp .L65
+ 1132               	.LBE21:
+ 1133               	.LBE22:
+ 1134               		.cfi_endproc
+ 1135               	.LFE8:
+ 1137               	.global	zapisz_naglowek_pdu
+ 1139               	zapisz_naglowek_pdu:
+ 1140               	.LFB9:
+ 254:pdu.c         **** 
+ 255:pdu.c         **** uchar* zapisz_naglowek_pdu(uchar* ptr, const uchar* telefon_odbiorcy, 
+ 256:pdu.c         **** 	const uchar* telefon_centrum_sms, const uchar TP_PID, const uchar TP_DCS)
+ 257:pdu.c         **** {
+ 1141               		.loc 1 257 0
+ 1142               		.cfi_startproc
+ 1143               	.LVL161:
+ 1144 0412 EF92      		push r14
+ 1145               	.LCFI23:
+ 1146               		.cfi_def_cfa_offset 3
+ 1147               		.cfi_offset 14, -2
+ 1148 0414 FF92      		push r15
+ 1149               	.LCFI24:
+ 1150               		.cfi_def_cfa_offset 4
+ 1151               		.cfi_offset 15, -3
+ 1152 0416 0F93      		push r16
+ 1153               	.LCFI25:
+ 1154               		.cfi_def_cfa_offset 5
+ 1155               		.cfi_offset 16, -4
+ 1156 0418 CF93      		push r28
+ 1157               	.LCFI26:
+ 1158               		.cfi_def_cfa_offset 6
+ 1159               		.cfi_offset 28, -5
+ 1160               	/* prologue: function */
+ 1161               	/* frame size = 0 */
+ 1162               	/* stack size = 4 */
+ 1163               	.L__stack_usage = 4
+ 1164 041a 7B01      		movw r14,r22
+ 1165 041c C22F      		mov r28,r18
+ 258:pdu.c         **** 	ptr = wpisz_centrum_sms_w_formacie_sms(ptr, telefon_centrum_sms);
+ 1166               		.loc 1 258 0
+ 1167 041e BA01      		movw r22,r20
+ 1168               	.LVL162:
+ 1169 0420 0E94 0000 		call wpisz_centrum_sms_w_formacie_sms
+ 1170               	.LVL163:
+ 259:pdu.c         **** 	*ptr++ = 0x11;
+ 1171               		.loc 1 259 0
+ 1172 0424 21E1      		ldi r18,lo8(17)
+ 1173 0426 FC01      		movw r30,r24
+ 1174 0428 2083      		st Z,r18
+ 1175               	.LVL164:
+ 260:pdu.c         **** 	*ptr++ = 0x00;
+ 1176               		.loc 1 260 0
+ 1177 042a 1182      		std Z+1,__zero_reg__
+ 261:pdu.c         **** 	ptr = wpisz_telefon_w_formacie_sms(ptr, telefon_odbiorcy);
+ 1178               		.loc 1 261 0
+ 1179 042c B701      		movw r22,r14
+ 1180 042e 0296      		adiw r24,2
+ 1181               	.LVL165:
+ 1182 0430 0E94 0000 		call wpisz_telefon_w_formacie_sms
+ 1183               	.LVL166:
+ 262:pdu.c         **** 	*ptr++ = TP_PID;	// TP-PID. Protocol identifier 
+ 1184               		.loc 1 262 0
+ 1185 0434 FC01      		movw r30,r24
+ 1186 0436 C083      		st Z,r28
  1187               	.LVL167:
- 1188 0434 0895      		ret
- 1189               		.cfi_endproc
- 1190               	.LFE9:
- 1192               	.global	konwertuj_pdu_na_blok_wysylany
- 1194               	konwertuj_pdu_na_blok_wysylany:
- 1195               	.LFB10:
- 265:pdu.c         **** 
- 266:pdu.c         **** void konwertuj_pdu_na_blok_wysylany(uchar* buf, const uchar* pdu_ptr, 
- 267:pdu.c         **** 	const uchar dlugosc_pdu)
- 268:pdu.c         **** {
- 1196               		.loc 1 268 0
- 1197               		.cfi_startproc
- 1198               	.LVL168:
- 1199 0436 CF93      		push r28
- 1200               	.LCFI27:
- 1201               		.cfi_def_cfa_offset 3
- 1202               		.cfi_offset 28, -2
- 1203 0438 DF93      		push r29
- 1204               	.LCFI28:
- 1205               		.cfi_def_cfa_offset 4
- 1206               		.cfi_offset 29, -3
- 1207 043a 1F92      		push __zero_reg__
- 1208               	.LCFI29:
- 1209               		.cfi_def_cfa_offset 5
- 1210 043c CDB7      		in r28,__SP_L__
- 1211 043e DEB7      		in r29,__SP_H__
- 1212               	.LCFI30:
- 1213               		.cfi_def_cfa_register 28
- 1214               	/* prologue: function */
- 1215               	/* frame size = 1 */
- 1216               	/* stack size = 3 */
- 1217               	.L__stack_usage = 3
- 1218               	.LVL169:
- 1219 0440 9C01      		movw r18,r24
- 1220 0442 562F      		mov r21,r22
- 1221               	.LBB23:
- 269:pdu.c         **** 	static const char znak_wartosc_heksadecymalna[] PROGMEM = "0123456789ABCDEF";
- 270:pdu.c         **** 	for (uchar i = 0; i < dlugosc_pdu; ++i)
- 1222               		.loc 1 270 0
- 1223 0444 DB01      		movw r26,r22
- 1224               	.LVL170:
- 1225               	.L70:
- 1226               		.loc 1 270 0 is_stmt 0 discriminator 1
- 1227 0446 8A2F      		mov r24,r26
- 1228 0448 851B      		sub r24,r21
- 1229 044a 8417      		cp r24,r20
- 1230 044c 00F0      		brlo .L71
- 1231               	/* epilogue start */
- 1232               	.LBE23:
- 271:pdu.c         **** 	{
- 272:pdu.c         **** 		uchar znak = *pdu_ptr++;
- 273:pdu.c         **** 		volatile uchar pom = znak & 0xf0;	// bardzo wa¿ne jst s³owo volatile, bo kompilator Ÿle generuje 
- 274:pdu.c         **** 		SWAP(pom);
- 275:pdu.c         **** 		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + pom);
- 276:pdu.c         **** 		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + (znak & 0x0f));
- 277:pdu.c         **** 	}
- 278:pdu.c         **** }
- 1233               		.loc 1 278 0 is_stmt 1
- 1234 044e 0F90      		pop __tmp_reg__
- 1235 0450 DF91      		pop r29
- 1236 0452 CF91      		pop r28
- 1237 0454 0895      		ret
- 1238               	.L71:
- 1239               	.LVL171:
- 1240               	.LBB27:
- 1241               	.LBB24:
- 272:pdu.c         **** 		volatile uchar pom = znak & 0xf0;	// bardzo wa¿ne jst s³owo volatile, bo kompilator Ÿle generuje 
- 1242               		.loc 1 272 0 discriminator 3
- 1243 0456 9D91      		ld r25,X+
- 1244               	.LVL172:
- 273:pdu.c         **** 		SWAP(pom);
- 1245               		.loc 1 273 0 discriminator 3
- 1246 0458 892F      		mov r24,r25
- 1247 045a 807F      		andi r24,lo8(-16)
- 1248 045c 8983      		std Y+1,r24
- 274:pdu.c         **** 		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + pom);
- 1249               		.loc 1 274 0 discriminator 3
- 1250               	/* #APP */
- 1251               	 ;  274 "pdu.c" 1
- 1252 045e 8295      		swap r24
- 1253               		
- 1254               	 ;  0 "" 2
- 1255               	/* #NOAPP */
- 1256 0460 8983      		std Y+1,r24
- 1257               	.LBB25:
- 275:pdu.c         **** 		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + (znak & 0x0f));
- 1258               		.loc 1 275 0 discriminator 3
- 1259 0462 E981      		ldd r30,Y+1
- 1260               	.LVL173:
- 1261 0464 F0E0      		ldi r31,0
- 1262 0466 E050      		subi r30,lo8(-(znak_wartosc_heksadecymalna.2041))
- 1263 0468 F040      		sbci r31,hi8(-(znak_wartosc_heksadecymalna.2041))
- 1264               	.LVL174:
- 1265               	/* #APP */
- 1266               	 ;  275 "pdu.c" 1
- 1267 046a 8491      		lpm r24, Z
- 1268               		
- 1269               	 ;  0 "" 2
- 1270               	.LVL175:
- 1271               	/* #NOAPP */
- 1272               	.LBE25:
- 1273 046c F901      		movw r30,r18
- 1274 046e 8083      		st Z,r24
- 1275               	.LVL176:
- 1276               	.LBB26:
- 276:pdu.c         **** 	}
- 1277               		.loc 1 276 0 discriminator 3
- 1278 0470 9F70      		andi r25,lo8(15)
- 1279               	.LVL177:
- 1280 0472 E92F      		mov r30,r25
- 1281 0474 F0E0      		ldi r31,0
- 1282 0476 E050      		subi r30,lo8(-(znak_wartosc_heksadecymalna.2041))
- 1283 0478 F040      		sbci r31,hi8(-(znak_wartosc_heksadecymalna.2041))
- 1284               	/* #APP */
- 1285               	 ;  276 "pdu.c" 1
- 1286 047a 8491      		lpm r24, Z
- 1287               		
- 1288               	 ;  0 "" 2
- 1289               	.LVL178:
- 1290               	/* #NOAPP */
- 1291               	.LBE26:
- 1292 047c F901      		movw r30,r18
- 1293 047e 8183      		std Z+1,r24
- 1294               	.LVL179:
- 1295 0480 2E5F      		subi r18,-2
- 1296 0482 3F4F      		sbci r19,-1
- 1297               	.LVL180:
- 1298 0484 00C0      		rjmp .L70
- 1299               	.LBE24:
- 1300               	.LBE27:
- 1301               		.cfi_endproc
- 1302               	.LFE10:
- 1304               		.section	.progmem.data,"a",@progbits
- 1307               	znak_wartosc_heksadecymalna.2041:
- 1308 0000 3031 3233 		.string	"0123456789ABCDEF"
- 1308      3435 3637 
- 1308      3839 4142 
- 1308      4344 4546 
- 1308      00
- 1311               	GSM_Default_DeAlphabet:
- 1312 0011 3F        		.byte	63
- 1313 0012 3F        		.byte	63
- 1314 0013 3F        		.byte	63
- 1315 0014 3F        		.byte	63
- 1316 0015 3F        		.byte	63
- 1317 0016 3F        		.byte	63
- 1318 0017 3F        		.byte	63
- 1319 0018 3F        		.byte	63
- 1320 0019 3F        		.byte	63
- 1321 001a 3F        		.byte	63
- 1322 001b 0A        		.byte	10
- 1323 001c 3F        		.byte	63
- 1324 001d 3F        		.byte	63
- 1325 001e 0D        		.byte	13
- 1326 001f 3F        		.byte	63
- 1327 0020 3F        		.byte	63
- 1328 0021 3F        		.byte	63
- 1329 0022 3F        		.byte	63
- 1330 0023 3F        		.byte	63
- 1331 0024 3F        		.byte	63
- 1332 0025 3F        		.byte	63
- 1333 0026 3F        		.byte	63
- 1334 0027 3F        		.byte	63
- 1335 0028 3F        		.byte	63
- 1336 0029 3F        		.byte	63
- 1337 002a 3F        		.byte	63
- 1338 002b 3F        		.byte	63
- 1339 002c 3F        		.byte	63
- 1340 002d 3F        		.byte	63
- 1341 002e 3F        		.byte	63
- 1342 002f 3F        		.byte	63
- 1343 0030 3F        		.byte	63
- 1344 0031 20        		.byte	32
- 1345 0032 21        		.byte	33
- 1346 0033 22        		.byte	34
- 1347 0034 23        		.byte	35
- 1348 0035 02        		.byte	2
- 1349 0036 25        		.byte	37
- 1350 0037 26        		.byte	38
- 1351 0038 27        		.byte	39
- 1352 0039 28        		.byte	40
- 1353 003a 29        		.byte	41
- 1354 003b 2A        		.byte	42
- 1355 003c 2B        		.byte	43
- 1356 003d 2C        		.byte	44
- 1357 003e 2D        		.byte	45
- 1358 003f 2E        		.byte	46
- 1359 0040 2F        		.byte	47
- 1360 0041 30        		.byte	48
- 1361 0042 31        		.byte	49
- 1362 0043 32        		.byte	50
- 1363 0044 33        		.byte	51
- 1364 0045 34        		.byte	52
- 1365 0046 35        		.byte	53
- 1366 0047 36        		.byte	54
- 1367 0048 37        		.byte	55
- 1368 0049 38        		.byte	56
- 1369 004a 39        		.byte	57
- 1370 004b 3A        		.byte	58
- 1371 004c 3B        		.byte	59
- 1372 004d 3C        		.byte	60
- 1373 004e 3D        		.byte	61
- 1374 004f 3E        		.byte	62
- 1375 0050 3F        		.byte	63
- 1376 0051 00        		.byte	0
- 1377 0052 41        		.byte	65
- 1378 0053 42        		.byte	66
- 1379 0054 43        		.byte	67
- 1380 0055 44        		.byte	68
- 1381 0056 45        		.byte	69
- 1382 0057 46        		.byte	70
- 1383 0058 47        		.byte	71
- 1384 0059 48        		.byte	72
- 1385 005a 49        		.byte	73
- 1386 005b 4A        		.byte	74
- 1387 005c 4B        		.byte	75
- 1388 005d 4C        		.byte	76
- 1389 005e 4D        		.byte	77
- 1390 005f 4E        		.byte	78
- 1391 0060 4F        		.byte	79
- 1392 0061 50        		.byte	80
- 1393 0062 51        		.byte	81
- 1394 0063 52        		.byte	82
- 1395 0064 53        		.byte	83
- 1396 0065 54        		.byte	84
- 1397 0066 55        		.byte	85
- 1398 0067 56        		.byte	86
- 1399 0068 57        		.byte	87
- 1400 0069 58        		.byte	88
- 1401 006a 59        		.byte	89
- 1402 006b 5A        		.byte	90
- 1403 006c 3F        		.byte	63
- 1404 006d 3F        		.byte	63
- 1405 006e 3F        		.byte	63
- 1406 006f 3F        		.byte	63
- 1407 0070 11        		.byte	17
- 1408 0071 3F        		.byte	63
- 1409 0072 61        		.byte	97
- 1410 0073 62        		.byte	98
- 1411 0074 63        		.byte	99
- 1412 0075 64        		.byte	100
- 1413 0076 65        		.byte	101
- 1414 0077 66        		.byte	102
- 1415 0078 67        		.byte	103
- 1416 0079 68        		.byte	104
- 1417 007a 69        		.byte	105
- 1418 007b 6A        		.byte	106
- 1419 007c 6B        		.byte	107
- 1420 007d 6C        		.byte	108
- 1421 007e 6D        		.byte	109
- 1422 007f 6E        		.byte	110
- 1423 0080 6F        		.byte	111
- 1424 0081 70        		.byte	112
- 1425 0082 71        		.byte	113
- 1426 0083 72        		.byte	114
- 1427 0084 73        		.byte	115
- 1428 0085 74        		.byte	116
- 1429 0086 75        		.byte	117
- 1430 0087 76        		.byte	118
- 1431 0088 77        		.byte	119
- 1432 0089 78        		.byte	120
- 1433 008a 79        		.byte	121
- 1434 008b 7A        		.byte	122
- 1435 008c 3F        		.byte	63
- 1436 008d 3F        		.byte	63
- 1437 008e 3F        		.byte	63
- 1438 008f 3F        		.byte	63
- 1439 0090 3F        		.byte	63
- 1440 0091 3F        		.byte	63
- 1441 0092 3F        		.byte	63
- 1442 0093 3F        		.byte	63
- 1443 0094 3F        		.byte	63
- 1444 0095 3F        		.byte	63
- 1445 0096 3F        		.byte	63
- 1446 0097 3F        		.byte	63
- 1447 0098 3F        		.byte	63
- 1448 0099 3F        		.byte	63
- 1449 009a 3F        		.byte	63
- 1450 009b 3F        		.byte	63
- 1451 009c 3F        		.byte	63
- 1452 009d 3F        		.byte	63
- 1453 009e 3F        		.byte	63
- 1454 009f 3F        		.byte	63
- 1455 00a0 3F        		.byte	63
- 1456 00a1 3F        		.byte	63
- 1457 00a2 3F        		.byte	63
- 1458 00a3 3F        		.byte	63
- 1459 00a4 3F        		.byte	63
- 1460 00a5 3F        		.byte	63
- 1461 00a6 3F        		.byte	63
- 1462 00a7 3F        		.byte	63
- 1463 00a8 3F        		.byte	63
- 1464 00a9 3F        		.byte	63
- 1465 00aa 3F        		.byte	63
- 1466 00ab 3F        		.byte	63
- 1467 00ac 3F        		.byte	63
- 1468 00ad 3F        		.byte	63
- 1469 00ae 3F        		.byte	63
- 1470 00af 3F        		.byte	63
- 1471 00b0 3F        		.byte	63
- 1472 00b1 3F        		.byte	63
- 1473 00b2 40        		.byte	64
- 1474 00b3 3F        		.byte	63
- 1475 00b4 01        		.byte	1
- 1476 00b5 24        		.byte	36
- 1477 00b6 03        		.byte	3
- 1478 00b7 3F        		.byte	63
- 1479 00b8 5F        		.byte	95
- 1480 00b9 3F        		.byte	63
- 1481 00ba 3F        		.byte	63
- 1482 00bb 3F        		.byte	63
- 1483 00bc 3F        		.byte	63
- 1484 00bd 3F        		.byte	63
- 1485 00be 3F        		.byte	63
- 1486 00bf 3F        		.byte	63
- 1487 00c0 3F        		.byte	63
- 1488 00c1 3F        		.byte	63
- 1489 00c2 3F        		.byte	63
- 1490 00c3 3F        		.byte	63
- 1491 00c4 3F        		.byte	63
- 1492 00c5 3F        		.byte	63
- 1493 00c6 3F        		.byte	63
- 1494 00c7 3F        		.byte	63
- 1495 00c8 3F        		.byte	63
- 1496 00c9 3F        		.byte	63
- 1497 00ca 3F        		.byte	63
- 1498 00cb 3F        		.byte	63
- 1499 00cc 3F        		.byte	63
- 1500 00cd 3F        		.byte	63
- 1501 00ce 3F        		.byte	63
- 1502 00cf 3F        		.byte	63
- 1503 00d0 60        		.byte	96
- 1504 00d1 3F        		.byte	63
- 1505 00d2 3F        		.byte	63
- 1506 00d3 3F        		.byte	63
- 1507 00d4 3F        		.byte	63
- 1508 00d5 5B        		.byte	91
- 1509 00d6 0E        		.byte	14
- 1510 00d7 1C        		.byte	28
- 1511 00d8 09        		.byte	9
- 1512 00d9 3F        		.byte	63
- 1513 00da 1F        		.byte	31
- 1514 00db 3F        		.byte	63
- 1515 00dc 3F        		.byte	63
- 1516 00dd 3F        		.byte	63
- 1517 00de 3F        		.byte	63
- 1518 00df 3F        		.byte	63
- 1519 00e0 3F        		.byte	63
- 1520 00e1 3F        		.byte	63
- 1521 00e2 5D        		.byte	93
- 1522 00e3 3F        		.byte	63
- 1523 00e4 3F        		.byte	63
- 1524 00e5 3F        		.byte	63
- 1525 00e6 3F        		.byte	63
- 1526 00e7 5C        		.byte	92
- 1527 00e8 3F        		.byte	63
- 1528 00e9 0B        		.byte	11
- 1529 00ea 3F        		.byte	63
- 1530 00eb 3F        		.byte	63
- 1531 00ec 3F        		.byte	63
- 1532 00ed 5E        		.byte	94
- 1533 00ee 3F        		.byte	63
- 1534 00ef 3F        		.byte	63
- 1535 00f0 1E        		.byte	30
- 1536 00f1 7F        		.byte	127
- 1537 00f2 3F        		.byte	63
- 1538 00f3 3F        		.byte	63
- 1539 00f4 3F        		.byte	63
- 1540 00f5 7B        		.byte	123
- 1541 00f6 0F        		.byte	15
- 1542 00f7 1D        		.byte	29
- 1543 00f8 3F        		.byte	63
- 1544 00f9 04        		.byte	4
- 1545 00fa 05        		.byte	5
- 1546 00fb 3F        		.byte	63
- 1547 00fc 3F        		.byte	63
- 1548 00fd 07        		.byte	7
- 1549 00fe 3F        		.byte	63
- 1550 00ff 3F        		.byte	63
- 1551 0100 3F        		.byte	63
- 1552 0101 3F        		.byte	63
- 1553 0102 7D        		.byte	125
- 1554 0103 08        		.byte	8
- 1555 0104 3F        		.byte	63
- 1556 0105 3F        		.byte	63
- 1557 0106 3F        		.byte	63
- 1558 0107 7C        		.byte	124
- 1559 0108 3F        		.byte	63
- 1560 0109 0C        		.byte	12
- 1561 010a 06        		.byte	6
- 1562 010b 3F        		.byte	63
- 1563 010c 3F        		.byte	63
- 1564 010d 7E        		.byte	126
- 1565 010e 3F        		.byte	63
- 1566 010f 3F        		.byte	63
- 1567 0110 3F        		.byte	63
- 1570               	GSM_Default_Alphabet:
- 1571 0111 40        		.byte	64
- 1572 0112 A3        		.byte	-93
- 1573 0113 24        		.byte	36
- 1574 0114 A5        		.byte	-91
- 1575 0115 E8        		.byte	-24
- 1576 0116 E9        		.byte	-23
- 1577 0117 F9        		.byte	-7
- 1578 0118 EC        		.byte	-20
- 1579 0119 F2        		.byte	-14
- 1580 011a C7        		.byte	-57
- 1581 011b 0A        		.byte	10
- 1582 011c D8        		.byte	-40
- 1583 011d F8        		.byte	-8
- 1584 011e 0D        		.byte	13
- 1585 011f C5        		.byte	-59
- 1586 0120 E5        		.byte	-27
- 1587 0121 3F        		.byte	63
- 1588 0122 5F        		.byte	95
- 1589 0123 3F        		.byte	63
- 1590 0124 3F        		.byte	63
- 1591 0125 3F        		.byte	63
- 1592 0126 3F        		.byte	63
- 1593 0127 3F        		.byte	63
- 1594 0128 3F        		.byte	63
- 1595 0129 3F        		.byte	63
- 1596 012a 3F        		.byte	63
- 1597 012b 3F        		.byte	63
- 1598 012c 3F        		.byte	63
- 1599 012d C6        		.byte	-58
- 1600 012e E6        		.byte	-26
- 1601 012f DF        		.byte	-33
- 1602 0130 C9        		.byte	-55
- 1603 0131 20        		.byte	32
- 1604 0132 21        		.byte	33
- 1605 0133 22        		.byte	34
- 1606 0134 23        		.byte	35
- 1607 0135 A4        		.byte	-92
- 1608 0136 25        		.byte	37
- 1609 0137 26        		.byte	38
- 1610 0138 27        		.byte	39
- 1611 0139 28        		.byte	40
- 1612 013a 29        		.byte	41
- 1613 013b 2A        		.byte	42
- 1614 013c 2B        		.byte	43
- 1615 013d 2C        		.byte	44
- 1616 013e 2D        		.byte	45
- 1617 013f 2E        		.byte	46
- 1618 0140 2F        		.byte	47
- 1619 0141 30        		.byte	48
- 1620 0142 31        		.byte	49
- 1621 0143 32        		.byte	50
- 1622 0144 33        		.byte	51
- 1623 0145 34        		.byte	52
- 1624 0146 35        		.byte	53
- 1625 0147 36        		.byte	54
- 1626 0148 37        		.byte	55
- 1627 0149 38        		.byte	56
- 1628 014a 39        		.byte	57
- 1629 014b 3A        		.byte	58
- 1630 014c 3B        		.byte	59
- 1631 014d 3C        		.byte	60
- 1632 014e 3D        		.byte	61
- 1633 014f 3E        		.byte	62
- 1634 0150 3F        		.byte	63
- 1635 0151 A1        		.byte	-95
- 1636 0152 41        		.byte	65
- 1637 0153 42        		.byte	66
- 1638 0154 43        		.byte	67
- 1639 0155 44        		.byte	68
- 1640 0156 45        		.byte	69
- 1641 0157 46        		.byte	70
- 1642 0158 47        		.byte	71
- 1643 0159 48        		.byte	72
- 1644 015a 49        		.byte	73
- 1645 015b 4A        		.byte	74
- 1646 015c 4B        		.byte	75
- 1647 015d 4C        		.byte	76
- 1648 015e 4D        		.byte	77
- 1649 015f 4E        		.byte	78
- 1650 0160 4F        		.byte	79
- 1651 0161 50        		.byte	80
- 1652 0162 51        		.byte	81
- 1653 0163 52        		.byte	82
- 1654 0164 53        		.byte	83
- 1655 0165 54        		.byte	84
- 1656 0166 55        		.byte	85
- 1657 0167 56        		.byte	86
- 1658 0168 57        		.byte	87
- 1659 0169 58        		.byte	88
- 1660 016a 59        		.byte	89
- 1661 016b 5A        		.byte	90
- 1662 016c C4        		.byte	-60
- 1663 016d D6        		.byte	-42
- 1664 016e D1        		.byte	-47
- 1665 016f DC        		.byte	-36
- 1666 0170 A7        		.byte	-89
- 1667 0171 BF        		.byte	-65
- 1668 0172 61        		.byte	97
- 1669 0173 62        		.byte	98
- 1670 0174 63        		.byte	99
- 1671 0175 64        		.byte	100
- 1672 0176 65        		.byte	101
- 1673 0177 66        		.byte	102
- 1674 0178 67        		.byte	103
- 1675 0179 68        		.byte	104
- 1676 017a 69        		.byte	105
- 1677 017b 6A        		.byte	106
- 1678 017c 6B        		.byte	107
- 1679 017d 6C        		.byte	108
- 1680 017e 6D        		.byte	109
- 1681 017f 6E        		.byte	110
- 1682 0180 6F        		.byte	111
- 1683 0181 70        		.byte	112
- 1684 0182 71        		.byte	113
- 1685 0183 72        		.byte	114
- 1686 0184 73        		.byte	115
- 1687 0185 74        		.byte	116
- 1688 0186 75        		.byte	117
- 1689 0187 76        		.byte	118
- 1690 0188 77        		.byte	119
- 1691 0189 78        		.byte	120
- 1692 018a 79        		.byte	121
- 1693 018b 7A        		.byte	122
- 1694 018c E4        		.byte	-28
- 1695 018d F6        		.byte	-10
- 1696 018e F1        		.byte	-15
- 1697 018f FC        		.byte	-4
- 1698 0190 E0        		.byte	-32
- 1699               		.text
- 1700               	.Letext0:
- 1701               		.file 2 "narzedzia.h"
- 1702               		.file 3 "/usr/local/avr8-gnu-toolchain/avr/include/stdint.h"
+ 263:pdu.c         **** 	*ptr++ = TP_DCS;	// TP-DCS. Data coding scheme (7-bit, 8-bit, UCS2)
+ 1188               		.loc 1 263 0
+ 1189 0438 0183      		std Z+1,r16
+ 1190               	.LVL168:
+ 264:pdu.c         **** 	*ptr++ = 0xAA;	// TP-Validity-Period. "AA" means 4 days
+ 1191               		.loc 1 264 0
+ 1192 043a 2AEA      		ldi r18,lo8(-86)
+ 1193 043c 2283      		std Z+2,r18
+ 265:pdu.c         **** 	return ptr;
+ 266:pdu.c         **** }
+ 1194               		.loc 1 266 0
+ 1195 043e 0396      		adiw r24,3
+ 1196               	.LVL169:
+ 1197               	/* epilogue start */
+ 1198 0440 CF91      		pop r28
+ 1199               	.LVL170:
+ 1200 0442 0F91      		pop r16
+ 1201               	.LVL171:
+ 1202 0444 FF90      		pop r15
+ 1203 0446 EF90      		pop r14
+ 1204               	.LVL172:
+ 1205 0448 0895      		ret
+ 1206               		.cfi_endproc
+ 1207               	.LFE9:
+ 1209               	.global	konwertuj_pdu_na_blok_wysylany
+ 1211               	konwertuj_pdu_na_blok_wysylany:
+ 1212               	.LFB10:
+ 267:pdu.c         **** 
+ 268:pdu.c         **** void konwertuj_pdu_na_blok_wysylany(uchar* buf, const uchar* pdu_ptr, 
+ 269:pdu.c         **** 	const uchar dlugosc_pdu)
+ 270:pdu.c         **** {
+ 1213               		.loc 1 270 0
+ 1214               		.cfi_startproc
+ 1215               	.LVL173:
+ 1216 044a CF93      		push r28
+ 1217               	.LCFI27:
+ 1218               		.cfi_def_cfa_offset 3
+ 1219               		.cfi_offset 28, -2
+ 1220 044c DF93      		push r29
+ 1221               	.LCFI28:
+ 1222               		.cfi_def_cfa_offset 4
+ 1223               		.cfi_offset 29, -3
+ 1224 044e 1F92      		push __zero_reg__
+ 1225               	.LCFI29:
+ 1226               		.cfi_def_cfa_offset 5
+ 1227 0450 CDB7      		in r28,__SP_L__
+ 1228 0452 DEB7      		in r29,__SP_H__
+ 1229               	.LCFI30:
+ 1230               		.cfi_def_cfa_register 28
+ 1231               	/* prologue: function */
+ 1232               	/* frame size = 1 */
+ 1233               	/* stack size = 3 */
+ 1234               	.L__stack_usage = 3
+ 1235               	.LVL174:
+ 1236 0454 9C01      		movw r18,r24
+ 1237 0456 562F      		mov r21,r22
+ 1238               	.LBB23:
+ 271:pdu.c         **** 	static const char znak_wartosc_heksadecymalna[] PROGMEM = "0123456789ABCDEF";
+ 272:pdu.c         **** 	for (uchar i = 0; i < dlugosc_pdu; ++i)
+ 1239               		.loc 1 272 0
+ 1240 0458 DB01      		movw r26,r22
+ 1241               	.LVL175:
+ 1242               	.L70:
+ 1243               		.loc 1 272 0 is_stmt 0 discriminator 1
+ 1244 045a 8A2F      		mov r24,r26
+ 1245 045c 851B      		sub r24,r21
+ 1246 045e 8417      		cp r24,r20
+ 1247 0460 00F0      		brlo .L71
+ 1248               	/* epilogue start */
+ 1249               	.LBE23:
+ 273:pdu.c         **** 	{
+ 274:pdu.c         **** 		uchar znak = *pdu_ptr++;
+ 275:pdu.c         **** 		volatile uchar pom = znak & 0xf0;	// bardzo wa¿ne jst s³owo volatile, bo kompilator Ÿle generuje 
+ 276:pdu.c         **** 		SWAP(pom);
+ 277:pdu.c         **** 		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + pom);
+ 278:pdu.c         **** 		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + (znak & 0x0f));
+ 279:pdu.c         **** 	}
+ 280:pdu.c         **** }
+ 1250               		.loc 1 280 0 is_stmt 1
+ 1251 0462 0F90      		pop __tmp_reg__
+ 1252 0464 DF91      		pop r29
+ 1253 0466 CF91      		pop r28
+ 1254 0468 0895      		ret
+ 1255               	.L71:
+ 1256               	.LVL176:
+ 1257               	.LBB27:
+ 1258               	.LBB24:
+ 274:pdu.c         **** 		volatile uchar pom = znak & 0xf0;	// bardzo wa¿ne jst s³owo volatile, bo kompilator Ÿle generuje 
+ 1259               		.loc 1 274 0 discriminator 3
+ 1260 046a 9D91      		ld r25,X+
+ 1261               	.LVL177:
+ 275:pdu.c         **** 		SWAP(pom);
+ 1262               		.loc 1 275 0 discriminator 3
+ 1263 046c 892F      		mov r24,r25
+ 1264 046e 807F      		andi r24,lo8(-16)
+ 1265 0470 8983      		std Y+1,r24
+ 276:pdu.c         **** 		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + pom);
+ 1266               		.loc 1 276 0 discriminator 3
+ 1267               	/* #APP */
+ 1268               	 ;  276 "pdu.c" 1
+ 1269 0472 8295      		swap r24
+ 1270               		
+ 1271               	 ;  0 "" 2
+ 1272               	/* #NOAPP */
+ 1273 0474 8983      		std Y+1,r24
+ 1274               	.LBB25:
+ 277:pdu.c         **** 		*buf++ = pgm_read_byte(znak_wartosc_heksadecymalna + (znak & 0x0f));
+ 1275               		.loc 1 277 0 discriminator 3
+ 1276 0476 E981      		ldd r30,Y+1
+ 1277               	.LVL178:
+ 1278 0478 F0E0      		ldi r31,0
+ 1279 047a E050      		subi r30,lo8(-(znak_wartosc_heksadecymalna.2043))
+ 1280 047c F040      		sbci r31,hi8(-(znak_wartosc_heksadecymalna.2043))
+ 1281               	.LVL179:
+ 1282               	/* #APP */
+ 1283               	 ;  277 "pdu.c" 1
+ 1284 047e 8491      		lpm r24, Z
+ 1285               		
+ 1286               	 ;  0 "" 2
+ 1287               	.LVL180:
+ 1288               	/* #NOAPP */
+ 1289               	.LBE25:
+ 1290 0480 F901      		movw r30,r18
+ 1291 0482 8083      		st Z,r24
+ 1292               	.LVL181:
+ 1293               	.LBB26:
+ 278:pdu.c         **** 	}
+ 1294               		.loc 1 278 0 discriminator 3
+ 1295 0484 9F70      		andi r25,lo8(15)
+ 1296               	.LVL182:
+ 1297 0486 E92F      		mov r30,r25
+ 1298 0488 F0E0      		ldi r31,0
+ 1299 048a E050      		subi r30,lo8(-(znak_wartosc_heksadecymalna.2043))
+ 1300 048c F040      		sbci r31,hi8(-(znak_wartosc_heksadecymalna.2043))
+ 1301               	/* #APP */
+ 1302               	 ;  278 "pdu.c" 1
+ 1303 048e 8491      		lpm r24, Z
+ 1304               		
+ 1305               	 ;  0 "" 2
+ 1306               	.LVL183:
+ 1307               	/* #NOAPP */
+ 1308               	.LBE26:
+ 1309 0490 F901      		movw r30,r18
+ 1310 0492 8183      		std Z+1,r24
+ 1311               	.LVL184:
+ 1312 0494 2E5F      		subi r18,-2
+ 1313 0496 3F4F      		sbci r19,-1
+ 1314               	.LVL185:
+ 1315 0498 00C0      		rjmp .L70
+ 1316               	.LBE24:
+ 1317               	.LBE27:
+ 1318               		.cfi_endproc
+ 1319               	.LFE10:
+ 1321               		.section	.progmem.data,"a",@progbits
+ 1324               	znak_wartosc_heksadecymalna.2043:
+ 1325 0000 3031 3233 		.string	"0123456789ABCDEF"
+ 1325      3435 3637 
+ 1325      3839 4142 
+ 1325      4344 4546 
+ 1325      00
+ 1328               	GSM_Default_DeAlphabet:
+ 1329 0011 3F        		.byte	63
+ 1330 0012 3F        		.byte	63
+ 1331 0013 3F        		.byte	63
+ 1332 0014 3F        		.byte	63
+ 1333 0015 3F        		.byte	63
+ 1334 0016 3F        		.byte	63
+ 1335 0017 3F        		.byte	63
+ 1336 0018 3F        		.byte	63
+ 1337 0019 3F        		.byte	63
+ 1338 001a 3F        		.byte	63
+ 1339 001b 0A        		.byte	10
+ 1340 001c 3F        		.byte	63
+ 1341 001d 3F        		.byte	63
+ 1342 001e 0D        		.byte	13
+ 1343 001f 3F        		.byte	63
+ 1344 0020 3F        		.byte	63
+ 1345 0021 3F        		.byte	63
+ 1346 0022 3F        		.byte	63
+ 1347 0023 3F        		.byte	63
+ 1348 0024 3F        		.byte	63
+ 1349 0025 3F        		.byte	63
+ 1350 0026 3F        		.byte	63
+ 1351 0027 3F        		.byte	63
+ 1352 0028 3F        		.byte	63
+ 1353 0029 3F        		.byte	63
+ 1354 002a 3F        		.byte	63
+ 1355 002b 3F        		.byte	63
+ 1356 002c 3F        		.byte	63
+ 1357 002d 3F        		.byte	63
+ 1358 002e 3F        		.byte	63
+ 1359 002f 3F        		.byte	63
+ 1360 0030 3F        		.byte	63
+ 1361 0031 20        		.byte	32
+ 1362 0032 21        		.byte	33
+ 1363 0033 22        		.byte	34
+ 1364 0034 23        		.byte	35
+ 1365 0035 02        		.byte	2
+ 1366 0036 25        		.byte	37
+ 1367 0037 26        		.byte	38
+ 1368 0038 27        		.byte	39
+ 1369 0039 28        		.byte	40
+ 1370 003a 29        		.byte	41
+ 1371 003b 2A        		.byte	42
+ 1372 003c 2B        		.byte	43
+ 1373 003d 2C        		.byte	44
+ 1374 003e 2D        		.byte	45
+ 1375 003f 2E        		.byte	46
+ 1376 0040 2F        		.byte	47
+ 1377 0041 30        		.byte	48
+ 1378 0042 31        		.byte	49
+ 1379 0043 32        		.byte	50
+ 1380 0044 33        		.byte	51
+ 1381 0045 34        		.byte	52
+ 1382 0046 35        		.byte	53
+ 1383 0047 36        		.byte	54
+ 1384 0048 37        		.byte	55
+ 1385 0049 38        		.byte	56
+ 1386 004a 39        		.byte	57
+ 1387 004b 3A        		.byte	58
+ 1388 004c 3B        		.byte	59
+ 1389 004d 3C        		.byte	60
+ 1390 004e 3D        		.byte	61
+ 1391 004f 3E        		.byte	62
+ 1392 0050 3F        		.byte	63
+ 1393 0051 00        		.byte	0
+ 1394 0052 41        		.byte	65
+ 1395 0053 42        		.byte	66
+ 1396 0054 43        		.byte	67
+ 1397 0055 44        		.byte	68
+ 1398 0056 45        		.byte	69
+ 1399 0057 46        		.byte	70
+ 1400 0058 47        		.byte	71
+ 1401 0059 48        		.byte	72
+ 1402 005a 49        		.byte	73
+ 1403 005b 4A        		.byte	74
+ 1404 005c 4B        		.byte	75
+ 1405 005d 4C        		.byte	76
+ 1406 005e 4D        		.byte	77
+ 1407 005f 4E        		.byte	78
+ 1408 0060 4F        		.byte	79
+ 1409 0061 50        		.byte	80
+ 1410 0062 51        		.byte	81
+ 1411 0063 52        		.byte	82
+ 1412 0064 53        		.byte	83
+ 1413 0065 54        		.byte	84
+ 1414 0066 55        		.byte	85
+ 1415 0067 56        		.byte	86
+ 1416 0068 57        		.byte	87
+ 1417 0069 58        		.byte	88
+ 1418 006a 59        		.byte	89
+ 1419 006b 5A        		.byte	90
+ 1420 006c 3F        		.byte	63
+ 1421 006d 3F        		.byte	63
+ 1422 006e 3F        		.byte	63
+ 1423 006f 3F        		.byte	63
+ 1424 0070 11        		.byte	17
+ 1425 0071 3F        		.byte	63
+ 1426 0072 61        		.byte	97
+ 1427 0073 62        		.byte	98
+ 1428 0074 63        		.byte	99
+ 1429 0075 64        		.byte	100
+ 1430 0076 65        		.byte	101
+ 1431 0077 66        		.byte	102
+ 1432 0078 67        		.byte	103
+ 1433 0079 68        		.byte	104
+ 1434 007a 69        		.byte	105
+ 1435 007b 6A        		.byte	106
+ 1436 007c 6B        		.byte	107
+ 1437 007d 6C        		.byte	108
+ 1438 007e 6D        		.byte	109
+ 1439 007f 6E        		.byte	110
+ 1440 0080 6F        		.byte	111
+ 1441 0081 70        		.byte	112
+ 1442 0082 71        		.byte	113
+ 1443 0083 72        		.byte	114
+ 1444 0084 73        		.byte	115
+ 1445 0085 74        		.byte	116
+ 1446 0086 75        		.byte	117
+ 1447 0087 76        		.byte	118
+ 1448 0088 77        		.byte	119
+ 1449 0089 78        		.byte	120
+ 1450 008a 79        		.byte	121
+ 1451 008b 7A        		.byte	122
+ 1452 008c 3F        		.byte	63
+ 1453 008d 3F        		.byte	63
+ 1454 008e 3F        		.byte	63
+ 1455 008f 3F        		.byte	63
+ 1456 0090 3F        		.byte	63
+ 1457 0091 3F        		.byte	63
+ 1458 0092 3F        		.byte	63
+ 1459 0093 3F        		.byte	63
+ 1460 0094 3F        		.byte	63
+ 1461 0095 3F        		.byte	63
+ 1462 0096 3F        		.byte	63
+ 1463 0097 3F        		.byte	63
+ 1464 0098 3F        		.byte	63
+ 1465 0099 3F        		.byte	63
+ 1466 009a 3F        		.byte	63
+ 1467 009b 3F        		.byte	63
+ 1468 009c 3F        		.byte	63
+ 1469 009d 3F        		.byte	63
+ 1470 009e 3F        		.byte	63
+ 1471 009f 3F        		.byte	63
+ 1472 00a0 3F        		.byte	63
+ 1473 00a1 3F        		.byte	63
+ 1474 00a2 3F        		.byte	63
+ 1475 00a3 3F        		.byte	63
+ 1476 00a4 3F        		.byte	63
+ 1477 00a5 3F        		.byte	63
+ 1478 00a6 3F        		.byte	63
+ 1479 00a7 3F        		.byte	63
+ 1480 00a8 3F        		.byte	63
+ 1481 00a9 3F        		.byte	63
+ 1482 00aa 3F        		.byte	63
+ 1483 00ab 3F        		.byte	63
+ 1484 00ac 3F        		.byte	63
+ 1485 00ad 3F        		.byte	63
+ 1486 00ae 3F        		.byte	63
+ 1487 00af 3F        		.byte	63
+ 1488 00b0 3F        		.byte	63
+ 1489 00b1 3F        		.byte	63
+ 1490 00b2 40        		.byte	64
+ 1491 00b3 3F        		.byte	63
+ 1492 00b4 01        		.byte	1
+ 1493 00b5 24        		.byte	36
+ 1494 00b6 03        		.byte	3
+ 1495 00b7 3F        		.byte	63
+ 1496 00b8 5F        		.byte	95
+ 1497 00b9 3F        		.byte	63
+ 1498 00ba 3F        		.byte	63
+ 1499 00bb 3F        		.byte	63
+ 1500 00bc 3F        		.byte	63
+ 1501 00bd 3F        		.byte	63
+ 1502 00be 3F        		.byte	63
+ 1503 00bf 3F        		.byte	63
+ 1504 00c0 3F        		.byte	63
+ 1505 00c1 3F        		.byte	63
+ 1506 00c2 3F        		.byte	63
+ 1507 00c3 3F        		.byte	63
+ 1508 00c4 3F        		.byte	63
+ 1509 00c5 3F        		.byte	63
+ 1510 00c6 3F        		.byte	63
+ 1511 00c7 3F        		.byte	63
+ 1512 00c8 3F        		.byte	63
+ 1513 00c9 3F        		.byte	63
+ 1514 00ca 3F        		.byte	63
+ 1515 00cb 3F        		.byte	63
+ 1516 00cc 3F        		.byte	63
+ 1517 00cd 3F        		.byte	63
+ 1518 00ce 3F        		.byte	63
+ 1519 00cf 3F        		.byte	63
+ 1520 00d0 60        		.byte	96
+ 1521 00d1 3F        		.byte	63
+ 1522 00d2 3F        		.byte	63
+ 1523 00d3 3F        		.byte	63
+ 1524 00d4 3F        		.byte	63
+ 1525 00d5 5B        		.byte	91
+ 1526 00d6 0E        		.byte	14
+ 1527 00d7 1C        		.byte	28
+ 1528 00d8 09        		.byte	9
+ 1529 00d9 3F        		.byte	63
+ 1530 00da 1F        		.byte	31
+ 1531 00db 3F        		.byte	63
+ 1532 00dc 3F        		.byte	63
+ 1533 00dd 3F        		.byte	63
+ 1534 00de 3F        		.byte	63
+ 1535 00df 3F        		.byte	63
+ 1536 00e0 3F        		.byte	63
+ 1537 00e1 3F        		.byte	63
+ 1538 00e2 5D        		.byte	93
+ 1539 00e3 3F        		.byte	63
+ 1540 00e4 3F        		.byte	63
+ 1541 00e5 3F        		.byte	63
+ 1542 00e6 3F        		.byte	63
+ 1543 00e7 5C        		.byte	92
+ 1544 00e8 3F        		.byte	63
+ 1545 00e9 0B        		.byte	11
+ 1546 00ea 3F        		.byte	63
+ 1547 00eb 3F        		.byte	63
+ 1548 00ec 3F        		.byte	63
+ 1549 00ed 5E        		.byte	94
+ 1550 00ee 3F        		.byte	63
+ 1551 00ef 3F        		.byte	63
+ 1552 00f0 1E        		.byte	30
+ 1553 00f1 7F        		.byte	127
+ 1554 00f2 3F        		.byte	63
+ 1555 00f3 3F        		.byte	63
+ 1556 00f4 3F        		.byte	63
+ 1557 00f5 7B        		.byte	123
+ 1558 00f6 0F        		.byte	15
+ 1559 00f7 1D        		.byte	29
+ 1560 00f8 3F        		.byte	63
+ 1561 00f9 04        		.byte	4
+ 1562 00fa 05        		.byte	5
+ 1563 00fb 3F        		.byte	63
+ 1564 00fc 3F        		.byte	63
+ 1565 00fd 07        		.byte	7
+ 1566 00fe 3F        		.byte	63
+ 1567 00ff 3F        		.byte	63
+ 1568 0100 3F        		.byte	63
+ 1569 0101 3F        		.byte	63
+ 1570 0102 7D        		.byte	125
+ 1571 0103 08        		.byte	8
+ 1572 0104 3F        		.byte	63
+ 1573 0105 3F        		.byte	63
+ 1574 0106 3F        		.byte	63
+ 1575 0107 7C        		.byte	124
+ 1576 0108 3F        		.byte	63
+ 1577 0109 0C        		.byte	12
+ 1578 010a 06        		.byte	6
+ 1579 010b 3F        		.byte	63
+ 1580 010c 3F        		.byte	63
+ 1581 010d 7E        		.byte	126
+ 1582 010e 3F        		.byte	63
+ 1583 010f 3F        		.byte	63
+ 1584 0110 3F        		.byte	63
+ 1587               	GSM_Default_Alphabet:
+ 1588 0111 40        		.byte	64
+ 1589 0112 A3        		.byte	-93
+ 1590 0113 24        		.byte	36
+ 1591 0114 A5        		.byte	-91
+ 1592 0115 E8        		.byte	-24
+ 1593 0116 E9        		.byte	-23
+ 1594 0117 F9        		.byte	-7
+ 1595 0118 EC        		.byte	-20
+ 1596 0119 F2        		.byte	-14
+ 1597 011a C7        		.byte	-57
+ 1598 011b 0A        		.byte	10
+ 1599 011c D8        		.byte	-40
+ 1600 011d F8        		.byte	-8
+ 1601 011e 0D        		.byte	13
+ 1602 011f C5        		.byte	-59
+ 1603 0120 E5        		.byte	-27
+ 1604 0121 3F        		.byte	63
+ 1605 0122 5F        		.byte	95
+ 1606 0123 3F        		.byte	63
+ 1607 0124 3F        		.byte	63
+ 1608 0125 3F        		.byte	63
+ 1609 0126 3F        		.byte	63
+ 1610 0127 3F        		.byte	63
+ 1611 0128 3F        		.byte	63
+ 1612 0129 3F        		.byte	63
+ 1613 012a 3F        		.byte	63
+ 1614 012b 3F        		.byte	63
+ 1615 012c 3F        		.byte	63
+ 1616 012d C6        		.byte	-58
+ 1617 012e E6        		.byte	-26
+ 1618 012f DF        		.byte	-33
+ 1619 0130 C9        		.byte	-55
+ 1620 0131 20        		.byte	32
+ 1621 0132 21        		.byte	33
+ 1622 0133 22        		.byte	34
+ 1623 0134 23        		.byte	35
+ 1624 0135 A4        		.byte	-92
+ 1625 0136 25        		.byte	37
+ 1626 0137 26        		.byte	38
+ 1627 0138 27        		.byte	39
+ 1628 0139 28        		.byte	40
+ 1629 013a 29        		.byte	41
+ 1630 013b 2A        		.byte	42
+ 1631 013c 2B        		.byte	43
+ 1632 013d 2C        		.byte	44
+ 1633 013e 2D        		.byte	45
+ 1634 013f 2E        		.byte	46
+ 1635 0140 2F        		.byte	47
+ 1636 0141 30        		.byte	48
+ 1637 0142 31        		.byte	49
+ 1638 0143 32        		.byte	50
+ 1639 0144 33        		.byte	51
+ 1640 0145 34        		.byte	52
+ 1641 0146 35        		.byte	53
+ 1642 0147 36        		.byte	54
+ 1643 0148 37        		.byte	55
+ 1644 0149 38        		.byte	56
+ 1645 014a 39        		.byte	57
+ 1646 014b 3A        		.byte	58
+ 1647 014c 3B        		.byte	59
+ 1648 014d 3C        		.byte	60
+ 1649 014e 3D        		.byte	61
+ 1650 014f 3E        		.byte	62
+ 1651 0150 3F        		.byte	63
+ 1652 0151 A1        		.byte	-95
+ 1653 0152 41        		.byte	65
+ 1654 0153 42        		.byte	66
+ 1655 0154 43        		.byte	67
+ 1656 0155 44        		.byte	68
+ 1657 0156 45        		.byte	69
+ 1658 0157 46        		.byte	70
+ 1659 0158 47        		.byte	71
+ 1660 0159 48        		.byte	72
+ 1661 015a 49        		.byte	73
+ 1662 015b 4A        		.byte	74
+ 1663 015c 4B        		.byte	75
+ 1664 015d 4C        		.byte	76
+ 1665 015e 4D        		.byte	77
+ 1666 015f 4E        		.byte	78
+ 1667 0160 4F        		.byte	79
+ 1668 0161 50        		.byte	80
+ 1669 0162 51        		.byte	81
+ 1670 0163 52        		.byte	82
+ 1671 0164 53        		.byte	83
+ 1672 0165 54        		.byte	84
+ 1673 0166 55        		.byte	85
+ 1674 0167 56        		.byte	86
+ 1675 0168 57        		.byte	87
+ 1676 0169 58        		.byte	88
+ 1677 016a 59        		.byte	89
+ 1678 016b 5A        		.byte	90
+ 1679 016c C4        		.byte	-60
+ 1680 016d D6        		.byte	-42
+ 1681 016e D1        		.byte	-47
+ 1682 016f DC        		.byte	-36
+ 1683 0170 A7        		.byte	-89
+ 1684 0171 BF        		.byte	-65
+ 1685 0172 61        		.byte	97
+ 1686 0173 62        		.byte	98
+ 1687 0174 63        		.byte	99
+ 1688 0175 64        		.byte	100
+ 1689 0176 65        		.byte	101
+ 1690 0177 66        		.byte	102
+ 1691 0178 67        		.byte	103
+ 1692 0179 68        		.byte	104
+ 1693 017a 69        		.byte	105
+ 1694 017b 6A        		.byte	106
+ 1695 017c 6B        		.byte	107
+ 1696 017d 6C        		.byte	108
+ 1697 017e 6D        		.byte	109
+ 1698 017f 6E        		.byte	110
+ 1699 0180 6F        		.byte	111
+ 1700 0181 70        		.byte	112
+ 1701 0182 71        		.byte	113
+ 1702 0183 72        		.byte	114
+ 1703 0184 73        		.byte	115
+ 1704 0185 74        		.byte	116
+ 1705 0186 75        		.byte	117
+ 1706 0187 76        		.byte	118
+ 1707 0188 77        		.byte	119
+ 1708 0189 78        		.byte	120
+ 1709 018a 79        		.byte	121
+ 1710 018b 7A        		.byte	122
+ 1711 018c E4        		.byte	-28
+ 1712 018d F6        		.byte	-10
+ 1713 018e F1        		.byte	-15
+ 1714 018f FC        		.byte	-4
+ 1715 0190 E0        		.byte	-32
+ 1716               		.text
+ 1717               	.Letext0:
+ 1718               		.file 2 "narzedzia.h"
+ 1719               		.file 3 "/usr/local/avr8-gnu-toolchain/avr/include/stdint.h"
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 pdu.c
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:2      *ABS*:000000000000003e __SP_H__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:3      *ABS*:000000000000003d __SP_L__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:4      *ABS*:000000000000003f __SREG__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:5      *ABS*:000000000000003b __RAMPZ__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:6      *ABS*:0000000000000000 __tmp_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:7      *ABS*:0000000000000001 __zero_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:13     .text:0000000000000000 pdu_to_ascii
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:1570   .progmem.data:0000000000000111 GSM_Default_Alphabet
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:207    .text:00000000000000a8 ascii_to_pdu_blok
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:1311   .progmem.data:0000000000000011 GSM_Default_DeAlphabet
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:454    .text:000000000000019c konwertuj_blok_dwa_znaki_na_znak_pdu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:538    .text:00000000000001d6 pobierz_numer_telefonu_nadawcy_z_PDU
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:728    .text:0000000000000284 pobierz_date_z_PDU
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:794    .text:00000000000002ca pobierz_czas_z_PDU
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:842    .text:00000000000002fc wpisz_telefon_w_formacie_sms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:981    .text:000000000000037a wpisz_centrum_sms_w_formacie_sms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:1122   .text:00000000000003fe zapisz_naglowek_pdu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:1194   .text:0000000000000436 konwertuj_pdu_na_blok_wysylany
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccb4OVqQ.s:1307   .progmem.data:0000000000000000 znak_wartosc_heksadecymalna.2041
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:13     .text:0000000000000000 pdu_to_ascii
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:1587   .progmem.data:0000000000000111 GSM_Default_Alphabet
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:207    .text:00000000000000a8 ascii_to_pdu_blok
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:1328   .progmem.data:0000000000000011 GSM_Default_DeAlphabet
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:454    .text:000000000000019c konwertuj_blok_dwa_znaki_na_znak_pdu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:538    .text:00000000000001d6 pobierz_numer_telefonu_nadawcy_z_PDU
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:728    .text:0000000000000284 pobierz_date_z_PDU
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:794    .text:00000000000002ca pobierz_czas_z_PDU
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:859    .text:0000000000000310 wpisz_telefon_w_formacie_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:998    .text:000000000000038e wpisz_centrum_sms_w_formacie_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:1139   .text:0000000000000412 zapisz_naglowek_pdu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:1211   .text:000000000000044a konwertuj_pdu_na_blok_wysylany
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccj1wDtd.s:1324   .progmem.data:0000000000000000 znak_wartosc_heksadecymalna.2043
 
 NO UNDEFINED SYMBOLS
