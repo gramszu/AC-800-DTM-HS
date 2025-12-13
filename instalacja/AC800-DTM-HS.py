@@ -1733,6 +1733,14 @@ class BramsterApp:
 
         frame_buttons = tk.Frame(self.root)
         frame_buttons.pack(fill="x", pady=5)
+        
+        # Konfiguracja kolumn i wierszy - uniform zapewnia identyczny rozmiar
+        frame_buttons.columnconfigure(0, weight=1, uniform="btns")
+        frame_buttons.columnconfigure(1, weight=1, uniform="btns")
+        frame_buttons.columnconfigure(2, weight=1, uniform="btns")
+        frame_buttons.rowconfigure(0, weight=1, uniform="btnrows")
+        frame_buttons.rowconfigure(1, weight=1, uniform="btnrows")
+        frame_buttons.rowconfigure(3, weight=1, uniform="btnrows")
 
         self.btn_read_chip = tk.Button(
             frame_buttons,
