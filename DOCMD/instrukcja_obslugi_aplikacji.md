@@ -674,6 +674,60 @@ Harmonogram pozwala ograniczyć działanie bramy do określonych godzin.
 
 ---
 
+## Numer Karty SIM w Sterowniku (MYNUM)
+
+### Czym jest Numer Karty SIM?
+
+Numer karty SIM to numer telefonu karty zainstalowanej w sterowniku. Jest używany do **automatycznej synchronizacji czasu** po restarcie urządzenia.
+
+### Jak ustawić numer?
+
+#### Metoda 1: Przez aplikację Python
+
+1. Otwórz aplikację AC800-DTM-HS
+2. W sekcji **"Numer karty SIM w sterowniku"** wpisz numer telefonu (np. `600123456`)
+3. Kliknij **"Wgraj dane do sterownika"**
+4. Poczekaj na zakończenie operacji
+
+#### Metoda 2: Przez SMS
+
+Wyślij SMS na numer sterownika:
+```
+ABCD MYNUM 600123456
+```
+
+> **📝 Uwaga:** Numer może mieć od 3 do 9 cyfr. Znaki specjalne (+, #, *, spacje) są automatycznie pomijane.
+
+### Automatyczna Synchronizacja Czasu
+
+Jeśli sterownik wykryje nieprawidłowy czas po restarcie (00:00:xx), automatycznie:
+
+1. ⏱️ Czeka 10 sekund po zalogowaniu do sieci
+2. 🔍 Sprawdza czas w module GSM
+3. 📱 Jeśli czas to 00:00:xx - wysyła SMS do siebie
+4. ⏰ Synchronizuje czas z otrzymanego SMS-a
+
+> **✅ Zaleta:** Nie musisz ręcznie ustawiać czasu po każdym restarcie!
+
+### Sprawdzanie zapisanego numeru
+
+Wyślij SMS:
+```
+ABCD REPORT
+```
+
+W odpowiedzi zobaczysz:
+```
+Moj nr: 600123456
+```
+
+Lub jeśli nie ustawiono:
+```
+Moj nr: ----
+```
+
+---
+
 ## Kontakt i Wsparcie
 
 **Producent:** Robert Gramsz  
