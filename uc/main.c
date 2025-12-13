@@ -1533,11 +1533,12 @@ void steruj_urzadzeniem_100MS(void) {
 
   if (autosync_czas_aktywny && !autosync_sms_wyslany &&
       modul_zalogowany_w_sieci) {
-    // Odczekaj 10 sekund po zalogowaniu do sieci (stabilizacja modemu)
-    if (autosync_timer_100ms < 100) {
+    // Odczekaj 25 sekund po zalogowaniu do sieci (stabilizacja modemu +
+    // aktualizacja RTC)
+    if (autosync_timer_100ms < 250) {
       autosync_timer_100ms++;
     } else {
-      // Po 10 sekundach sprawdź czas z RTC modemu
+      // Po 25 sekundach sprawdź czas z RTC modemu
       // Jeśli czas to 00:00:xx (sekundy dowolne) - wyślij SMS
       if (rtc_czas[0] == '0' && rtc_czas[1] == '0' && rtc_czas[3] == '0' &&
           rtc_czas[4] == '0') {
