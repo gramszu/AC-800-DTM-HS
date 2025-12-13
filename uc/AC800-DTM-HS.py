@@ -390,7 +390,30 @@ class BramsterApp:
             # Wymuś tryb CLIP
             if self.clip_dtmf_var.get() != 1:
                 self.clip_dtmf_var.set(1)
+            
+            # Disable controls
+            try:
+                self.check_status_active.config(state="disabled")
+                self.check_status_blocked.config(state="disabled")
+                self.check_mode_private.config(state="disabled")
+                self.check_mode_public.config(state="disabled")
+                self.check_clip.config(state="disabled")
+                self.check_dtmf.config(state="disabled")
+            except AttributeError:
+                pass # Kontrolki mogą jeszcze nie istnieć przy inicjalizacji
+            
         elif val == 0:
+            # Enable controls first
+            try:
+                self.check_status_active.config(state="normal")
+                self.check_status_blocked.config(state="normal")
+                self.check_mode_private.config(state="normal")
+                self.check_mode_public.config(state="normal")
+                self.check_clip.config(state="normal")
+                self.check_dtmf.config(state="normal")
+            except AttributeError:
+                pass
+
             # Wyłączanie Skryby: Przywróć poprzednie tryby (jeśli były zapisane)
             if self.backup_mode is not None:
                 self.mode_var.set(self.backup_mode)
