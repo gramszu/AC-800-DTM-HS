@@ -1722,13 +1722,18 @@ class BramsterApp:
         self.btn_clear_all.grid(row=3, column=0, padx=5, pady=5)
         self.btn_sync_numbers.grid(row=3, column=1, padx=5, pady=5)
 
-        frame_ascii = tk.LabelFrame(self.root, text=self.config.LABELS["access_code"])
-        frame_ascii.pack(fill="x", padx=10, pady=8)
+        # Kontener dla ramek obok siebie
+        container_frames = tk.Frame(self.root)
+        container_frames.pack(fill="x", padx=10, pady=8)
+
+        # Ramka kodu dostępu (po lewej)
+        frame_ascii = tk.LabelFrame(container_frames, text=self.config.LABELS["access_code"])
+        frame_ascii.pack(side="left", fill="both", expand=True, padx=(0, 5))
 
         self.entry_ascii = tk.Entry(
             frame_ascii,
             textvariable=self.ascii_var,
-            width=40
+            width=20
         )
         self.entry_ascii.grid(row=0, column=0, padx=8, pady=8)
 
@@ -1739,16 +1744,16 @@ class BramsterApp:
         )
         self.btn_apply_ascii.grid(row=0, column=1, padx=8, pady=8)
 
-        # Osobna ramka dla numeru karty SIM
-        frame_mynum = tk.LabelFrame(self.root, text="Numer karty SIM w sterowniku")
-        frame_mynum.pack(fill="x", padx=10, pady=8)
+        # Ramka numeru karty SIM (po prawej)
+        frame_mynum = tk.LabelFrame(container_frames, text="Numer karty SIM w sterowniku")
+        frame_mynum.pack(side="left", fill="both", expand=True, padx=(5, 0))
 
         # Walidacja: tylko cyfry 0-9
         vcmd_mynum = (self.root.register(self.validate_mynum_input), '%P')
         self.entry_mynum = tk.Entry(
             frame_mynum,
             textvariable=self.mynum_var,
-            width=40,
+            width=20,
             validate='key',
             validatecommand=vcmd_mynum
         )
