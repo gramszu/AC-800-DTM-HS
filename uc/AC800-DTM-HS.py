@@ -918,13 +918,6 @@ class BramsterApp:
 
             for line in lines:
                 if ':' not in line:
-                    # Jeśli linia zawiera tekst ale nie ma dwukropka - błąd formatu
-                    if line.strip():
-                         messagebox.showerror(
-                            self.config.MESSAGES["error"],
-                            f"Nieprawidłowy format linii:\n'{line.strip()}'\n\nOczekiwano formatu: 'Pozycja: Numer'"
-                        )
-                         return False
                     continue
                 name, value = line.split(':', 1)
                 name = name.strip()
