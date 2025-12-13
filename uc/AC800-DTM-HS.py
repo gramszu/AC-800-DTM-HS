@@ -1147,6 +1147,15 @@ class BramsterApp:
 
     def zapis_eeprom(self) -> None:
         """Zapisuje dane do EEPROM."""
+        # Okno dialogowe z potwierdzeniem
+        if not messagebox.askokcancel(
+            "Potwierdzenie zapisu",
+            "Zapisane zostaną tylko dane widoczne w aplikacji.\n\n"
+            "Upewnij się, że wszystkie ustawienia są poprawne.\n\n"
+            "Czy kontynuować zapis do sterownika?"
+        ):
+            return
+        
         self.update_com_port()
 
         # 1. Walidacja i synchronizacja danych (w wątku głównym)
