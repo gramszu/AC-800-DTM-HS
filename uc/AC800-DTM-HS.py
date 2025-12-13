@@ -78,7 +78,7 @@ class AppConfig:
         self.AVRDUDE_CONF = resource_path("tools/avrdude.conf")
 
         # Ustawienia interfejsu
-        self.WINDOW_TITLE = "Bramster AC800-TS"
+        self.WINDOW_TITLE = "AC800 DTM-TS"
         self.WINDOW_SIZE = "605x950" # Zwiekszone dla Time Control
         self.WEBSITE_URL = "https://www.sonfy.pl"
 
@@ -151,7 +151,7 @@ class AppConfig:
         self.update_addresses()
 
         self.ABOUT_INFO = """
-Bramster AC800-TS
+AC800 DTM-TS
 firmware 2.0
 
 Autor: Robert Gramsz
