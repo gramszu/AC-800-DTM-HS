@@ -1863,22 +1863,7 @@ class BramsterApp:
             height=2,
             font=btn_font
         )
-        self.btn_clear_all = tk.Button(
-            frame_buttons,
-            text=self.config.BUTTONS["clear_all"],
-            command=self.clear_all_numbers,
-            width=30,
-            height=2,
-            font=btn_font
-        )
-        self.btn_sync_numbers = tk.Button(
-            frame_buttons,
-            text=self.config.BUTTONS["sync_numbers"],
-            command=self.sync_from_numbers_list,
-            width=30,
-            height=2,
-            font=btn_font
-        )
+
         self.btn_about = tk.Button(
             frame_buttons,
             text=self.config.BUTTONS["about"],
@@ -1894,8 +1879,9 @@ class BramsterApp:
         self.btn_about.grid(row=1, column=2, padx=5, pady=5, sticky="ew")
         self.btn_save_csv.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
         self.btn_read_csv.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        self.btn_clear_all.grid(row=3, column=0, padx=5, pady=5, sticky="ew")
-        self.btn_sync_numbers.grid(row=3, column=1, padx=5, pady=5, sticky="ew")
+        
+        # Przyciski clear_all i sync_numbers usunięte na żądanie użytkownika.
+
 
         # Kontener dla ramek obok siebie
         container_frames = tk.Frame(self.root)
@@ -1912,12 +1898,8 @@ class BramsterApp:
         )
         self.entry_ascii.grid(row=0, column=0, padx=8, pady=8)
 
-        self.btn_apply_ascii = tk.Button(
-            frame_ascii,
-            text=self.config.BUTTONS["apply"],
-            command=self.sync_ascii_into_textarea
-        )
-        self.btn_apply_ascii.grid(row=0, column=1, padx=8, pady=8)
+        self.entry_ascii.grid(row=0, column=0, padx=8, pady=8, sticky="ew")
+        frame_ascii.columnconfigure(0, weight=1)
 
         # Ramka numeru karty SIM (po prawej)
         frame_mynum = tk.LabelFrame(container_frames, text="Numer karty SIM w sterowniku")
