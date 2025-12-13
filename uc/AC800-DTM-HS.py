@@ -55,7 +55,8 @@ class AppConfig:
             "ADDR_TIME_STOP_H": 4092,
             "ADDR_TIME_STOP_M": 4093,
             "ADDR_MODE": 4094,
-            "ADDR_STATUS": 4087,  
+            "ADDR_STATUS": 4087,
+            "ADDR_MYNUM": 4040,  # Własny numer telefonu (10 bajtów)
         }
 
         # Aktywna konfiguracja - tylko M1284
@@ -164,6 +165,7 @@ www.sonfy.pl
         self.EEPROM_ADDR_TIME_START_M = self.ACTIVE_CONFIG["ADDR_TIME_START_M"]
         self.EEPROM_ADDR_TIME_STOP_H = self.ACTIVE_CONFIG["ADDR_TIME_STOP_H"]
         self.EEPROM_ADDR_TIME_STOP_M = self.ACTIVE_CONFIG["ADDR_TIME_STOP_M"]
+        self.EEPROM_ADDR_MYNUM = self.ACTIVE_CONFIG["ADDR_MYNUM"]
 
 
 
@@ -301,6 +303,7 @@ class BramsterApp:
         self.about_logo: Optional[tk.PhotoImage] = None
         self.icon_photo: Optional[tk.PhotoImage] = None
         self.ascii_var = tk.StringVar()
+        self.mynum_var = tk.StringVar()  # Własny numer telefonu dla auto-sync
         self.com_port_var = tk.StringVar(value=self.config.PORT)
 
         # Zmienne dla statusu, trybu i sterowania (zgodne z C)
@@ -512,6 +515,19 @@ class BramsterApp:
                     if len(data) > self.config.EEPROM_ADDR_TIME_STOP_M:
                         self.time_stop_m_var.set(f"{data[self.config.EEPROM_ADDR_TIME_STOP_M]:02d}")
 
+        # MYNUM (własny numer telefonu)
+        if self.config.EEPROM_ADDR_MYNUM and len(data) > self.config.EEPROM_ADDR_MYNUM + 9:
+            # Odczytaj 10 bajtów (maksymalnie 9 cyfr + null terminator)
+            mynum_bytes = data[self.config.EEPROM_ADDR_MYNUM:self.config.EEPROM_ADDR_MYNUM + 10]
+            # Konwertuj na string, zatrzymaj się na 0x00 lub 0xFF
+            mynum_str = ""
+            for b in mynum_bytes:
+                if b == 0x00 or b == 0xFF:
+                    break
+                if 48 <= b <= 57:  # ASCII cyfry 0-9
+                    mynum_str += chr(b)
+            self.mynum_var.set(mynum_str)
+
         logging.info(
             f"Read from EEPROM - Status: {self.status_var.get()}, "
             f"Mode: {self.mode_var.get()}, Skryba: {self.skryba_var.get()}"
@@ -556,6 +572,22 @@ class BramsterApp:
                     data[self.config.EEPROM_ADDR_TIME_STOP_M] = int(self.time_stop_m_var.get())
                 except ValueError:
                     logging.error("Invalid time values")
+
+        # MYNUM (własny numer telefonu)
+        if self.config.EEPROM_ADDR_MYNUM:
+            mynum_str = self.mynum_var.get().strip()
+            # Walidacja: tylko cyfry, 3-9 znaków
+            if mynum_str and mynum_str.isdigit() and 3 <= len(mynum_str) <= 9:
+                # Zapisz numer jako ASCII
+                for i, char in enumerate(mynum_str):
+                    data[self.config.EEPROM_ADDR_MYNUM + i] = ord(char)
+                # Dodaj null terminator
+                if len(mynum_str) < 10:
+                    data[self.config.EEPROM_ADDR_MYNUM + len(mynum_str)] = 0x00
+            else:
+                # Wyczyść (ustaw na 0xFF)
+                for i in range(10):
+                    data[self.config.EEPROM_ADDR_MYNUM + i] = 0xFF
 
         logging.info(
             f"Write to EEPROM - Status: {self.status_var.get()}, "
@@ -1688,7 +1720,7 @@ class BramsterApp:
         self.entry_ascii = tk.Entry(
             frame_ascii,
             textvariable=self.ascii_var,
-            width=40
+            width=20
         )
         self.entry_ascii.grid(row=0, column=0, padx=8, pady=8)
 
@@ -1698,6 +1730,15 @@ class BramsterApp:
             command=self.sync_ascii_into_textarea
         )
         self.btn_apply_ascii.grid(row=0, column=1, padx=8, pady=8)
+
+        # Pole MYNUM (własny numer)
+        tk.Label(frame_ascii, text="Mój numer:").grid(row=0, column=2, padx=(20, 5), pady=8)
+        self.entry_mynum = tk.Entry(
+            frame_ascii,
+            textvariable=self.mynum_var,
+            width=15
+        )
+        self.entry_mynum.grid(row=0, column=3, padx=5, pady=8)
 
         label_hex = tk.Label(
             self.root,
