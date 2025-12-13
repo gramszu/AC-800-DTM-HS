@@ -1590,7 +1590,7 @@ class BramsterApp:
 
         # Zapisujemy referencje do ramki trybu
         self.frame_mode = tk.LabelFrame(frame_status_mode, text=self.config.LABELS["mode_control"])
-        self.frame_mode.pack(side="left", padx=(5, 5), expand=True, fill="x")
+        self.frame_mode.pack(side="left", padx=(5, 0), expand=True, fill="x")
 
         self.check_mode_private = tk.Radiobutton(
             self.frame_mode,
