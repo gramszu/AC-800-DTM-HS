@@ -132,6 +132,7 @@ czekanie_na_odebranie_zachety
                     0x1               sim900.o
 liczba_odebranych_znakow_SIM900
                     0x2               sim900.o
+moj_numer_telefonu  0x11              main.o
 numer_telefonu_odebranego_smsa
                     0x11              main.o
 bufor_pomoc_adres_eeprom
@@ -310,7 +311,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x0000000000000000     0x65ec
+.text           0x0000000000000000     0x67a6
  *(.vectors)
  .vectors       0x0000000000000000       0x8c /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
                 0x0000000000000000                __vectors
@@ -326,40 +327,41 @@ END GROUP
  *libprintf_flt.a:*(.progmem.data)
  *libc.a:*(.progmem.data)
  *(.progmem*)
- .progmem.data  0x000000000000008c      0x2e4 main.o
- .progmem.data  0x0000000000000370       0x72 poleceniagsm.o
- .progmem.data  0x00000000000003e2       0x9f interpretacjaSMS.o
- .progmem.data  0x0000000000000481       0x10 konfiguracja.o
- .progmem.data  0x0000000000000491      0x191 pdu.o
-                0x0000000000000622                . = ALIGN (0x2)
+ .progmem.data  0x000000000000008c      0x2f4 main.o
+ .progmem.data  0x0000000000000380       0x72 poleceniagsm.o
+ .progmem.data  0x00000000000003f2       0xb8 interpretacjaSMS.o
+ .progmem.data  0x00000000000004aa       0x10 konfiguracja.o
+ .progmem.data  0x00000000000004ba      0x191 pdu.o
+                0x000000000000064c                . = ALIGN (0x2)
+ *fill*         0x000000000000064b        0x1 
  *(.jumptables)
  *(.jumptables*)
  *(.lowtext)
  *(.lowtext*)
-                0x0000000000000622                __ctors_start = .
+                0x000000000000064c                __ctors_start = .
  *(.ctors)
-                0x0000000000000622                __ctors_end = .
-                0x0000000000000622                __dtors_start = .
+                0x000000000000064c                __ctors_end = .
+                0x000000000000064c                __dtors_start = .
  *(.dtors)
-                0x0000000000000622                __dtors_end = .
+                0x000000000000064c                __dtors_end = .
  SORT(*)(.ctors)
  SORT(*)(.dtors)
  *(.init0)
- .init0         0x0000000000000622        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
-                0x0000000000000622                __init
+ .init0         0x000000000000064c        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
+                0x000000000000064c                __init
  *(.init0)
  *(.init1)
  *(.init1)
  *(.init2)
- .init2         0x0000000000000622        0xc /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
+ .init2         0x000000000000064c        0xc /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
  *(.init2)
  *(.init3)
  *(.init3)
  *(.init4)
- .init4         0x000000000000062e       0x1a /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
-                0x000000000000062e                __do_copy_data
- .init4         0x0000000000000648       0x10 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
-                0x0000000000000648                __do_clear_bss
+ .init4         0x0000000000000658       0x1a /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
+                0x0000000000000658                __do_copy_data
+ .init4         0x0000000000000672       0x10 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
+                0x0000000000000672                __do_clear_bss
  *(.init4)
  *(.init5)
  *(.init5)
@@ -370,420 +372,420 @@ END GROUP
  *(.init8)
  *(.init8)
  *(.init9)
- .init9         0x0000000000000658        0x8 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
+ .init9         0x0000000000000682        0x8 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
  *(.init9)
  *(.text)
- .text          0x0000000000000660        0x4 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
-                0x0000000000000660                __vector_18
-                0x0000000000000660                __vector_1
-                0x0000000000000660                __vector_32
-                0x0000000000000660                __vector_34
-                0x0000000000000660                __vector_24
-                0x0000000000000660                __vector_12
-                0x0000000000000660                __bad_interrupt
-                0x0000000000000660                __vector_6
-                0x0000000000000660                __vector_31
-                0x0000000000000660                __vector_3
-                0x0000000000000660                __vector_23
-                0x0000000000000660                __vector_30
-                0x0000000000000660                __vector_25
-                0x0000000000000660                __vector_11
-                0x0000000000000660                __vector_13
-                0x0000000000000660                __vector_17
-                0x0000000000000660                __vector_19
-                0x0000000000000660                __vector_7
-                0x0000000000000660                __vector_27
-                0x0000000000000660                __vector_5
-                0x0000000000000660                __vector_33
-                0x0000000000000660                __vector_4
-                0x0000000000000660                __vector_9
-                0x0000000000000660                __vector_2
-                0x0000000000000660                __vector_21
-                0x0000000000000660                __vector_15
-                0x0000000000000660                __vector_29
-                0x0000000000000660                __vector_8
-                0x0000000000000660                __vector_26
-                0x0000000000000660                __vector_14
-                0x0000000000000660                __vector_10
-                0x0000000000000660                __vector_28
- .text          0x0000000000000664     0x33c2 main.o
-                0x00000000000007c0                test_dioda_wyjscia
-                0x00000000000007ee                test_wejscie
-                0x00000000000007fe                __vector_16
-                0x0000000000000900                generuj_raport_sieci
-                0x00000000000009c8                generuj_raport_uzytkownikow_1
-                0x0000000000000a7a                generuj_raport_uzytkownikow
-                0x0000000000000b1c                generuj_raport_stanu_urzadzenia
-                0x0000000000000c98                czy_numer_jest_super_userem
-                0x0000000000000cf8                ustaw_wyjscie_clip
-                0x0000000000000d18                wykonanie_polecenia_sms
-                0x00000000000012a6                steruj_wejsciem_reset_100ms
-                0x00000000000012ee                sprawdz_przychodzaca_rozmowe
-                0x0000000000001392                zakonczono_rozmowe_telefoniczna
-                0x00000000000013ae                zakonczono_wysylanie_smsa
-                0x00000000000013ba                problem_z_wyslaniem_powiadomienia
-                0x00000000000013e2                wyzerowanie_danych_SIM900
-                0x0000000000001410                reset_modulu_SIM900
-                0x000000000000146a                obsluga_wysylania_sms
-                0x0000000000001574                odpowiedz_na_polecenie
-                0x0000000000001bf0                obsluga_komendy_SIM900
-                0x0000000000001e96                wyslanie_polecenia_ROM
-                0x0000000000001ebe                wyslij_sms
-                0x0000000000001fb8                wykonanie_komend_SIM900
-                0x0000000000002866                steruj_SIM900_100MS
-                0x0000000000002a3e                steruj_SIM900_10MS
-                0x0000000000002bfe                wykonanie_komend_powiadomien
-                0x0000000000002d6a                test_sms_clip_100ms
-                0x0000000000002d6c                steruj_wejscia_wyjscia_100ms
-                0x0000000000002d78                zapis_w_eeprom_stanu_wyjsc
-                0x0000000000002df4                steruj_urzadzeniem_100MS
-                0x0000000000003020                steruj_urzadzeniem_10MS
-                0x000000000000302c                wolne_zdarzenie_timer
-                0x000000000000310a                ustaw_parametry_dla_bezpieczenstwa
-                0x000000000000312a                inicjalizuj_parametry_modulu
-                0x0000000000003386                wykonanie_komend_ukladow
-                0x0000000000003a0e                wykonanie_komend
- .text          0x0000000000003a26      0x20a wewy.o
-                0x0000000000003a26                aktualny_stan_logiczny_na_wejsciu
-                0x0000000000003a3a                aktualizuj_stan_wyzwolenia_wejsc_100ms
-                0x0000000000003b78                steruj_wejscia_10ms
-                0x0000000000003b8c                steruj_wyjscia_100ms
-                0x0000000000003bea                kopiuj_parametry_we_wy_z_eeprom
-                0x0000000000003c14                inicjalizuj_parametry_we_wy
- .text          0x0000000000003c30      0x420 sim900.o
-                0x0000000000003c30                wyslij_znaki_SIM900
-                0x0000000000003c62                wyslij_polecenie_ROM_SIM900
-                0x0000000000003c9a                wyslij_polecenie_RAM_SIM900
-                0x0000000000003cc4                __vector_22
-                0x0000000000003d4c                __vector_20
-                0x0000000000003f8e                inicjalizacja_SIM900
-                0x0000000000003fb2                zakonczenie_procedury_inicjalizacyjnej
-                0x0000000000003fd8                procedura_inicjalizacyjna_SIM900_100MS
- .text          0x0000000000004050      0x476 poleceniagsm.o
-                0x0000000000004050                porownaj_znaki
-                0x000000000000407c                resetuj_polecenie_konczace
-                0x0000000000004094                polecenia_konczace_gsm
-                0x0000000000004482                czy_jest_nowa_komenda_SIM900
- .text          0x00000000000044c6        0x0 pamiec_ram.o
- .text          0x00000000000044c6      0x9e2 interpretacjaSMS.o
-                0x00000000000044c6                sprawdz_kod
-                0x0000000000004530                sprawdz_reset_ustawien
-                0x0000000000004548                interpretuj_instrukcje_sms
-                0x00000000000045fc                pobierz_long
-                0x0000000000004642                pomin_znak
-                0x000000000000469e                czy_jest_znak
-                0x0000000000004708                pobierz_wyraz
-                0x0000000000004788                pobierz_numer_telefonu
-                0x00000000000048a2                interpretuj_wiadomosc_sms
- .text          0x0000000000004ea8       0xb0 komendy.o
-                0x0000000000004ea8                dodaj_komende
-                0x0000000000004ecc                filtruj_i_dodaj_komende
-                0x0000000000004ef4                filtruj_komendy_z_przedzialu
-                0x0000000000004f24                usun_komende
-                0x0000000000004f3a                czy_sa_komendy_z_przedzialu
- .text          0x0000000000004f58      0x280 konfiguracja.o
-                0x0000000000004f58                konwersja_znaku_telefonu
-                0x0000000000004f7e                konwertuj_telefon_na_blok_eeprom
-                0x0000000000005004                konwersja_znaku_telefonu_eeprom
-                0x0000000000005010                konwertuj_blok_eeprom_na_telefon
-                0x00000000000050e0                kopiuj_blok_eeprom_na_telefon
-                0x0000000000005128                porownaj_numer_telefonu_blok
-                0x0000000000005186                porownaj_numer_telefonu
- .text          0x00000000000051d8      0x1c6 zapiseeprom.o
-                0x0000000000005204                zapisz_bajt_w_EEPROM
-                0x00000000000052cc                zapisz_znaki_w_eeprom
-                0x000000000000531a                zapisz_znaki_w_eeprom_bez_kopiowania
-                0x0000000000005322                zapisz_znak_w_eeprom
-                0x0000000000005350                eeprom_read_3char
- .text          0x000000000000539e      0x49a pdu.o
-                0x000000000000539e                pdu_to_ascii
-                0x0000000000005446                ascii_to_pdu_blok
-                0x000000000000553a                konwertuj_blok_dwa_znaki_na_znak_pdu
-                0x0000000000005574                pobierz_numer_telefonu_nadawcy_z_PDU
-                0x0000000000005622                pobierz_date_z_PDU
-                0x0000000000005668                pobierz_czas_z_PDU
-                0x00000000000056ae                wpisz_telefon_w_formacie_sms
-                0x000000000000572c                wpisz_centrum_sms_w_formacie_sms
-                0x00000000000057b0                zapisz_naglowek_pdu
-                0x00000000000057e8                konwertuj_pdu_na_blok_wysylany
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strtol.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strtoul.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(isspace.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(toupper.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcmp_P.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcpy_P.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcpy_P.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strncasecmp_P.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strncmp_P.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strstr_P.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcmp.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcpy.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memset.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcat.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strchr.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcpy.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(utoa_ncheck.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(sprintf.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(vfprintf_std.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(errno.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(cty_isfalse.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strnlen_P.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strnlen.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strrev.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(fputc.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(ultoa_invert.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eerd_block.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eerd_byte.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eeupd_block.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eeupd_byte.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
- .text          0x0000000000005838        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
-                0x0000000000005838                . = ALIGN (0x2)
+ .text          0x000000000000068a        0x4 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
+                0x000000000000068a                __vector_18
+                0x000000000000068a                __vector_1
+                0x000000000000068a                __vector_32
+                0x000000000000068a                __vector_34
+                0x000000000000068a                __vector_24
+                0x000000000000068a                __vector_12
+                0x000000000000068a                __bad_interrupt
+                0x000000000000068a                __vector_6
+                0x000000000000068a                __vector_31
+                0x000000000000068a                __vector_3
+                0x000000000000068a                __vector_23
+                0x000000000000068a                __vector_30
+                0x000000000000068a                __vector_25
+                0x000000000000068a                __vector_11
+                0x000000000000068a                __vector_13
+                0x000000000000068a                __vector_17
+                0x000000000000068a                __vector_19
+                0x000000000000068a                __vector_7
+                0x000000000000068a                __vector_27
+                0x000000000000068a                __vector_5
+                0x000000000000068a                __vector_33
+                0x000000000000068a                __vector_4
+                0x000000000000068a                __vector_9
+                0x000000000000068a                __vector_2
+                0x000000000000068a                __vector_21
+                0x000000000000068a                __vector_15
+                0x000000000000068a                __vector_29
+                0x000000000000068a                __vector_8
+                0x000000000000068a                __vector_26
+                0x000000000000068a                __vector_14
+                0x000000000000068a                __vector_10
+                0x000000000000068a                __vector_28
+ .text          0x000000000000068e     0x34e4 main.o
+                0x00000000000007ea                test_dioda_wyjscia
+                0x0000000000000818                test_wejscie
+                0x0000000000000828                __vector_16
+                0x000000000000092a                generuj_raport_sieci
+                0x00000000000009f2                generuj_raport_uzytkownikow_1
+                0x0000000000000aa4                generuj_raport_uzytkownikow
+                0x0000000000000b46                generuj_raport_stanu_urzadzenia
+                0x0000000000000d16                czy_numer_jest_super_userem
+                0x0000000000000d76                ustaw_wyjscie_clip
+                0x0000000000000d96                wykonanie_polecenia_sms
+                0x000000000000132e                steruj_wejsciem_reset_100ms
+                0x0000000000001376                sprawdz_przychodzaca_rozmowe
+                0x000000000000141a                zakonczono_rozmowe_telefoniczna
+                0x0000000000001436                zakonczono_wysylanie_smsa
+                0x0000000000001442                problem_z_wyslaniem_powiadomienia
+                0x000000000000146a                wyzerowanie_danych_SIM900
+                0x0000000000001498                reset_modulu_SIM900
+                0x00000000000014f2                obsluga_wysylania_sms
+                0x00000000000015fc                odpowiedz_na_polecenie
+                0x0000000000001c78                obsluga_komendy_SIM900
+                0x0000000000001f1e                wyslanie_polecenia_ROM
+                0x0000000000001f46                wyslij_sms
+                0x0000000000002040                wykonanie_komend_SIM900
+                0x00000000000028ee                steruj_SIM900_100MS
+                0x0000000000002ac6                steruj_SIM900_10MS
+                0x0000000000002c86                wykonanie_komend_powiadomien
+                0x0000000000002df2                test_sms_clip_100ms
+                0x0000000000002df4                steruj_wejscia_wyjscia_100ms
+                0x0000000000002e00                zapis_w_eeprom_stanu_wyjsc
+                0x0000000000002e7c                steruj_urzadzeniem_100MS
+                0x0000000000003126                steruj_urzadzeniem_10MS
+                0x0000000000003132                wolne_zdarzenie_timer
+                0x0000000000003210                ustaw_parametry_dla_bezpieczenstwa
+                0x0000000000003230                inicjalizuj_parametry_modulu
+                0x00000000000034d2                wykonanie_komend_ukladow
+                0x0000000000003b5a                wykonanie_komend
+ .text          0x0000000000003b72      0x20a wewy.o
+                0x0000000000003b72                aktualny_stan_logiczny_na_wejsciu
+                0x0000000000003b86                aktualizuj_stan_wyzwolenia_wejsc_100ms
+                0x0000000000003cc4                steruj_wejscia_10ms
+                0x0000000000003cd8                steruj_wyjscia_100ms
+                0x0000000000003d36                kopiuj_parametry_we_wy_z_eeprom
+                0x0000000000003d60                inicjalizuj_parametry_we_wy
+ .text          0x0000000000003d7c      0x420 sim900.o
+                0x0000000000003d7c                wyslij_znaki_SIM900
+                0x0000000000003dae                wyslij_polecenie_ROM_SIM900
+                0x0000000000003de6                wyslij_polecenie_RAM_SIM900
+                0x0000000000003e10                __vector_22
+                0x0000000000003e98                __vector_20
+                0x00000000000040da                inicjalizacja_SIM900
+                0x00000000000040fe                zakonczenie_procedury_inicjalizacyjnej
+                0x0000000000004124                procedura_inicjalizacyjna_SIM900_100MS
+ .text          0x000000000000419c      0x476 poleceniagsm.o
+                0x000000000000419c                porownaj_znaki
+                0x00000000000041c8                resetuj_polecenie_konczace
+                0x00000000000041e0                polecenia_konczace_gsm
+                0x00000000000045ce                czy_jest_nowa_komenda_SIM900
+ .text          0x0000000000004612        0x0 pamiec_ram.o
+ .text          0x0000000000004612      0xa50 interpretacjaSMS.o
+                0x0000000000004612                sprawdz_kod
+                0x000000000000467c                sprawdz_reset_ustawien
+                0x0000000000004694                interpretuj_instrukcje_sms
+                0x0000000000004748                pobierz_long
+                0x000000000000478e                pomin_znak
+                0x00000000000047ea                czy_jest_znak
+                0x0000000000004854                pobierz_wyraz
+                0x00000000000048d4                pobierz_numer_telefonu
+                0x00000000000049ee                interpretuj_wiadomosc_sms
+ .text          0x0000000000005062       0xb0 komendy.o
+                0x0000000000005062                dodaj_komende
+                0x0000000000005086                filtruj_i_dodaj_komende
+                0x00000000000050ae                filtruj_komendy_z_przedzialu
+                0x00000000000050de                usun_komende
+                0x00000000000050f4                czy_sa_komendy_z_przedzialu
+ .text          0x0000000000005112      0x280 konfiguracja.o
+                0x0000000000005112                konwersja_znaku_telefonu
+                0x0000000000005138                konwertuj_telefon_na_blok_eeprom
+                0x00000000000051be                konwersja_znaku_telefonu_eeprom
+                0x00000000000051ca                konwertuj_blok_eeprom_na_telefon
+                0x000000000000529a                kopiuj_blok_eeprom_na_telefon
+                0x00000000000052e2                porownaj_numer_telefonu_blok
+                0x0000000000005340                porownaj_numer_telefonu
+ .text          0x0000000000005392      0x1c6 zapiseeprom.o
+                0x00000000000053be                zapisz_bajt_w_EEPROM
+                0x0000000000005486                zapisz_znaki_w_eeprom
+                0x00000000000054d4                zapisz_znaki_w_eeprom_bez_kopiowania
+                0x00000000000054dc                zapisz_znak_w_eeprom
+                0x000000000000550a                eeprom_read_3char
+ .text          0x0000000000005558      0x49a pdu.o
+                0x0000000000005558                pdu_to_ascii
+                0x0000000000005600                ascii_to_pdu_blok
+                0x00000000000056f4                konwertuj_blok_dwa_znaki_na_znak_pdu
+                0x000000000000572e                pobierz_numer_telefonu_nadawcy_z_PDU
+                0x00000000000057dc                pobierz_date_z_PDU
+                0x0000000000005822                pobierz_czas_z_PDU
+                0x0000000000005868                wpisz_telefon_w_formacie_sms
+                0x00000000000058e6                wpisz_centrum_sms_w_formacie_sms
+                0x000000000000596a                zapisz_naglowek_pdu
+                0x00000000000059a2                konwertuj_pdu_na_blok_wysylany
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strtol.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strtoul.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(isspace.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(toupper.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcmp_P.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcpy_P.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcpy_P.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strncasecmp_P.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strncmp_P.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strstr_P.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcmp.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcpy.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memset.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcat.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strchr.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcpy.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(utoa_ncheck.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(sprintf.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(vfprintf_std.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(errno.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(cty_isfalse.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strnlen_P.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strnlen.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strrev.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(fputc.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(ultoa_invert.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eerd_block.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eerd_byte.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eeupd_block.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eeupd_byte.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
+ .text          0x00000000000059f2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
+                0x00000000000059f2                . = ALIGN (0x2)
  *(.text.*)
- .text.startup  0x0000000000005838       0x88 main.o
-                0x0000000000005838                main
+ .text.startup  0x00000000000059f2       0x88 main.o
+                0x00000000000059f2                main
  .text.libgcc.mul
-                0x00000000000058c0        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
+                0x0000000000005a7a        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
  .text.libgcc.div
-                0x00000000000058c0       0x28 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
-                0x00000000000058c0                __divmodhi4
-                0x00000000000058c0                _div
- .text.libgcc   0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
+                0x0000000000005a7a       0x28 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
+                0x0000000000005a7a                __divmodhi4
+                0x0000000000005a7a                _div
+ .text.libgcc   0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
  .text.libgcc.prologue
-                0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
+                0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
  .text.libgcc.builtins
-                0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
+                0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
  .text.libgcc.fmul
-                0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
+                0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
  .text.libgcc.fixed
-                0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
+                0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
  .text.libgcc.mul
-                0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
+                0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
  .text.libgcc.div
-                0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
- .text.libgcc   0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
+                0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
+ .text.libgcc   0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
  .text.libgcc.prologue
-                0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
+                0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
  .text.libgcc.builtins
-                0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
+                0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
  .text.libgcc.fmul
-                0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
+                0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
  .text.libgcc.fixed
-                0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
+                0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
  .text.libgcc.mul
-                0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
+                0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
  .text.libgcc.div
-                0x00000000000058e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
- .text.libgcc   0x00000000000058e8       0x12 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
-                0x00000000000058e8                __tablejump2__
+                0x0000000000005aa2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
+ .text.libgcc   0x0000000000005aa2       0x12 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
+                0x0000000000005aa2                __tablejump2__
  .text.libgcc.prologue
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
  .text.libgcc.builtins
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
  .text.libgcc.fmul
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
  .text.libgcc.fixed
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
  .text.libgcc.mul
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
  .text.libgcc.div
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
- .text.libgcc   0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
+ .text.libgcc   0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
  .text.libgcc.prologue
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
  .text.libgcc.builtins
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
  .text.libgcc.fmul
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
  .text.libgcc.fixed
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
  .text.libgcc.mul
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
  .text.libgcc.div
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
- .text.libgcc   0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
+ .text.libgcc   0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
  .text.libgcc.prologue
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
  .text.libgcc.builtins
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
  .text.libgcc.fmul
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
  .text.libgcc.fixed
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
  .text.libgcc.mul
-                0x00000000000058fa        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
+                0x0000000000005ab4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
  .text.libgcc.div
-                0x00000000000058fa       0x28 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
-                0x00000000000058fa                __udivmodhi4
- .text.libgcc   0x0000000000005922        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
+                0x0000000000005ab4       0x28 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
+                0x0000000000005ab4                __udivmodhi4
+ .text.libgcc   0x0000000000005adc        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
  .text.libgcc.prologue
-                0x0000000000005922        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
+                0x0000000000005adc        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
  .text.libgcc.builtins
-                0x0000000000005922        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
+                0x0000000000005adc        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
  .text.libgcc.fmul
-                0x0000000000005922        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
+                0x0000000000005adc        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
  .text.libgcc.fixed
-                0x0000000000005922        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
+                0x0000000000005adc        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
  .text.avr-libc
-                0x0000000000005922      0x25c /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strtol.o)
-                0x0000000000005922                strtol
+                0x0000000000005adc      0x25c /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strtol.o)
+                0x0000000000005adc                strtol
  .text.avr-libc
-                0x0000000000005b7e      0x206 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strtoul.o)
-                0x0000000000005b7e                strtoul
+                0x0000000000005d38      0x206 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strtoul.o)
+                0x0000000000005d38                strtoul
  .text.avr-libc
-                0x0000000000005d84       0x12 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(isspace.o)
-                0x0000000000005d84                isspace
+                0x0000000000005f3e       0x12 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(isspace.o)
+                0x0000000000005f3e                isspace
  .text.avr-libc
-                0x0000000000005d96       0x10 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(toupper.o)
-                0x0000000000005d96                toupper
+                0x0000000000005f50       0x10 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(toupper.o)
+                0x0000000000005f50                toupper
  .text.avr-libc
-                0x0000000000005da6       0x1a /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcmp_P.o)
-                0x0000000000005da6                memcmp_P
+                0x0000000000005f60       0x1a /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcmp_P.o)
+                0x0000000000005f60                memcmp_P
  .text.avr-libc
-                0x0000000000005dc0       0x12 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcpy_P.o)
-                0x0000000000005dc0                memcpy_P
+                0x0000000000005f7a       0x12 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcpy_P.o)
+                0x0000000000005f7a                memcpy_P
  .text.avr-libc
-                0x0000000000005dd2        0xe /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcpy_P.o)
-                0x0000000000005dd2                strcpy_P
+                0x0000000000005f8c        0xe /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcpy_P.o)
+                0x0000000000005f8c                strcpy_P
  .text.avr-libc
-                0x0000000000005de0       0x30 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strncasecmp_P.o)
-                0x0000000000005de0                strncasecmp_P
+                0x0000000000005f9a       0x30 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strncasecmp_P.o)
+                0x0000000000005f9a                strncasecmp_P
  .text.avr-libc
-                0x0000000000005e10       0x1c /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strncmp_P.o)
-                0x0000000000005e10                strncmp_P
+                0x0000000000005fca       0x1c /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strncmp_P.o)
+                0x0000000000005fca                strncmp_P
  .text.avr-libc
-                0x0000000000005e2c       0x34 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strstr_P.o)
-                0x0000000000005e2c                strstr_P
+                0x0000000000005fe6       0x34 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strstr_P.o)
+                0x0000000000005fe6                strstr_P
  .text.avr-libc
-                0x0000000000005e60       0x1a /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcmp.o)
-                0x0000000000005e60                memcmp
+                0x000000000000601a       0x1a /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcmp.o)
+                0x000000000000601a                memcmp
  .text.avr-libc
-                0x0000000000005e7a       0x12 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcpy.o)
-                0x0000000000005e7a                memcpy
+                0x0000000000006034       0x12 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcpy.o)
+                0x0000000000006034                memcpy
  .text.avr-libc
-                0x0000000000005e8c        0xe /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memset.o)
-                0x0000000000005e8c                memset
+                0x0000000000006046        0xe /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memset.o)
+                0x0000000000006046                memset
  .text.avr-libc
-                0x0000000000005e9a       0x16 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcat.o)
-                0x0000000000005e9a                strcat
+                0x0000000000006054       0x16 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcat.o)
+                0x0000000000006054                strcat
  .text.avr-libc
-                0x0000000000005eb0       0x16 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strchr.o)
-                0x0000000000005eb0                strchr
+                0x000000000000606a       0x16 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strchr.o)
+                0x000000000000606a                strchr
  .text.avr-libc
-                0x0000000000005ec6        0xe /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcpy.o)
-                0x0000000000005ec6                strcpy
+                0x0000000000006080        0xe /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcpy.o)
+                0x0000000000006080                strcpy
  .text.avr-libc
-                0x0000000000005ed4       0x34 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(utoa_ncheck.o)
-                0x0000000000005ed4                __utoa_ncheck
-                0x0000000000005ed6                __utoa_common
+                0x000000000000608e       0x34 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(utoa_ncheck.o)
+                0x000000000000608e                __utoa_ncheck
+                0x0000000000006090                __utoa_common
  .text.avr-libc
-                0x0000000000005f08       0x60 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(sprintf.o)
-                0x0000000000005f08                sprintf
+                0x00000000000060c2       0x60 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(sprintf.o)
+                0x00000000000060c2                sprintf
  .text.avr-libc
-                0x0000000000005f68      0x406 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(vfprintf_std.o)
-                0x0000000000005f68                vfprintf
+                0x0000000000006122      0x406 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(vfprintf_std.o)
+                0x0000000000006122                vfprintf
  .text.avr-libc
-                0x000000000000636e        0x6 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(cty_isfalse.o)
-                0x000000000000636e                __ctype_isfalse
-                0x0000000000006372                __ctype_istrue
+                0x0000000000006528        0x6 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(cty_isfalse.o)
+                0x0000000000006528                __ctype_isfalse
+                0x000000000000652c                __ctype_istrue
  .text.avr-libc
-                0x0000000000006374       0x16 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strnlen_P.o)
-                0x0000000000006374                strnlen_P
+                0x000000000000652e       0x16 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strnlen_P.o)
+                0x000000000000652e                strnlen_P
  .text.avr-libc
-                0x000000000000638a       0x16 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strnlen.o)
-                0x000000000000638a                strnlen
+                0x0000000000006544       0x16 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strnlen.o)
+                0x0000000000006544                strnlen
  .text.avr-libc
-                0x00000000000063a0       0x20 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strrev.o)
-                0x00000000000063a0                strrev
+                0x000000000000655a       0x20 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strrev.o)
+                0x000000000000655a                strrev
  .text.avr-libc
-                0x00000000000063c0       0x60 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(fputc.o)
-                0x00000000000063c0                fputc
+                0x000000000000657a       0x60 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(fputc.o)
+                0x000000000000657a                fputc
  .text.avr-libc
-                0x0000000000006420       0xbc /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(ultoa_invert.o)
-                0x0000000000006420                __ultoa_invert
+                0x00000000000065da       0xbc /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(ultoa_invert.o)
+                0x00000000000065da                __ultoa_invert
  .text.avr-libc
-                0x00000000000064dc       0x20 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eerd_block.o)
-                0x00000000000064dc                eeprom_read_block
-                0x00000000000064e0                eeprom_read_blraw
+                0x0000000000006696       0x20 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eerd_block.o)
+                0x0000000000006696                eeprom_read_block
+                0x000000000000669a                eeprom_read_blraw
  .text.avr-libc
-                0x00000000000064fc       0x10 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eerd_byte.o)
-                0x00000000000064fc                eeprom_read_byte
+                0x00000000000066b6       0x10 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eerd_byte.o)
+                0x00000000000066b6                eeprom_read_byte
  .text.avr-libc
-                0x000000000000650c       0x20 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eeupd_block.o)
-                0x000000000000650c                eeprom_update_block
+                0x00000000000066c6       0x20 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eeupd_block.o)
+                0x00000000000066c6                eeprom_update_block
  .text.avr-libc
-                0x000000000000652c       0x24 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eeupd_byte.o)
-                0x000000000000652c                eeprom_update_byte
-                0x000000000000652e                eeprom_update_r18
+                0x00000000000066e6       0x24 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eeupd_byte.o)
+                0x00000000000066e6                eeprom_update_byte
+                0x00000000000066e8                eeprom_update_r18
  .text.libgcc.mul
-                0x0000000000006550       0x20 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
-                0x0000000000006550                __mulsi3
+                0x000000000000670a       0x20 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
+                0x000000000000670a                __mulsi3
  .text.libgcc.div
-                0x0000000000006570        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
- .text.libgcc   0x0000000000006570        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
+                0x000000000000672a        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
+ .text.libgcc   0x000000000000672a        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
  .text.libgcc.prologue
-                0x0000000000006570        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
+                0x000000000000672a        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
  .text.libgcc.builtins
-                0x0000000000006570        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
+                0x000000000000672a        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
  .text.libgcc.fmul
-                0x0000000000006570        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
+                0x000000000000672a        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
  .text.libgcc.fixed
-                0x0000000000006570        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
+                0x000000000000672a        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
  .text.libgcc.mul
-                0x0000000000006570        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
+                0x000000000000672a        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
  .text.libgcc.div
-                0x0000000000006570       0x44 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
-                0x0000000000006570                __udivmodsi4
- .text.libgcc   0x00000000000065b4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
+                0x000000000000672a       0x44 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
+                0x000000000000672a                __udivmodsi4
+ .text.libgcc   0x000000000000676e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
  .text.libgcc.prologue
-                0x00000000000065b4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
+                0x000000000000676e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
  .text.libgcc.builtins
-                0x00000000000065b4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
+                0x000000000000676e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
  .text.libgcc.fmul
-                0x00000000000065b4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
+                0x000000000000676e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
  .text.libgcc.fixed
-                0x00000000000065b4        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
+                0x000000000000676e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
  .text.libgcc.mul
-                0x00000000000065b4       0x16 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
-                0x00000000000065b4                __muluhisi3
+                0x000000000000676e       0x16 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
+                0x000000000000676e                __muluhisi3
  .text.libgcc.div
-                0x00000000000065ca        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
- .text.libgcc   0x00000000000065ca        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
+                0x0000000000006784        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
+ .text.libgcc   0x0000000000006784        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
  .text.libgcc.prologue
-                0x00000000000065ca        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
+                0x0000000000006784        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
  .text.libgcc.builtins
-                0x00000000000065ca        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
+                0x0000000000006784        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
  .text.libgcc.fmul
-                0x00000000000065ca        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
+                0x0000000000006784        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
  .text.libgcc.fixed
-                0x00000000000065ca        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
+                0x0000000000006784        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
  .text.libgcc.mul
-                0x00000000000065ca       0x1e /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
-                0x00000000000065ca                __umulhisi3
+                0x0000000000006784       0x1e /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
+                0x0000000000006784                __umulhisi3
  .text.libgcc.div
-                0x00000000000065e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
- .text.libgcc   0x00000000000065e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
+                0x00000000000067a2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
+ .text.libgcc   0x00000000000067a2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
  .text.libgcc.prologue
-                0x00000000000065e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
+                0x00000000000067a2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
  .text.libgcc.builtins
-                0x00000000000065e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
+                0x00000000000067a2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
  .text.libgcc.fmul
-                0x00000000000065e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
+                0x00000000000067a2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
  .text.libgcc.fixed
-                0x00000000000065e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
-                0x00000000000065e8                . = ALIGN (0x2)
+                0x00000000000067a2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
+                0x00000000000067a2                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000000000065e8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
-                0x00000000000065e8                exit
-                0x00000000000065e8                _exit
+ .fini9         0x00000000000067a2        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
+                0x00000000000067a2                exit
+                0x00000000000067a2                _exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -802,11 +804,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000000000065e8        0x4 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
+ .fini0         0x00000000000067a2        0x4 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
  *(.fini0)
-                0x00000000000065ec                _etext = .
+                0x00000000000067a6                _etext = .
 
-.data           0x0000000000800100       0xe0 load address 0x00000000000065ec
+.data           0x0000000000800100       0xd8 load address 0x00000000000067a6
                 0x0000000000800100                PROVIDE (__data_start, .)
  *(.data)
  .data          0x0000000000800100        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
@@ -876,195 +878,196 @@ END GROUP
  *(.rodata)
  *(.rodata*)
  .rodata.str1.1
-                0x0000000000800117       0xc8 main.o
+                0x0000000000800117       0xc1 main.o
  .rodata.str1.1
-                0x00000000008001df       0x23 interpretacjaSMS.o
+                0x00000000008001d8       0x23 interpretacjaSMS.o
  *(.gnu.linkonce.r*)
-                0x0000000000800202                . = ALIGN (0x2)
- *fill*         0x00000000008001df        0x1 
-                0x00000000008001e0                _edata = .
-                0x00000000008001e0                PROVIDE (__data_end, .)
+                0x00000000008001fc                . = ALIGN (0x2)
+                0x00000000008001fc                _edata = .
+                0x00000000008001fc                PROVIDE (__data_end, .)
 
-.bss            0x00000000008001e0      0x633
-                0x00000000008001e0                PROVIDE (__bss_start, .)
+.bss            0x00000000008001d8      0x648
+                0x00000000008001d8                PROVIDE (__bss_start, .)
  *(.bss)
- .bss           0x00000000008001e0        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
- .bss           0x00000000008001e0       0x56 main.o
-                0x00000000008001e0                wysylanie_smsa_clipa
-                0x00000000008001e1                wysylanie_echa_przez_pdu
-                0x00000000008001e2                blokada_systemu
-                0x00000000008001e3                opoznienie_wysylania_clipow_100MS
-                0x00000000008001e5                licznik_reset_urzadzenia
-                0x00000000008001e6                licznik_reset_modulu_SIM900
-                0x00000000008001e7                modul_zalogowany_w_sieci
-                0x00000000008001e8                licznik_wybudz_watki_10MS
-                0x00000000008001e9                wykonac_watki
-                0x00000000008001ea                wykonac_watki_10MS
-                0x00000000008001eb                wykonaj_zdarzenie_timer
-                0x00000000008001ec                stan_cyklu_blysku
-                0x00000000008001ed                liczba_blyskow_led
-                0x00000000008001ee                g_czas_systemowy_100ms
-                0x00000000008001f2                licznik_timeout_rozmowy_100ms
-                0x00000000008001f4                skryba_wlaczona
-                0x00000000008001f5                sms_pomijaj_aktualizacje_czasu
-                0x00000000008001f6                sms_timestamp_sekunda
-                0x00000000008001f7                sms_timestamp_minuta
-                0x00000000008001f8                sms_timestamp_godzina
-                0x00000000008001f9                watchdog_sms_safe_mode_100ms
-                0x00000000008001fb                watchdog_sms_trwa_reset
-                0x00000000008001fc                watchdog_sms_licznik_100ms
-                0x00000000008001fe                watchdog_sms_aktywny
-                0x00000000008001ff                blokada_clip
-                0x0000000000800200                max_oczekiwanie_na_odpowiedz_at
-                0x0000000000800201                licznik_bezpieczenstwa_opoznienie_wysylania_sms
-                0x0000000000800203                licznik_ogolny_blad_zalogowania
-                0x0000000000800205                licznik_blad_zalogowania_u_operatora
-                0x0000000000800206                licznik_blad_stanu_karty_SIM
-                0x0000000000800207                licznik_awaria_brak_zasiegu
-                0x0000000000800209                liczba_smsow_ech_do_wyslania
-                0x000000000080020a                ustaw_maksymalny_czas_dzwonienia
-                0x000000000080020b                maksymalny_czas_dzwonienia
-                0x000000000080020c                liczba_prob_wyslania_smsa
-                0x000000000080020d                flaga_wysylanie_smsa
-                0x000000000080020e                flaga_odczytywanie_smsa
-                0x000000000080020f                dlugosc_pdu
-                0x0000000000800210                licznik_bezpieczenstwa_wykonywana_rozmowa
-                0x0000000000800212                trwa_rozmowa_przychodzaca_od_uzytkownika
-                0x0000000000800213                nastepne_wysylane_polecenie_SIM900
-                0x0000000000800214                licznik_wysylane_polecenie_SIM900
-                0x0000000000800216                aktualnie_wysylane_polecenie_SIM900
-                0x0000000000800217                oproznij_bufor_SIM900_po_bledzie
-                0x0000000000800218                opoznienie_SIM900_100MS
- .bss           0x0000000000800236        0x0 wewy.o
- .bss           0x0000000000800236        0x4 sim900.o
-                0x0000000000800236                podlaczona_karta_SIM_SIM900
-                0x0000000000800237                podlaczony_modul_gsm_SIM900
-                0x0000000000800238                komenda_SIM900
-                0x0000000000800239                sprawdzaj_wejscie_CTS_SIM900
- .bss           0x000000000080023a        0x5 poleceniagsm.o
-                0x000000000080023a                numer_bledu_cms
-                0x000000000080023c                numer_bledu_cme
-                0x000000000080023e                bledny_PIN
- .bss           0x000000000080023f        0x0 pamiec_ram.o
- .bss           0x000000000080023f        0x0 interpretacjaSMS.o
- .bss           0x000000000080023f        0x1 komendy.o
-                0x000000000080023f                blokada_sterowania_czasowa
- .bss           0x0000000000800240        0x0 konfiguracja.o
- .bss           0x0000000000800240        0x2 zapiseeprom.o
-                0x0000000000800240                nr_zapisanego_znaku
-                0x0000000000800241                liczba_znakow_do_zapisu
- .bss           0x0000000000800242        0x0 pdu.o
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strtol.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strtoul.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(isspace.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(toupper.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcmp_P.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcpy_P.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcpy_P.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strncasecmp_P.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strncmp_P.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strstr_P.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcmp.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcpy.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memset.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcat.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strchr.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcpy.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(utoa_ncheck.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(sprintf.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(vfprintf_std.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(errno.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(cty_isfalse.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strnlen_P.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strnlen.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strrev.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(fputc.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(ultoa_invert.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eerd_block.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eerd_byte.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eeupd_block.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eeupd_byte.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
- .bss           0x0000000000800242        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
+ .bss           0x00000000008001d8        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
+ .bss           0x00000000008001d8       0x5a main.o
+                0x00000000008001d8                wysylanie_smsa_clipa
+                0x00000000008001d9                wysylanie_echa_przez_pdu
+                0x00000000008001da                blokada_systemu
+                0x00000000008001db                autosync_czas_aktywny
+                0x00000000008001dc                opoznienie_wysylania_clipow_100MS
+                0x00000000008001de                licznik_reset_urzadzenia
+                0x00000000008001df                licznik_reset_modulu_SIM900
+                0x00000000008001e0                modul_zalogowany_w_sieci
+                0x00000000008001e1                licznik_wybudz_watki_10MS
+                0x00000000008001e2                wykonac_watki
+                0x00000000008001e3                wykonac_watki_10MS
+                0x00000000008001e4                wykonaj_zdarzenie_timer
+                0x00000000008001e5                stan_cyklu_blysku
+                0x00000000008001e6                liczba_blyskow_led
+                0x00000000008001e7                g_czas_systemowy_100ms
+                0x00000000008001eb                licznik_timeout_rozmowy_100ms
+                0x00000000008001ed                skryba_wlaczona
+                0x00000000008001ee                sms_pomijaj_aktualizacje_czasu
+                0x00000000008001ef                sms_timestamp_sekunda
+                0x00000000008001f0                sms_timestamp_minuta
+                0x00000000008001f1                sms_timestamp_godzina
+                0x00000000008001f2                watchdog_sms_safe_mode_100ms
+                0x00000000008001f4                watchdog_sms_trwa_reset
+                0x00000000008001f5                watchdog_sms_licznik_100ms
+                0x00000000008001f7                watchdog_sms_aktywny
+                0x00000000008001f8                blokada_clip
+                0x00000000008001f9                max_oczekiwanie_na_odpowiedz_at
+                0x00000000008001fa                licznik_bezpieczenstwa_opoznienie_wysylania_sms
+                0x00000000008001fc                licznik_ogolny_blad_zalogowania
+                0x00000000008001fe                licznik_blad_zalogowania_u_operatora
+                0x00000000008001ff                licznik_blad_stanu_karty_SIM
+                0x0000000000800200                licznik_awaria_brak_zasiegu
+                0x0000000000800202                liczba_smsow_ech_do_wyslania
+                0x0000000000800203                ustaw_maksymalny_czas_dzwonienia
+                0x0000000000800204                maksymalny_czas_dzwonienia
+                0x0000000000800205                liczba_prob_wyslania_smsa
+                0x0000000000800206                flaga_wysylanie_smsa
+                0x0000000000800207                flaga_odczytywanie_smsa
+                0x0000000000800208                dlugosc_pdu
+                0x0000000000800209                licznik_bezpieczenstwa_wykonywana_rozmowa
+                0x000000000080020b                trwa_rozmowa_przychodzaca_od_uzytkownika
+                0x000000000080020c                nastepne_wysylane_polecenie_SIM900
+                0x000000000080020d                licznik_wysylane_polecenie_SIM900
+                0x000000000080020f                aktualnie_wysylane_polecenie_SIM900
+                0x0000000000800210                oproznij_bufor_SIM900_po_bledzie
+                0x0000000000800211                opoznienie_SIM900_100MS
+ .bss           0x0000000000800232        0x0 wewy.o
+ .bss           0x0000000000800232        0x4 sim900.o
+                0x0000000000800232                podlaczona_karta_SIM_SIM900
+                0x0000000000800233                podlaczony_modul_gsm_SIM900
+                0x0000000000800234                komenda_SIM900
+                0x0000000000800235                sprawdzaj_wejscie_CTS_SIM900
+ .bss           0x0000000000800236        0x5 poleceniagsm.o
+                0x0000000000800236                numer_bledu_cms
+                0x0000000000800238                numer_bledu_cme
+                0x000000000080023a                bledny_PIN
+ .bss           0x000000000080023b        0x0 pamiec_ram.o
+ .bss           0x000000000080023b        0x0 interpretacjaSMS.o
+ .bss           0x000000000080023b        0x1 komendy.o
+                0x000000000080023b                blokada_sterowania_czasowa
+ .bss           0x000000000080023c        0x0 konfiguracja.o
+ .bss           0x000000000080023c        0x2 zapiseeprom.o
+                0x000000000080023c                nr_zapisanego_znaku
+                0x000000000080023d                liczba_znakow_do_zapisu
+ .bss           0x000000000080023e        0x0 pdu.o
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_divmodhi4.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_exit.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_tablejump2.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_copy_data.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_clear_bss.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodhi4.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strtol.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strtoul.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(isspace.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(toupper.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcmp_P.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcpy_P.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcpy_P.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strncasecmp_P.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strncmp_P.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strstr_P.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcmp.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memcpy.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(memset.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcat.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strchr.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcpy.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(utoa_ncheck.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(sprintf.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(vfprintf_std.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(errno.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(cty_isfalse.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strnlen_P.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strnlen.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strrev.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(fputc.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(ultoa_invert.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eerd_block.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eerd_byte.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eeupd_block.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libatmega1284p.a(eeupd_byte.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_mulsi3.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_udivmodsi4.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_muluhisi3.o)
+ .bss           0x000000000080023e        0x0 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/avr51/libgcc.a(_umulhisi3.o)
  *(.bss*)
  *(COMMON)
- COMMON         0x0000000000800242      0x158 main.o
-                0x0000000000800242                stan_wyjscie
-                0x0000000000800243                opoznienie_zatrzymaj_odpytywanie_urzadzenia
-                0x0000000000800244                nie_wysylaj_echa_z_powodu_nietypowego_smsa
-                0x0000000000800245                nazwa_operatora
-                0x0000000000800250                numer_telefonu_wysylanego_smsa
-                0x0000000000800271                bufor_pdu
-                0x0000000000800339                numer_skopiowanego_telefonu_do_raportu_uzytkownikow_brama
-                0x000000000080033a                numer_telefonu_odebranego_smsa
-                0x000000000080034b                numer_telefonu_do_ktorego_dzwonic
-                0x000000000080036c                licznik_oczekiwanie_na_potwierdzenie_wyslania_znakow
-                0x000000000080036d                liczba_wykonanych_komend_identycznego_polecenia
-                0x000000000080036e                licznik_100ms_dioda_led
-                0x000000000080036f                kod_modulu
-                0x0000000000800373                numer_telefonu_skryba
-                0x0000000000800387                numer_telefonu_ktory_dzwoni
-                0x0000000000800398                ptr_start_pdu_z_wiadomoscia
- COMMON         0x000000000080039a       0x18 wewy.o
-                0x000000000080039a                licznik_wstrzymanie_alarmow_po_inicjalizacji_100ms
-                0x000000000080039b                licznik_wejscie
-                0x000000000080039c                czas_trwania_impulsu_off_na_wejsciu
-                0x00000000008003a0                czas_trwania_impulsu_off
-                0x00000000008003a4                stan_logiczny_na_wejsciu
-                0x00000000008003a5                licznik_przelacznik_wyjscia
-                0x00000000008003a9                czas_trwania_impulsu_na_wejsciu
-                0x00000000008003ad                czas_trwania_impulsu
-                0x00000000008003b1                poprzedni_stan_logiczny_na_wejsciu
- COMMON         0x00000000008003b2      0x1ac sim900.o
-                0x00000000008003b2                czy_jest_nowe_polecenie_SIM900
-                0x00000000008003b3                flaga_odebrany_znak_zachety
-                0x00000000008003b4                wykonywanie_rozmowy_telefonicznej
-                0x00000000008003b5                poczatek_polecenia_SIM900
-                0x00000000008003b7                odebrany_blok_SIM900
-                0x0000000000800548                liczba_wysylanych_znakow_SIM900
-                0x000000000080054a                zakonczenie_polecenia_SIM900
-                0x000000000080054c                czekanie_na_odebranie_zachety
-                0x000000000080054d                liczba_odebranych_znakow_SIM900
-                0x000000000080054f                liczba_znakow_pdu_do_odebrania
-                0x0000000000800551                nr_wyslanego_znaku_SIM900
-                0x0000000000800553                polozenie_otrzymanych_komend_SIM900
-                0x000000000080055d                licznik_opoznienie_oczekiwania_na_bajt_SIM900
- COMMON         0x000000000080055e        0xb poleceniagsm.o
-                0x000000000080055e                zarejestrowane_komendy_od_SIM900
-                0x0000000000800568                liczba_komend_w_kolejce_SIM900
- COMMON         0x0000000000800569      0x231 pamiec_ram.o
-                0x0000000000800569                tekst_wysylanego_smsa
-                0x000000000080060a                wysylany_blok_SIM900
- COMMON         0x000000000080079a        0x1 interpretacjaSMS.o
-                0x000000000080079a                nr_usunietego_uzytkownika_z_smsa
- COMMON         0x000000000080079b       0x3e komendy.o
-                0x000000000080079b                komendy_kolejka
-                0x00000000008007b9                bufor_ustaw_czas
- COMMON         0x00000000008007d9       0x38 zapiseeprom.o
-                0x00000000008007d9                pozycja_w_eeprom
-                0x00000000008007db                bufor_pomoc_liczba_znakow_do_zapisu
-                0x00000000008007dc                czy_zajety_bufor_eeprom
-                0x00000000008007dd                bufor_eeprom
-                0x000000000080080f                bufor_pomoc_adres_eeprom
- COMMON         0x0000000000800811        0x2 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(errno.o)
-                0x0000000000800811                errno
-                0x0000000000800813                PROVIDE (__bss_end, .)
-                0x00000000000065ec                __data_load_start = LOADADDR (.data)
-                0x00000000000066cc                __data_load_end = (__data_load_start + SIZEOF (.data))
+ COMMON         0x000000000080023e      0x169 main.o
+                0x000000000080023e                stan_wyjscie
+                0x000000000080023f                opoznienie_zatrzymaj_odpytywanie_urzadzenia
+                0x0000000000800240                nie_wysylaj_echa_z_powodu_nietypowego_smsa
+                0x0000000000800241                nazwa_operatora
+                0x000000000080024c                numer_telefonu_wysylanego_smsa
+                0x000000000080026d                bufor_pdu
+                0x0000000000800335                numer_skopiowanego_telefonu_do_raportu_uzytkownikow_brama
+                0x0000000000800336                moj_numer_telefonu
+                0x0000000000800347                numer_telefonu_odebranego_smsa
+                0x0000000000800358                numer_telefonu_do_ktorego_dzwonic
+                0x0000000000800379                licznik_oczekiwanie_na_potwierdzenie_wyslania_znakow
+                0x000000000080037a                liczba_wykonanych_komend_identycznego_polecenia
+                0x000000000080037b                licznik_100ms_dioda_led
+                0x000000000080037c                kod_modulu
+                0x0000000000800380                numer_telefonu_skryba
+                0x0000000000800394                numer_telefonu_ktory_dzwoni
+                0x00000000008003a5                ptr_start_pdu_z_wiadomoscia
+ COMMON         0x00000000008003a7       0x18 wewy.o
+                0x00000000008003a7                licznik_wstrzymanie_alarmow_po_inicjalizacji_100ms
+                0x00000000008003a8                licznik_wejscie
+                0x00000000008003a9                czas_trwania_impulsu_off_na_wejsciu
+                0x00000000008003ad                czas_trwania_impulsu_off
+                0x00000000008003b1                stan_logiczny_na_wejsciu
+                0x00000000008003b2                licznik_przelacznik_wyjscia
+                0x00000000008003b6                czas_trwania_impulsu_na_wejsciu
+                0x00000000008003ba                czas_trwania_impulsu
+                0x00000000008003be                poprzedni_stan_logiczny_na_wejsciu
+ COMMON         0x00000000008003bf      0x1ac sim900.o
+                0x00000000008003bf                czy_jest_nowe_polecenie_SIM900
+                0x00000000008003c0                flaga_odebrany_znak_zachety
+                0x00000000008003c1                wykonywanie_rozmowy_telefonicznej
+                0x00000000008003c2                poczatek_polecenia_SIM900
+                0x00000000008003c4                odebrany_blok_SIM900
+                0x0000000000800555                liczba_wysylanych_znakow_SIM900
+                0x0000000000800557                zakonczenie_polecenia_SIM900
+                0x0000000000800559                czekanie_na_odebranie_zachety
+                0x000000000080055a                liczba_odebranych_znakow_SIM900
+                0x000000000080055c                liczba_znakow_pdu_do_odebrania
+                0x000000000080055e                nr_wyslanego_znaku_SIM900
+                0x0000000000800560                polozenie_otrzymanych_komend_SIM900
+                0x000000000080056a                licznik_opoznienie_oczekiwania_na_bajt_SIM900
+ COMMON         0x000000000080056b        0xb poleceniagsm.o
+                0x000000000080056b                zarejestrowane_komendy_od_SIM900
+                0x0000000000800575                liczba_komend_w_kolejce_SIM900
+ COMMON         0x0000000000800576      0x231 pamiec_ram.o
+                0x0000000000800576                tekst_wysylanego_smsa
+                0x0000000000800617                wysylany_blok_SIM900
+ COMMON         0x00000000008007a7        0x1 interpretacjaSMS.o
+                0x00000000008007a7                nr_usunietego_uzytkownika_z_smsa
+ COMMON         0x00000000008007a8       0x3e komendy.o
+                0x00000000008007a8                komendy_kolejka
+                0x00000000008007c6                bufor_ustaw_czas
+ COMMON         0x00000000008007e6       0x38 zapiseeprom.o
+                0x00000000008007e6                pozycja_w_eeprom
+                0x00000000008007e8                bufor_pomoc_liczba_znakow_do_zapisu
+                0x00000000008007e9                czy_zajety_bufor_eeprom
+                0x00000000008007ea                bufor_eeprom
+                0x000000000080081c                bufor_pomoc_adres_eeprom
+ COMMON         0x000000000080081e        0x2 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(errno.o)
+                0x000000000080081e                errno
+                0x0000000000800820                PROVIDE (__bss_end, .)
+                0x00000000000067a6                __data_load_start = LOADADDR (.data)
+                0x000000000000687e                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x0000000000800813        0x0
+.noinit         0x0000000000800820        0x0
                 [!provide]                        PROVIDE (__noinit_start, .)
  *(.noinit*)
                 [!provide]                        PROVIDE (__noinit_end, .)
-                0x0000000000800813                _end = .
+                0x0000000000800820                _end = .
                 [!provide]                        PROVIDE (__heap_start, .)
 
 .eeprom         0x0000000000810000        0x0
@@ -1175,21 +1178,21 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x0000000000000000     0xa3d7
+.debug_info     0x0000000000000000     0xa65a
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x0000000000000000      0x792 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
- .debug_info    0x0000000000000792     0x5320 main.o
- .debug_info    0x0000000000005ab2      0x40b wewy.o
- .debug_info    0x0000000000005ebd      0x5da sim900.o
- .debug_info    0x0000000000006497      0xa40 poleceniagsm.o
- .debug_info    0x0000000000006ed7       0xb6 pamiec_ram.o
- .debug_info    0x0000000000006f8d     0x1824 interpretacjaSMS.o
- .debug_info    0x00000000000087b1      0x8d3 komendy.o
- .debug_info    0x0000000000009084      0x663 konfiguracja.o
- .debug_info    0x00000000000096e7      0x538 zapiseeprom.o
- .debug_info    0x0000000000009c1f      0x7b8 pdu.o
+ .debug_info    0x0000000000000792     0x5463 main.o
+ .debug_info    0x0000000000005bf5      0x40b wewy.o
+ .debug_info    0x0000000000006000      0x5da sim900.o
+ .debug_info    0x00000000000065da      0xa40 poleceniagsm.o
+ .debug_info    0x000000000000701a       0xb6 pamiec_ram.o
+ .debug_info    0x00000000000070d0     0x1964 interpretacjaSMS.o
+ .debug_info    0x0000000000008a34      0x8d3 komendy.o
+ .debug_info    0x0000000000009307      0x663 konfiguracja.o
+ .debug_info    0x000000000000996a      0x538 zapiseeprom.o
+ .debug_info    0x0000000000009ea2      0x7b8 pdu.o
 
-.debug_abbrev   0x0000000000000000     0x1d23
+.debug_abbrev   0x0000000000000000     0x1d32
  *(.debug_abbrev)
  .debug_abbrev  0x0000000000000000      0x729 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
  .debug_abbrev  0x0000000000000729      0x5f4 main.o
@@ -1197,25 +1200,25 @@ END GROUP
  .debug_abbrev  0x0000000000000ec7      0x1ac sim900.o
  .debug_abbrev  0x0000000000001073      0x211 poleceniagsm.o
  .debug_abbrev  0x0000000000001284       0x6c pamiec_ram.o
- .debug_abbrev  0x00000000000012f0      0x285 interpretacjaSMS.o
- .debug_abbrev  0x0000000000001575      0x128 komendy.o
- .debug_abbrev  0x000000000000169d      0x23e konfiguracja.o
- .debug_abbrev  0x00000000000018db      0x23d zapiseeprom.o
- .debug_abbrev  0x0000000000001b18      0x20b pdu.o
+ .debug_abbrev  0x00000000000012f0      0x294 interpretacjaSMS.o
+ .debug_abbrev  0x0000000000001584      0x128 komendy.o
+ .debug_abbrev  0x00000000000016ac      0x23e konfiguracja.o
+ .debug_abbrev  0x00000000000018ea      0x23d zapiseeprom.o
+ .debug_abbrev  0x0000000000001b27      0x20b pdu.o
 
-.debug_line     0x0000000000000000     0x4ded
+.debug_line     0x0000000000000000     0x4ef2
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x0000000000000000       0x1a /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
- .debug_line    0x000000000000001a     0x2e4f main.o
- .debug_line    0x0000000000002e69      0x22e wewy.o
- .debug_line    0x0000000000003097      0x4a9 sim900.o
- .debug_line    0x0000000000003540      0x43c poleceniagsm.o
- .debug_line    0x000000000000397c       0x49 pamiec_ram.o
- .debug_line    0x00000000000039c5      0x80d interpretacjaSMS.o
- .debug_line    0x00000000000041d2      0x174 komendy.o
- .debug_line    0x0000000000004346      0x340 konfiguracja.o
- .debug_line    0x0000000000004686      0x29f zapiseeprom.o
- .debug_line    0x0000000000004925      0x4c8 pdu.o
+ .debug_line    0x000000000000001a     0x2f24 main.o
+ .debug_line    0x0000000000002f3e      0x22e wewy.o
+ .debug_line    0x000000000000316c      0x4a9 sim900.o
+ .debug_line    0x0000000000003615      0x43c poleceniagsm.o
+ .debug_line    0x0000000000003a51       0x49 pamiec_ram.o
+ .debug_line    0x0000000000003a9a      0x83d interpretacjaSMS.o
+ .debug_line    0x00000000000042d7      0x174 komendy.o
+ .debug_line    0x000000000000444b      0x340 konfiguracja.o
+ .debug_line    0x000000000000478b      0x29f zapiseeprom.o
+ .debug_line    0x0000000000004a2a      0x4c8 pdu.o
 
 .debug_frame    0x0000000000000000      0xd28
  *(.debug_frame)
@@ -1229,41 +1232,41 @@ END GROUP
  .debug_frame   0x0000000000000b00       0xbc zapiseeprom.o
  .debug_frame   0x0000000000000bbc      0x16c pdu.o
 
-.debug_str      0x0000000000000000     0x4d58
+.debug_str      0x0000000000000000     0x4dc7
  *(.debug_str)
  .debug_str     0x0000000000000000      0x296 /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/crtatmega1284p.o
- .debug_str     0x0000000000000296     0x4278 main.o
-                                       0x43fe (size before relaxing)
- .debug_str     0x000000000000450e      0x10f wewy.o
+ .debug_str     0x0000000000000296     0x42cb main.o
+                                       0x4451 (size before relaxing)
+ .debug_str     0x0000000000004561      0x10f wewy.o
                                         0x42c (size before relaxing)
- .debug_str     0x000000000000461d       0x76 sim900.o
+ .debug_str     0x0000000000004670       0x76 sim900.o
                                         0x75e (size before relaxing)
- .debug_str     0x0000000000004693      0x16c poleceniagsm.o
+ .debug_str     0x00000000000046e6      0x16c poleceniagsm.o
                                         0x835 (size before relaxing)
- .debug_str     0x00000000000047ff        0xd pamiec_ram.o
+ .debug_str     0x0000000000004852        0xd pamiec_ram.o
                                         0x15d (size before relaxing)
- .debug_str     0x000000000000480c      0x2df interpretacjaSMS.o
-                                       0x2b28 (size before relaxing)
- .debug_str     0x0000000000004aeb        0xa komendy.o
+ .debug_str     0x000000000000485f      0x2fb interpretacjaSMS.o
+                                       0x2b5e (size before relaxing)
+ .debug_str     0x0000000000004b5a        0xa komendy.o
                                        0x2566 (size before relaxing)
- .debug_str     0x0000000000004af5       0x99 konfiguracja.o
+ .debug_str     0x0000000000004b64       0x99 konfiguracja.o
                                         0x3a9 (size before relaxing)
- .debug_str     0x0000000000004b8e       0x63 zapiseeprom.o
+ .debug_str     0x0000000000004bfd       0x63 zapiseeprom.o
                                         0x338 (size before relaxing)
- .debug_str     0x0000000000004bf1      0x167 pdu.o
+ .debug_str     0x0000000000004c60      0x167 pdu.o
                                         0x3e4 (size before relaxing)
 
-.debug_loc      0x0000000000000000     0x578b
+.debug_loc      0x0000000000000000     0x57c5
  *(.debug_loc)
  .debug_loc     0x0000000000000000     0x218f main.o
  .debug_loc     0x000000000000218f      0x114 wewy.o
  .debug_loc     0x00000000000022a3      0x221 sim900.o
  .debug_loc     0x00000000000024c4      0x457 poleceniagsm.o
- .debug_loc     0x000000000000291b      0xd9d interpretacjaSMS.o
- .debug_loc     0x00000000000036b8      0x198 komendy.o
- .debug_loc     0x0000000000003850      0x885 konfiguracja.o
- .debug_loc     0x00000000000040d5      0x509 zapiseeprom.o
- .debug_loc     0x00000000000045de     0x11ad pdu.o
+ .debug_loc     0x000000000000291b      0xdd7 interpretacjaSMS.o
+ .debug_loc     0x00000000000036f2      0x198 komendy.o
+ .debug_loc     0x000000000000388a      0x885 konfiguracja.o
+ .debug_loc     0x000000000000410f      0x509 zapiseeprom.o
+ .debug_loc     0x0000000000004618     0x11ad pdu.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -1283,16 +1286,16 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x0000000000000000      0x610
+.debug_ranges   0x0000000000000000      0x640
  *(.debug_ranges)
  .debug_ranges  0x0000000000000000      0x398 main.o
  .debug_ranges  0x0000000000000398       0x18 wewy.o
  .debug_ranges  0x00000000000003b0       0x58 poleceniagsm.o
- .debug_ranges  0x0000000000000408      0x108 interpretacjaSMS.o
- .debug_ranges  0x0000000000000510       0x30 komendy.o
- .debug_ranges  0x0000000000000540       0x20 konfiguracja.o
- .debug_ranges  0x0000000000000560       0x18 zapiseeprom.o
- .debug_ranges  0x0000000000000578       0x98 pdu.o
+ .debug_ranges  0x0000000000000408      0x138 interpretacjaSMS.o
+ .debug_ranges  0x0000000000000540       0x30 komendy.o
+ .debug_ranges  0x0000000000000570       0x20 konfiguracja.o
+ .debug_ranges  0x0000000000000590       0x18 zapiseeprom.o
+ .debug_ranges  0x00000000000005a8       0x98 pdu.o
 
 .debug_macro
  *(.debug_macro)
@@ -1404,6 +1407,7 @@ aktualnie_wysylane_polecenie_SIM900               main.o
 aktualny_stan_logiczny_na_wejsciu                 wewy.o
 ascii_to_pdu_blok                                 pdu.o
                                                   main.o
+autosync_czas_aktywny                             main.o
 bledny_PIN                                        poleceniagsm.o
                                                   main.o
 blokada_clip                                      main.o
@@ -1576,6 +1580,8 @@ memset                                            /usr/local/avr8-gnu-toolchain/
                                                   konfiguracja.o
                                                   main.o
 modul_zalogowany_w_sieci                          main.o
+moj_numer_telefonu                                main.o
+                                                  interpretacjaSMS.o
 nastepne_wysylane_polecenie_SIM900                main.o
 nazwa_operatora                                   main.o
 nie_wysylaj_echa_z_powodu_nietypowego_smsa        main.o
@@ -1679,6 +1685,7 @@ steruj_wejsciem_reset_100ms                       main.o
 steruj_wyjscia_100ms                              wewy.o
                                                   main.o
 strcat                                            /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strcat.o)
+                                                  interpretacjaSMS.o
                                                   main.o
 strchr                                            /usr/local/avr8-gnu-toolchain/bin/../lib/gcc/avr/7.3.0/../../../../avr/lib/avr51/libc.a(strchr.o)
                                                   main.o

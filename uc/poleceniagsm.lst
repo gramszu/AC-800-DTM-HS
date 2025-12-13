@@ -1252,35 +1252,35 @@
  977               		.file 8 "/usr/local/avr8-gnu-toolchain/avr/include/stdlib.h"
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 poleceniagsm.c
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:2      *ABS*:000000000000003e __SP_H__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:3      *ABS*:000000000000003d __SP_L__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:4      *ABS*:000000000000003f __SREG__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:5      *ABS*:000000000000003b __RAMPZ__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:6      *ABS*:0000000000000000 __tmp_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:7      *ABS*:0000000000000001 __zero_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:13     .text:0000000000000000 porownaj_znaki
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:91     .text:000000000000002c resetuj_polecenie_konczace
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:124    .text:0000000000000044 polecenia_konczace_gsm
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:13     .text:0000000000000000 porownaj_znaki
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:91     .text:000000000000002c resetuj_polecenie_konczace
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:124    .text:0000000000000044 polecenia_konczace_gsm
                             *COM*:0000000000000001 liczba_komend_w_kolejce_SIM900
                             *COM*:000000000000000a zarejestrowane_komendy_od_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:942    .progmem.data:000000000000006b polecenie_CMGS.2086
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:938    .progmem.data:0000000000000065 polecenie_ERROR.2087
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:934    .progmem.data:000000000000005d polecenie_MO_RING.2088
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:930    .progmem.data:0000000000000050 polecenie_MO_CONNECTED.2089
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:922    .progmem.data:0000000000000042 polecenie_DTMF.2091
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:918    .progmem.data:000000000000003b polecenie_CMTI.2092
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:914    .progmem.data:0000000000000030 polecenie_NO_CARRIER.2093
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:910    .progmem.data:0000000000000024 polecenie_NO_DIALTONE.2094
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:906    .progmem.data:000000000000001f polecenie_BUSY.2095
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:902    .progmem.data:0000000000000013 polecenie_CMEERROR.2096
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:955    .bss:0000000000000002 numer_bledu_cme
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:898    .progmem.data:0000000000000007 polecenie_CMSERROR.2097
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:950    .bss:0000000000000000 numer_bledu_cms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:894    .progmem.data:0000000000000000 polecenie_CUSD.2098
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:926    .progmem.data:0000000000000049 polecenie_CLIP.2090
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:816    .text:0000000000000432 czy_jest_nowa_komenda_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:961    .data:0000000000000000 poziom_sieci_gsm
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccayw45M.s:967    .bss:0000000000000004 bledny_PIN
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:942    .progmem.data:000000000000006b polecenie_CMGS.2086
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:938    .progmem.data:0000000000000065 polecenie_ERROR.2087
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:934    .progmem.data:000000000000005d polecenie_MO_RING.2088
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:930    .progmem.data:0000000000000050 polecenie_MO_CONNECTED.2089
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:922    .progmem.data:0000000000000042 polecenie_DTMF.2091
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:918    .progmem.data:000000000000003b polecenie_CMTI.2092
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:914    .progmem.data:0000000000000030 polecenie_NO_CARRIER.2093
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:910    .progmem.data:0000000000000024 polecenie_NO_DIALTONE.2094
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:906    .progmem.data:000000000000001f polecenie_BUSY.2095
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:902    .progmem.data:0000000000000013 polecenie_CMEERROR.2096
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:955    .bss:0000000000000002 numer_bledu_cme
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:898    .progmem.data:0000000000000007 polecenie_CMSERROR.2097
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:950    .bss:0000000000000000 numer_bledu_cms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:894    .progmem.data:0000000000000000 polecenie_CUSD.2098
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:926    .progmem.data:0000000000000049 polecenie_CLIP.2090
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:816    .text:0000000000000432 czy_jest_nowa_komenda_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:961    .data:0000000000000000 poziom_sieci_gsm
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc4MUUSS.s:967    .bss:0000000000000004 bledny_PIN
 
 UNDEFINED SYMBOLS
 odebrany_blok_SIM900

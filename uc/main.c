@@ -119,6 +119,12 @@ uchar licznik_reset_urzadzenia = 0;
 
 uint opoznienie_wysylania_clipow_100MS = 0;
 
+// Auto-sync czasu po restarcie
+uchar autosync_czas_aktywny =
+    FALSE; // TRUE gdy oczekujemy na SMS do synchronizacji
+uchar moj_numer_telefonu[MAX_LICZBA_ZNAKOW_TELEFON +
+                         1]; // Numer własny urządzenia
+
 void generuj_raport_sieci(uchar **buf_sms) {
   static const char tekst_gsm[] PROGMEM = "AC800-DTM-TS";
   uchar *ptr = *buf_sms;
@@ -133,7 +139,7 @@ void generuj_raport_sieci(uchar **buf_sms) {
   ptr += strlen((char *)ptr);
   *ptr++ = '\n';
 
-  static const char text_sygnal[] PROGMEM = "Sygnal GSM ";
+  static const char text_sygnal[] PROGMEM = "GSM: ";
   memcpy_R(ptr, text_sygnal);
   ptr += sizeof text_sygnal - 1;
 
@@ -151,7 +157,7 @@ void generuj_raport_sieci(uchar **buf_sms) {
 }
 
 void generuj_raport_uzytkownikow_1(uchar **buf_sms) {
-  static const char tekst_gsm[] PROGMEM = "Uzytkownicy ";
+  static const char tekst_gsm[] PROGMEM = "Uzyt: ";
   uchar *ptr = *buf_sms;
 
   memcpy_R(ptr, tekst_gsm);
@@ -237,9 +243,9 @@ void generuj_raport_stanu_urzadzenia(void) {
   *sms++ = '\n';
 
   if (czas_start_h == 0xFF) {
-    strcpy_P((char *)sms, PSTR("Harmonogram: Wylaczony"));
+    strcpy_P((char *)sms, PSTR("Harm: Wylaczony"));
   } else {
-    sprintf((char *)sms, "Harmonogram: %02d:%02d %02d:%02d", (int)czas_start_h,
+    sprintf((char *)sms, "Harm: %02d:%02d %02d:%02d", (int)czas_start_h,
             (int)czas_start_m, (int)czas_stop_h, (int)czas_stop_m);
   }
   sms += strlen((char *)sms);
@@ -250,6 +256,17 @@ void generuj_raport_stanu_urzadzenia(void) {
     strcpy_P((char *)sms, PSTR("Skryba: Wlaczona"));
   } else {
     strcpy_P((char *)sms, PSTR("Skryba: Wylaczona"));
+  }
+  sms += strlen((char *)sms);
+  *sms++ = '\n';
+
+  // Mój numer (dla auto-sync czasu)
+  strcpy_P((char *)sms, PSTR("Moj nr: "));
+  sms += strlen((char *)sms);
+  if (moj_numer_telefonu[0] != 0xFF && moj_numer_telefonu[0] != 0) {
+    strcpy((char *)sms, (char *)moj_numer_telefonu);
+  } else {
+    strcpy_P((char *)sms, PSTR("----"));
   }
   sms += strlen((char *)sms);
   *sms++ = '\n';
@@ -420,6 +437,11 @@ void wykonanie_polecenia_sms(void) {
 
   // Resetuj flagę pomijania dla następnego SMS
   sms_pomijaj_aktualizacje_czasu = FALSE;
+
+  // Auto-sync: Wyłącz po pierwszej synchronizacji czasu
+  if (autosync_czas_aktywny) {
+    autosync_czas_aktywny = FALSE;
+  }
 
   // --- BLOKADA SYSTEMU (START/STOP) ---
   if (blokada_systemu) {
@@ -1505,6 +1527,39 @@ void steruj_urzadzeniem_100MS(void) {
     licznik_report_user = 0;
   }
 
+  // Auto-sync czasu: Wyślij SMS do siebie jeśli aktywny i zalogowany w sieci
+  static uchar autosync_sms_wyslany = FALSE;
+  static uint autosync_timer_100ms = 0;
+
+  if (autosync_czas_aktywny && !autosync_sms_wyslany &&
+      modul_zalogowany_w_sieci) {
+    // Odczekaj 3 sekundy po zalogowaniu do sieci
+    if (autosync_timer_100ms < 30) {
+      autosync_timer_100ms++;
+    } else {
+      // Sprawdź czy mamy zapisany numer i czy nie wysyłamy już SMS-a
+      if (moj_numer_telefonu[0] != 0xFF && moj_numer_telefonu[0] != 0 &&
+          !flaga_wysylanie_smsa) {
+        // Wyślij SMS do siebie z treścią "Synchronizacja Czasu"
+        strcpy((char *)numer_telefonu_wysylanego_smsa,
+               (char *)moj_numer_telefonu);
+        strcpy_P((char *)tekst_wysylanego_smsa, PSTR("Synchronizacja Czasu"));
+        dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
+        autosync_sms_wyslany = TRUE;
+      } else {
+        // Brak numeru lub błąd - po prostu czekamy na przychodzący SMS
+        // System normalnie pracuje
+        autosync_sms_wyslany = TRUE; // Nie próbuj ponownie
+      }
+    }
+  }
+
+  // Reset flagi gdy auto-sync zostanie wyłączony
+  if (!autosync_czas_aktywny) {
+    autosync_sms_wyslany = FALSE;
+    autosync_timer_100ms = 0;
+  }
+
   // Mechanizm wykrywania zablokowanej kolejki i czyszczenia starych komend
   // SMS
   const komenda_typ pierwsza_komenda = komendy_kolejka[0];
@@ -1821,6 +1876,20 @@ void inicjalizuj_parametry_modulu(void) {
   while (!eeprom_is_ready())
     ;
   zapisz_debug_do_eeprom(0, 2); // Reset (komenda=0 oznacza reset)
+
+  // Auto-sync czasu: Odczytaj numer własny z EEPROM
+  eeprom_read_block(moj_numer_telefonu,
+                    (const void *)ADRES_EEPROM_MOJE_NUMER_START,
+                    MAX_LICZBA_ZNAKOW_TELEFON + 1);
+  moj_numer_telefonu[MAX_LICZBA_ZNAKOW_TELEFON] = 0; // Ensure null termination
+
+  // Sprawdź czy czas jest nieprawidłowy (00:00:xx) i czy mamy zapisany numer
+  if (rtc_czas[0] == '0' && rtc_czas[1] == '0' && rtc_czas[3] == '0' &&
+      rtc_czas[4] == '0' && moj_numer_telefonu[0] != 0xFF &&
+      moj_numer_telefonu[0] != 0) {
+    // Czas jest 00:00:xx i mamy zapisany numer - włącz auto-sync
+    autosync_czas_aktywny = TRUE;
+  }
 }
 
 static void opoznienie_startowe(void) {

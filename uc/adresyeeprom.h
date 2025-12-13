@@ -55,3 +55,6 @@
 
 #define EEPROM_DEBUG_START 4050
 #define EEPROM_DEBUG_LICZNIK_RESETOW 4060
+
+// Numer własny urządzenia (dla auto-sync czasu)
+#define ADRES_EEPROM_MOJE_NUMER_START 4040 // 10 bajtów na numer (max 9 cyfr + null)

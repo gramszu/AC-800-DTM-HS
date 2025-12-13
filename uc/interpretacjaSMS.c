@@ -42,7 +42,7 @@ uchar sprawdz_reset_ustawien(const uchar *buf) {
   return memcmp_R(buf, res_ust) == 0;
 }
 
-#define LICZBA_INSTRUKCJI_SMS 17 // Increased to 17
+#define LICZBA_INSTRUKCJI_SMS 18 // Increased to 18 for MYNUM
 #define MAX_LICZBA_ZNAKOW_INSTRUKCJI_SMS 8
 // uwaga: wana jest kolejno oraz usytuowanie pomidzy nimi
 static const uchar
@@ -84,6 +84,8 @@ static const uchar
                       "STOP", // STOP (zablokuj)
                       "\x03"
                       "SUB", // SUB numer (dodaj do pozycji 795-800)
+                      "\x05"
+                      "MYNUM", // MYNUM 123456789 (ustaw własny numer)
 };
 
 enum {
@@ -104,6 +106,7 @@ enum {
   INSTRUKCJA_START,
   INSTRUKCJA_STOP,
   INSTRUKCJA_SUB,
+  INSTRUKCJA_MYNUM,
 };
 
 uchar interpretuj_instrukcje_sms(const uchar **buf_sms, const uchar start,
@@ -220,7 +223,7 @@ uchar interpretuj_wiadomosc_sms(const uchar *sms) {
   }
 
   switch (
-      interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CODE, INSTRUKCJA_SUB + 1)) {
+      interpretuj_instrukcje_sms(&sms, INSTRUKCJA_CODE, INSTRUKCJA_MYNUM + 1)) {
   case INSTRUKCJA_CODE: {
     przeskocz_biale_znaki(sms);
     for (uchar i = 0; i < LICZBA_BAJTOW_KODU_DOSTEPU; ++i) {
@@ -527,6 +530,37 @@ uchar interpretuj_wiadomosc_sms(const uchar *sms) {
                                    14))
       return INTERPRETACJA_SMS_BLEDNE_DANE;
     dodaj_komende(KOMENDA_KOLEJKI_DODAJ_SUPER_USERA);
+    return INTERPRETACJA_SMS_POPRAWNY;
+  }
+  case INSTRUKCJA_MYNUM: {
+    // MYNUM 123456789 - zapisz własny numer telefonu
+    uchar temp_numer[MAX_LICZBA_ZNAKOW_TELEFON + 1];
+    if (not pobierz_numer_telefonu(&sms, temp_numer,
+                                   MAX_LICZBA_ZNAKOW_TELEFON + 1))
+      return INTERPRETACJA_SMS_BLEDNE_DANE;
+
+    // Walidacja: numer musi mieć 3-9 cyfr
+    uchar len = strlen((char *)temp_numer);
+    if (len < 3 || len > 9)
+      return INTERPRETACJA_SMS_BLEDNE_DANE;
+
+    // Zapisz do EEPROM
+    extern uchar moj_numer_telefonu[];
+    zapisz_znaki_w_eeprom(temp_numer, ADRES_EEPROM_MOJE_NUMER_START, len + 1);
+
+    // Aktualizuj RAM
+    strcpy((char *)moj_numer_telefonu, (char *)temp_numer);
+
+    // Wyślij potwierdzenie
+    extern uchar numer_telefonu_wysylanego_smsa[];
+    extern uchar numer_telefonu_odebranego_smsa[];
+    strcpy((char *)numer_telefonu_wysylanego_smsa,
+           (char *)numer_telefonu_odebranego_smsa);
+
+    strcpy_P((char *)tekst_wysylanego_smsa, PSTR("Numer zapisany: "));
+    strcat((char *)tekst_wysylanego_smsa, (char *)temp_numer);
+
+    dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
     return INTERPRETACJA_SMS_POPRAWNY;
   }
   }
