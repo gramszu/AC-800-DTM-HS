@@ -1533,24 +1533,26 @@ void steruj_urzadzeniem_100MS(void) {
 
   if (autosync_czas_aktywny && !autosync_sms_wyslany &&
       modul_zalogowany_w_sieci) {
-    // Odczekaj 3 sekundy po zalogowaniu do sieci
-    if (autosync_timer_100ms < 30) {
+    // Odczekaj 10 sekund po zalogowaniu do sieci (stabilizacja modemu)
+    if (autosync_timer_100ms < 100) {
       autosync_timer_100ms++;
     } else {
-      // Sprawdź czy mamy zapisany numer i czy nie wysyłamy już SMS-a
-      if (moj_numer_telefonu[0] != 0xFF && moj_numer_telefonu[0] != 0 &&
-          !flaga_wysylanie_smsa) {
-        // Wyślij SMS do siebie z treścią "Synchronizacja Czasu"
-        strcpy((char *)numer_telefonu_wysylanego_smsa,
-               (char *)moj_numer_telefonu);
-        strcpy_P((char *)tekst_wysylanego_smsa, PSTR("Synchronizacja Czasu"));
-        dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
-        autosync_sms_wyslany = TRUE;
-      } else {
-        // Brak numeru lub błąd - po prostu czekamy na przychodzący SMS
-        // System normalnie pracuje
-        autosync_sms_wyslany = TRUE; // Nie próbuj ponownie
+      // Po 10 sekundach sprawdź czas z RTC modemu
+      // Jeśli czas to 00:00:xx (sekundy dowolne) - wyślij SMS
+      if (rtc_czas[0] == '0' && rtc_czas[1] == '0' && rtc_czas[3] == '0' &&
+          rtc_czas[4] == '0') {
+        // Czas jest 00:00:xx - sprawdź czy mamy numer i wyślij SMS
+        if (moj_numer_telefonu[0] != 0xFF && moj_numer_telefonu[0] != 0 &&
+            !flaga_wysylanie_smsa) {
+          // Wyślij SMS do siebie z treścią "Synchronizacja Czasu"
+          strcpy((char *)numer_telefonu_wysylanego_smsa,
+                 (char *)moj_numer_telefonu);
+          strcpy_P((char *)tekst_wysylanego_smsa, PSTR("Synchronizacja Czasu"));
+          dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
+        }
       }
+      // Zawsze oznacz jako wysłany (albo próbowano wysłać, albo czas był OK)
+      autosync_sms_wyslany = TRUE;
     }
   }
 
@@ -1883,11 +1885,10 @@ void inicjalizuj_parametry_modulu(void) {
                     MAX_LICZBA_ZNAKOW_TELEFON + 1);
   moj_numer_telefonu[MAX_LICZBA_ZNAKOW_TELEFON] = 0; // Ensure null termination
 
-  // Sprawdź czy czas jest nieprawidłowy (00:00:xx) i czy mamy zapisany numer
-  if (rtc_czas[0] == '0' && rtc_czas[1] == '0' && rtc_czas[3] == '0' &&
-      rtc_czas[4] == '0' && moj_numer_telefonu[0] != 0xFF &&
-      moj_numer_telefonu[0] != 0) {
-    // Czas jest 00:00:xx i mamy zapisany numer - włącz auto-sync
+  // Włącz auto-sync jeśli mamy zapisany numer
+  // Sprawdzenie czasu nastąpi po zalogowaniu do sieci (w
+  // steruj_urzadzeniem_100MS)
+  if (moj_numer_telefonu[0] != 0xFF && moj_numer_telefonu[0] != 0) {
     autosync_czas_aktywny = TRUE;
   }
 }
