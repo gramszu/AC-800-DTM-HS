@@ -1596,9 +1596,11 @@ class BramsterApp:
         frame_controls = tk.Frame(self.root)
         frame_controls.pack(fill="x", padx=10, pady=8)
         
-        # Konfiguracja kolumn - uniform zapewnia identyczny rozmiar
+        # Konfiguracja kolumn i wierszy - uniform zapewnia identyczny rozmiar
         frame_controls.columnconfigure(0, weight=1, uniform="controls")
         frame_controls.columnconfigure(1, weight=1, uniform="controls")
+        frame_controls.rowconfigure(0, weight=1, uniform="rows")
+        frame_controls.rowconfigure(1, weight=1, uniform="rows")
 
         # Wiersz 1, Kolumna 1: Status sterownika
         self.frame_status = tk.LabelFrame(frame_controls, text=self.config.LABELS["status_control"])
