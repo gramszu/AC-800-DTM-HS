@@ -1559,6 +1559,10 @@ class BramsterApp:
         self.root.geometry(self.config.WINDOW_SIZE)
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
+        # Ustawienie domyślnej czcionki dla całej aplikacji
+        default_font = ("TkDefaultFont", 10)
+        self.root.option_add("*Font", default_font)
+
         try:
             icon_path = resource_path("graphics/logo.png")
             if os.path.exists(icon_path):
