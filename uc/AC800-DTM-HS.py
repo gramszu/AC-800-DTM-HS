@@ -1671,51 +1671,47 @@ class BramsterApp:
 
         # Processor selection removed - only AC800 supported
         
-        # --- Sekcja Kod Dostępu i Numer SIM (Przeniesiona na górę) ---
-        container_frames = tk.Frame(self.root)
-        container_frames.pack(fill="x", padx=10, pady=3)
 
-        # Ramka kodu dostępu (po lewej)
-        frame_ascii = tk.LabelFrame(container_frames, text=self.config.LABELS["access_code"])
-        frame_ascii.pack(side="left", fill="both", expand=True, padx=(0, 5))
 
-        self.entry_ascii = tk.Entry(
-            frame_ascii,
-            textvariable=self.ascii_var,
-            width=20
-        )
-        self.entry_ascii.grid(row=0, column=0, padx=8, pady=3, sticky="ew")
-        frame_ascii.columnconfigure(0, weight=1)
-
-        # Ramka numeru karty SIM (po prawej)
-        frame_mynum = tk.LabelFrame(container_frames, text="Numer karty SIM w sterowniku")
-        frame_mynum.pack(side="left", fill="both", expand=True, padx=(5, 0))
-
-        # Walidacja: tylko cyfry 0-9
-        vcmd_mynum = (self.root.register(self.validate_mynum_input), '%P')
-        self.entry_mynum = tk.Entry(
-            frame_mynum,
-            textvariable=self.mynum_var,
-            width=20,
-            validate='key',
-            validatecommand=vcmd_mynum
-        )
-        self.entry_mynum.grid(row=0, column=0, padx=8, pady=3)
-        # -------------------------------------------------------------
-
-        # --- Układ 2x2 dla kontrolek ---
+        # --- Układ 3x2 dla kontrolek (Grid Uniform) ---
         frame_controls = tk.Frame(self.root)
-        frame_controls.pack(fill="x", padx=10, pady=8)
+        frame_controls.pack(fill="x", padx=10, pady=3)
         
         # Konfiguracja kolumn i wierszy - uniform zapewnia identyczny rozmiar
         frame_controls.columnconfigure(0, weight=1, uniform="controls")
         frame_controls.columnconfigure(1, weight=1, uniform="controls")
         frame_controls.rowconfigure(0, weight=1, uniform="rows")
         frame_controls.rowconfigure(1, weight=1, uniform="rows")
+        frame_controls.rowconfigure(2, weight=1, uniform="rows")
+
+        # Wiersz 0, Kolumna 1: Token/Kod dostępu
+        self.frame_ascii = tk.LabelFrame(frame_controls, text=self.config.LABELS["access_code"])
+        self.frame_ascii.grid(row=0, column=0, padx=(0, 5), pady=(0, 5), sticky="nsew")
+        
+        self.entry_ascii = tk.Entry(
+            self.frame_ascii,
+            textvariable=self.ascii_var,
+            width=20
+        )
+        self.entry_ascii.pack(fill="x", padx=8, pady=8) # Pack wewnątrz ramki, bo ramka jest w gridzie
+
+        # Wiersz 0, Kolumna 2: Numer karty SIM
+        self.frame_mynum = tk.LabelFrame(frame_controls, text="Numer karty SIM w sterowniku")
+        self.frame_mynum.grid(row=0, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
+
+        vcmd_mynum = (self.root.register(self.validate_mynum_input), '%P')
+        self.entry_mynum = tk.Entry(
+            self.frame_mynum,
+            textvariable=self.mynum_var,
+            width=20,
+            validate='key',
+            validatecommand=vcmd_mynum
+        )
+        self.entry_mynum.pack(fill="x", padx=8, pady=8)
 
         # Wiersz 1, Kolumna 1: Status sterownika
         self.frame_status = tk.LabelFrame(frame_controls, text=self.config.LABELS["status_control"])
-        self.frame_status.grid(row=0, column=0, padx=(0, 5), pady=(0, 5), sticky="nsew")
+        self.frame_status.grid(row=1, column=0, padx=(0, 5), pady=(0, 5), sticky="nsew")
 
         self.check_status_active = tk.Radiobutton(
             self.frame_status,
@@ -1735,7 +1731,7 @@ class BramsterApp:
 
         # Wiersz 1, Kolumna 2: Tryb pracy
         self.frame_mode = tk.LabelFrame(frame_controls, text=self.config.LABELS["mode_control"])
-        self.frame_mode.grid(row=0, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
+        self.frame_mode.grid(row=1, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
         self.check_mode_private = tk.Radiobutton(
             self.frame_mode,
@@ -1755,7 +1751,7 @@ class BramsterApp:
 
         # Wiersz 2, Kolumna 1: Tryb sterowania CLIP/DTMF
         self.frame_clip_dtmf = tk.LabelFrame(frame_controls, text=self.config.LABELS["clip_dtmf_mode"])
-        self.frame_clip_dtmf.grid(row=1, column=0, padx=(0, 5), pady=(5, 0), sticky="nsew")
+        self.frame_clip_dtmf.grid(row=2, column=0, padx=(0, 5), pady=(5, 0), sticky="nsew")
 
         self.check_clip = tk.Radiobutton(
             self.frame_clip_dtmf,
@@ -1775,7 +1771,7 @@ class BramsterApp:
 
         # Wiersz 2, Kolumna 2: Funkcja Skryba
         self.frame_clip = tk.LabelFrame(frame_controls, text=self.config.LABELS["control_mode"])
-        self.frame_clip.grid(row=1, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
+        self.frame_clip.grid(row=2, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
 
         self.check_skryba_on = tk.Radiobutton(
             self.frame_clip,
