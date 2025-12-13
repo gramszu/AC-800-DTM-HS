@@ -1187,7 +1187,7 @@ class BramsterApp:
         if not messagebox.askokcancel(
             "Potwierdzenie zapisu",
             "Zapisane zostaną dane widoczne w aplikacji.\n"
-            "(Uprzednio wprowadzone ręcznie lub wczytane z CSV)\n\n"
+            "(Uprzednio wprowadzone ręcznie i wczytane z CSV)\n\n"
             "Upewnij się, że wszystkie ustawienia są poprawne.\n\n"
             "Czy kontynuować zapis do sterownika?"
         ):
