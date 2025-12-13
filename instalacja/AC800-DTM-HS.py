@@ -1150,7 +1150,8 @@ class BramsterApp:
         # Okno dialogowe z potwierdzeniem
         if not messagebox.askokcancel(
             "Potwierdzenie zapisu",
-            "Zapisane zostaną tylko dane widoczne w aplikacji.\n\n"
+            "Zapisane zostaną dane widoczne w aplikacji.\n"
+            "(Uprzednio wprowadzone ręcznie lub wczytane z CSV)\n\n"
             "Upewnij się, że wszystkie ustawienia są poprawne.\n\n"
             "Czy kontynuować zapis do sterownika?"
         ):
@@ -1182,25 +1183,29 @@ class BramsterApp:
                 )
                 return
 
-        def worker():
+        # Pobierz dane w wątku głównym (bezpiecznie dla Tkinter)
+        try:
+            current_data = bytearray(self.parse_hex_view(self.text_area.get(1.0, tk.END)))
+        except Exception as e:
+            logging.error(f"Error reading data from GUI: {e}")
+            messagebox.showerror("Błąd", "Nie udało się pobrać danych z interfejsu.")
+            return
+
+        def worker(data_to_write):
             try:
                 self.pulse_dtr()
                 self.progress_manager.start()
 
-                # 2. Pobierz dane (zaktualizowane przed chwilą)
-                data = bytearray(self.parse_hex_view(self.text_area.get(1.0, tk.END)))
+                # 3. Zapisz status/tryb/CLIP-DTMF/Time do bufora
+                self.write_status_and_mode_to_eeprom(data_to_write)
 
-                # 3. Zapisz status/tryb/CLIP-DTMF/Time
-                self.write_status_and_mode_to_eeprom(data)
-
-                # 4. Zaktualizuj GUI (odśwież widok HEX po zmianach statusu)
-                # Uwaga: Dostęp do GUI z wątku, ale w Tkinter często działa.
-                # Dla pełnego bezpieczeństwa można by to robić przez queue, ale zostawiamy jak było.
-                self.text_area.delete(1.0, tk.END)
-                self.text_area.insert(tk.END, self.format_hex_view(data))
-
-                # 5. Pobierz finalne dane
-                data = bytearray(self.parse_hex_view(self.text_area.get(1.0, tk.END)))
+                # 4. Zaktualizuj GUI ?? Nie możemy z wątku.
+                # Ale dane są już zaktualizowane w data_to_write.
+                # Możemy użyć schedule_update_gui jeśli byśmy chcieli,
+                # ale tutaj ważniejszy jest zapis do pliku.
+                
+                # 5. Używamy danych przekazanych do workera
+                data = data_to_write
 
                 # Zabezpieczenie: OUT zawsze wyłączone (5–7 = 0)
                 if len(data) >= 8:
@@ -1245,7 +1250,7 @@ class BramsterApp:
                 self.progress_manager.stop()
                 self.cleanup_temp_files()
 
-        threading.Thread(target=worker, daemon=True).start()
+        threading.Thread(target=worker, args=(current_data,), daemon=True).start()
 
     def odczyt_z_csv(self) -> None:
         """Odczytuje dane z pliku CSV (kod, status, tryb, skryba, czas + numery)."""
