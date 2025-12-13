@@ -1791,14 +1791,14 @@ class BramsterApp:
             width=15
         )
 
-        self.btn_read_chip.grid(row=0, column=0, padx=5, pady=5)
-        self.btn_write_chip.grid(row=0, column=1, padx=5, pady=5)
-        self.btn_buy_now.grid(row=0, column=2, padx=5, pady=5)
-        self.btn_about.grid(row=1, column=2, padx=5, pady=5)
-        self.btn_save_csv.grid(row=1, column=0, padx=5, pady=5)
-        self.btn_read_csv.grid(row=1, column=1, padx=5, pady=5)
-        self.btn_clear_all.grid(row=3, column=0, padx=5, pady=5)
-        self.btn_sync_numbers.grid(row=3, column=1, padx=5, pady=5)
+        self.btn_read_chip.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
+        self.btn_write_chip.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        self.btn_buy_now.grid(row=0, column=2, padx=5, pady=5, sticky="ew")
+        self.btn_about.grid(row=1, column=2, padx=5, pady=5, sticky="ew")
+        self.btn_save_csv.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
+        self.btn_read_csv.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        self.btn_clear_all.grid(row=3, column=0, padx=5, pady=5, sticky="ew")
+        self.btn_sync_numbers.grid(row=3, column=1, padx=5, pady=5, sticky="ew")
 
         # Kontener dla ramek obok siebie
         container_frames = tk.Frame(self.root)
