@@ -618,6 +618,8 @@ System zapisuje **tylko ostatnie 9 cyfr** numeru telefonu.
 | Wyłączyć harmonogram | `ABCD TIME OFF` | Brama działa 24/7 |
 | Ustawić czas | `ABCD SET 16:30:00` | Ustawia czas w systemie |
 | Sprawdzić czas | `ABCD SET` | Pokazuje aktualny czas |
+| **Auto-Sync Czasu** |
+| Ustawić numer karty SIM | `ABCD MYNUM 600123456` | Zapisuje numer do auto-sync czasu |
 | **Tryby Pracy** |
 | Tryb publiczny | `ABCD OPEN` | Wszyscy mogą dzwonić |
 | Tryb prywatny | `ABCD CLOSE` | Tylko zapisane numery |
@@ -628,6 +630,74 @@ System zapisuje **tylko ostatnie 9 cyfr** numeru telefonu.
 | Wyłączyć Skrybę | `ABCD SKRYBA OFF` | Zatrzymaj auto-dodawanie |
 | **Debug** |
 | Tryb debug | `ABCD DEBUG ON/OFF` | Włącz/wyłącz tryb debugowania |
+
+---
+
+## Automatyczna Synchronizacja Czasu (MYNUM)
+
+### Co to jest MYNUM?
+
+MYNUM to numer karty SIM zainstalowanej w sterowniku. System używa go do **automatycznej synchronizacji czasu** po restarcie urządzenia.
+
+**Dlaczego to ważne?**
+
+Po restarcie procesora (np. awaria zasilania), modem GSM może mieć nieprawidłowy czas (00:00:xx). System automatycznie wykrywa to i synchronizuje czas wysyłając SMS do siebie.
+
+---
+
+### Jak Ustawić Numer Karty SIM?
+
+#### Metoda 1: Przez SMS
+
+```
+ABCD MYNUM 600123456
+```
+
+**Przykłady:**
+```
+ABCD MYNUM 123456789    → Zapisze: 123456789
+ABCD MYNUM +48600123456 → Zapisze: 600123456 (pomija +48)
+ABCD MYNUM 600 123 456  → Zapisze: 600123456 (pomija spacje)
+```
+
+**Odpowiedź sterownika:**
+```
+MYNUM zapisany
+```
+
+> **📝 Uwaga:** Numer może mieć od 3 do 9 cyfr. Znaki specjalne (+, #, *, spacje) są automatycznie pomijane.
+
+---
+
+### Jak Działa Auto-Sync?
+
+Jeśli sterownik wykryje nieprawidłowy czas po restarcie (00:00:xx), automatycznie:
+
+1. ⏱️ Czeka 25 sekund po zalogowaniu do sieci
+2. 🔍 Sprawdza czas w module GSM
+3. 📱 Jeśli czas to 00:00:xx - wysyła SMS do siebie (MYNUM)
+4. ⏰ Synchronizuje czas z otrzymanego SMS-a
+
+> **✅ Zaleta:** Nie musisz ręcznie ustawiać czasu po każdym restarcie!
+
+---
+
+### Sprawdzanie Zapisanego Numeru
+
+Wyślij SMS:
+```
+ABCD REPORT
+```
+
+W odpowiedzi zobaczysz:
+```
+Moj nr: 600123456
+```
+
+Lub jeśli nie ustawiono:
+```
+Moj nr: ----
+```
 
 ---
 
