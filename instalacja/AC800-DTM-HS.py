@@ -1036,6 +1036,42 @@ class BramsterApp:
         if not hex_path:
             return
 
+        # 1. Pobierz aktualne dane konfiguracyjne z GUI (snapshot przed wątkiem)
+        try:
+            # Synchronizacja ASCII
+            if not self.sync_ascii_into_textarea():
+                return
+                
+            # Synchronizacja listy numerów
+            if not self.sync_from_numbers_list():
+                return
+                
+            current_data = bytearray(self.parse_hex_view(self.text_area.get(1.0, tk.END)))
+            
+            # Aktualizacja statusów w buforze
+            self.write_status_and_mode_to_eeprom(current_data)
+            
+            # Zabezpieczenie danych (OUT=0, długość)
+            if len(current_data) >= 8:
+                current_data[5] = 0x00
+                current_data[6] = 0x00
+                current_data[7] = 0x00
+                
+            if len(current_data) == self.config.EEPROM_SIZE:
+                # Zapisz "backup" do pliku tymczasowego (ten sam plik co przy normalnym zapisie)
+                try:
+                    with open(self.config.EEPROM_FILE, "wb") as f:
+                        f.write(current_data)
+                    logging.info("Configuration backed up to temporary file before flash.")
+                except Exception as e:
+                    logging.error(f"Failed to backup configuration: {e}")
+                    # Nie przerywamy, bo użytkownik chce wgrać firmware, ale warto zalogować
+            
+        except Exception as e:
+            logging.error(f"Error preparing configuration backup: {e}")
+            if not messagebox.askyesno("Ostrzeżenie", "Nie udało się przygotować kopii zapasowej ustawień.\nCzy mimo to kontynuować aktualizację firmware?"):
+                return
+
         def worker():
             try:
                 self.pulse_dtr()
