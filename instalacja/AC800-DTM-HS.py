@@ -377,9 +377,13 @@ class BramsterApp:
             
         val = self.skryba_var.get()
         if val == 1:
-            # Włączanie Skryby: Zapisz obecne tryby i wymuś CLIP + Publiczny
+            # Włączanie Skryby: Zapisz obecne tryby i wymuś Aktywny + CLIP + Publiczny
             self.backup_mode = self.mode_var.get()
             self.backup_clip_dtmf = self.clip_dtmf_var.get()
+            self.backup_status = self.status_var.get()
+            # Wymuś status Aktywny
+            if self.status_var.get() != 0:
+                self.status_var.set(0)
             # Wymuś tryb Publiczny
             if self.mode_var.get() != 1:
                 self.mode_var.set(1)
@@ -394,6 +398,9 @@ class BramsterApp:
             if self.backup_clip_dtmf is not None:
                 self.clip_dtmf_var.set(self.backup_clip_dtmf)
                 self.backup_clip_dtmf = None
+            if getattr(self, 'backup_status', None) is not None:
+                self.status_var.set(self.backup_status)
+                self.backup_status = None
 
     def validate_hour(self, new_value: str) -> bool:
         """Walidacja dla pola godziny (0-23)."""
