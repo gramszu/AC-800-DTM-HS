@@ -1746,49 +1746,57 @@ class BramsterApp:
             frame_buttons,
             text=self.config.BUTTONS["read_chip"],
             command=self.odczyt_eeprom,
-            width=30
+            width=30,
+            height=2
         )
         self.btn_write_chip = tk.Button(
             frame_buttons,
             text=self.config.BUTTONS["write_chip"],
             command=self.zapis_eeprom,
-            width=30
+            width=30,
+            height=2
         )
         self.btn_buy_now = tk.Button(
             frame_buttons,
             text=self.config.BUTTONS["buy_now"],
             command=self.flash_firmware,
-            width=15
+            width=15,
+            height=2
         )
         self.btn_save_csv = tk.Button(
             frame_buttons,
             text=self.config.BUTTONS["save_csv"],
             command=self.zapis_do_csv,
-            width=30
+            width=30,
+            height=2
         )
         self.btn_read_csv = tk.Button(
             frame_buttons,
             text=self.config.BUTTONS["read_csv"],
             command=self.odczyt_z_csv,
-            width=30
+            width=30,
+            height=2
         )
         self.btn_clear_all = tk.Button(
             frame_buttons,
             text=self.config.BUTTONS["clear_all"],
             command=self.clear_all_numbers,
-            width=30
+            width=30,
+            height=2
         )
         self.btn_sync_numbers = tk.Button(
             frame_buttons,
             text=self.config.BUTTONS["sync_numbers"],
             command=self.sync_from_numbers_list,
-            width=30
+            width=30,
+            height=2
         )
         self.btn_about = tk.Button(
             frame_buttons,
             text=self.config.BUTTONS["about"],
             command=self.show_about,
-            width=15
+            width=15,
+            height=2
         )
 
         self.btn_read_chip.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
