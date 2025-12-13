@@ -1670,6 +1670,38 @@ class BramsterApp:
             self.com_port_combobox.set(com_ports[0] if com_ports else "COM3")
 
         # Processor selection removed - only AC800 supported
+        
+        # --- Sekcja Kod Dostępu i Numer SIM (Przeniesiona na górę) ---
+        container_frames = tk.Frame(self.root)
+        container_frames.pack(fill="x", padx=10, pady=3)
+
+        # Ramka kodu dostępu (po lewej)
+        frame_ascii = tk.LabelFrame(container_frames, text=self.config.LABELS["access_code"])
+        frame_ascii.pack(side="left", fill="both", expand=True, padx=(0, 5))
+
+        self.entry_ascii = tk.Entry(
+            frame_ascii,
+            textvariable=self.ascii_var,
+            width=20
+        )
+        self.entry_ascii.grid(row=0, column=0, padx=8, pady=3, sticky="ew")
+        frame_ascii.columnconfigure(0, weight=1)
+
+        # Ramka numeru karty SIM (po prawej)
+        frame_mynum = tk.LabelFrame(container_frames, text="Numer karty SIM w sterowniku")
+        frame_mynum.pack(side="left", fill="both", expand=True, padx=(5, 0))
+
+        # Walidacja: tylko cyfry 0-9
+        vcmd_mynum = (self.root.register(self.validate_mynum_input), '%P')
+        self.entry_mynum = tk.Entry(
+            frame_mynum,
+            textvariable=self.mynum_var,
+            width=20,
+            validate='key',
+            validatecommand=vcmd_mynum
+        )
+        self.entry_mynum.grid(row=0, column=0, padx=8, pady=3)
+        # -------------------------------------------------------------
 
         # --- Układ 2x2 dla kontrolek ---
         frame_controls = tk.Frame(self.root)
@@ -1883,36 +1915,8 @@ class BramsterApp:
         # Przyciski clear_all i sync_numbers usunięte na żądanie użytkownika.
 
 
-        # Kontener dla ramek obok siebie
-        container_frames = tk.Frame(self.root)
-        container_frames.pack(fill="x", padx=10, pady=3)
+        # Ramki Access Code i SIM Number przeniesione wyżej...
 
-        # Ramka kodu dostępu (po lewej)
-        frame_ascii = tk.LabelFrame(container_frames, text=self.config.LABELS["access_code"])
-        frame_ascii.pack(side="left", fill="both", expand=True, padx=(0, 5))
-
-        self.entry_ascii = tk.Entry(
-            frame_ascii,
-            textvariable=self.ascii_var,
-            width=20
-        )
-        self.entry_ascii.grid(row=0, column=0, padx=8, pady=3, sticky="ew")
-        frame_ascii.columnconfigure(0, weight=1)
-
-        # Ramka numeru karty SIM (po prawej)
-        frame_mynum = tk.LabelFrame(container_frames, text="Numer karty SIM w sterowniku")
-        frame_mynum.pack(side="left", fill="both", expand=True, padx=(5, 0))
-
-        # Walidacja: tylko cyfry 0-9
-        vcmd_mynum = (self.root.register(self.validate_mynum_input), '%P')
-        self.entry_mynum = tk.Entry(
-            frame_mynum,
-            textvariable=self.mynum_var,
-            width=20,
-            validate='key',
-            validatecommand=vcmd_mynum
-        )
-        self.entry_mynum.grid(row=0, column=0, padx=8, pady=3)
 
         label_hex = tk.Label(
             self.root,
