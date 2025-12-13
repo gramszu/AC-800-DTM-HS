@@ -1565,12 +1565,17 @@ class BramsterApp:
 
         # Processor selection removed - only AC800 supported
 
-        frame_status_mode = tk.Frame(self.root)
-        frame_status_mode.pack(fill="x", padx=10, pady=8)
+        # --- Układ 2x2 dla kontrolek ---
+        frame_controls = tk.Frame(self.root)
+        frame_controls.pack(fill="x", padx=10, pady=8)
+        
+        # Konfiguracja kolumn - uniform zapewnia identyczny rozmiar
+        frame_controls.columnconfigure(0, weight=1, uniform="controls")
+        frame_controls.columnconfigure(1, weight=1, uniform="controls")
 
-        # Zapisujemy referencje do ramki statusu
-        self.frame_status = tk.LabelFrame(frame_status_mode, text=self.config.LABELS["status_control"])
-        self.frame_status.pack(side="left", padx=(0, 5), expand=True, fill="x")
+        # Wiersz 1, Kolumna 1: Status sterownika
+        self.frame_status = tk.LabelFrame(frame_controls, text=self.config.LABELS["status_control"])
+        self.frame_status.grid(row=0, column=0, padx=(0, 5), pady=(0, 5), sticky="nsew")
 
         self.check_status_active = tk.Radiobutton(
             self.frame_status,
@@ -1588,9 +1593,9 @@ class BramsterApp:
         )
         self.check_status_blocked.pack(side="left", padx=8, pady=8)
 
-        # Zapisujemy referencje do ramki trybu
-        self.frame_mode = tk.LabelFrame(frame_status_mode, text=self.config.LABELS["mode_control"])
-        self.frame_mode.pack(side="left", padx=(5, 0), expand=True, fill="x")
+        # Wiersz 1, Kolumna 2: Tryb pracy
+        self.frame_mode = tk.LabelFrame(frame_controls, text=self.config.LABELS["mode_control"])
+        self.frame_mode.grid(row=0, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
         self.check_mode_private = tk.Radiobutton(
             self.frame_mode,
@@ -1608,13 +1613,9 @@ class BramsterApp:
         )
         self.check_mode_public.pack(side="left", padx=8, pady=8)
 
-        # --- Nowy rząd: CLIP/DTMF i Skryba ---
-        frame_clip_skryba = tk.Frame(self.root)
-        frame_clip_skryba.pack(fill="x", padx=10, pady=8)
-
-        # Sekcja trybu sterowania CLIP/DTMF
-        self.frame_clip_dtmf = tk.LabelFrame(frame_clip_skryba, text=self.config.LABELS["clip_dtmf_mode"])
-        self.frame_clip_dtmf.pack(side="left", padx=(0, 5), expand=True, fill="x")
+        # Wiersz 2, Kolumna 1: Tryb sterowania CLIP/DTMF
+        self.frame_clip_dtmf = tk.LabelFrame(frame_controls, text=self.config.LABELS["clip_dtmf_mode"])
+        self.frame_clip_dtmf.grid(row=1, column=0, padx=(0, 5), pady=(5, 0), sticky="nsew")
 
         self.check_clip = tk.Radiobutton(
             self.frame_clip_dtmf,
@@ -1632,9 +1633,9 @@ class BramsterApp:
         )
         self.check_dtmf.pack(side="left", padx=8, pady=8)
 
-        # Sekcja funkcji Skryba
-        self.frame_clip = tk.LabelFrame(frame_clip_skryba, text=self.config.LABELS["control_mode"])
-        self.frame_clip.pack(side="left", padx=(5, 0), expand=True, fill="x")
+        # Wiersz 2, Kolumna 2: Funkcja Skryba
+        self.frame_clip = tk.LabelFrame(frame_controls, text=self.config.LABELS["control_mode"])
+        self.frame_clip.grid(row=1, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
 
         self.check_skryba_on = tk.Radiobutton(
             self.frame_clip,

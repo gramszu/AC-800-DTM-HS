@@ -57,6 +57,7 @@ class AppConfig:
             "ADDR_MODE": 4094,
             "ADDR_STATUS": 4087,
             "ADDR_MYNUM": 4040,  # Własny numer telefonu (10 bajtów)
+            "ADDR_CLIP_DTMF": 4095,  # 0=DTMF, 1=CLIP
         }
 
         # Aktywna konfiguracja - tylko M1284
@@ -109,9 +110,12 @@ class AppConfig:
             "status_blocked": "Blokada",
             "mode_private": "Prywatny",
             "mode_public": "Publiczny",
-            "control_mode": "Funkcja Skryba", # Zmienione z Sterowanie
-            "control_clip": "Włączona",      # Zmienione z CLIP
-            "control_dtmf": "Wyłączona",     # Zmienione z DTMF
+            "clip_dtmf_mode": "Tryb sterowania",  # Nowa sekcja CLIP/DTMF
+            "clip_mode": "CLIP",
+            "dtmf_mode": "DTMF",
+            "control_mode": "Funkcja Skryba",
+            "control_clip": "Włączona",
+            "control_dtmf": "Wyłączona",
             "time_control": "Harmonogram",
         }
 
@@ -166,6 +170,7 @@ www.sonfy.pl
         self.EEPROM_ADDR_TIME_STOP_H = self.ACTIVE_CONFIG["ADDR_TIME_STOP_H"]
         self.EEPROM_ADDR_TIME_STOP_M = self.ACTIVE_CONFIG["ADDR_TIME_STOP_M"]
         self.EEPROM_ADDR_MYNUM = self.ACTIVE_CONFIG["ADDR_MYNUM"]
+        self.EEPROM_ADDR_CLIP_DTMF = self.ACTIVE_CONFIG["ADDR_CLIP_DTMF"]
 
 
 
@@ -309,7 +314,8 @@ class BramsterApp:
         # Zmienne dla statusu, trybu i sterowania (zgodne z C)
         self.status_var = tk.IntVar(value=0)  # 0 = Aktywny, 1 = Blokada
         self.mode_var = tk.IntVar(value=1)    # 0 = Prywatny, 1 = Publiczny
-        self.skryba_var = tk.IntVar(value=0)  # 0 = Wylaczona, 1 = Wlaczona (dawniej CLIP/DTMF)
+        self.clip_dtmf_var = tk.IntVar(value=1)  # 0 = DTMF, 1 = CLIP (domyślnie CLIP)
+        self.skryba_var = tk.IntVar(value=0)  # 0 = Wylaczona, 1 = Wlaczona
         self.skryba_var.trace_add("write", self.on_skryba_change)
         self.backup_mode = None  # Do przywracania trybu po wyłączeniu Skryby
         self.skryba_limit_var = tk.IntVar(value=800)  # Limit użytkowników dla Skryby (1-800)
@@ -499,6 +505,12 @@ class BramsterApp:
             # W starym Pythonie: 0=Prywatny, 1=Publiczny (set(0 if mode_byte == 0x00 else 1))
             self.mode_var.set(0 if mode_byte == 0x00 else 1)
 
+        # CLIP/DTMF (0=DTMF, 1=CLIP)
+        if self.config.EEPROM_ADDR_CLIP_DTMF and len(data) > self.config.EEPROM_ADDR_CLIP_DTMF:
+            clip_byte = data[self.config.EEPROM_ADDR_CLIP_DTMF]
+            # 0x01 = CLIP, 0x00 = DTMF, 0xFF = domyślnie CLIP
+            self.clip_dtmf_var.set(1 if clip_byte != 0x00 else 0)
+
         # Time Control (tylko jesli zdefiniowane)
         if self.config.EEPROM_ADDR_TIME_START_H:
             # Sprawdź czy harmonogram jest włączony (czas_start_h != 0xFF)
@@ -538,7 +550,8 @@ class BramsterApp:
 
         logging.info(
             f"Read from EEPROM - Status: {self.status_var.get()}, "
-            f"Mode: {self.mode_var.get()}, Skryba: {self.skryba_var.get()}"
+            f"Mode: {self.mode_var.get()}, Skryba: {self.skryba_var.get()}, "
+            f"CLIP/DTMF: {self.clip_dtmf_var.get()}"
         )
 
     def write_status_and_mode_to_eeprom(self, data: bytearray) -> None:
@@ -562,6 +575,11 @@ class BramsterApp:
         if self.config.EEPROM_ADDR_MODE:
             val = 0x01 if self.mode_var.get() == 1 else 0x00
             data[self.config.EEPROM_ADDR_MODE] = val
+
+        # CLIP/DTMF (0=DTMF, 1=CLIP)
+        if self.config.EEPROM_ADDR_CLIP_DTMF:
+            val = 0x01 if self.clip_dtmf_var.get() == 1 else 0x00
+            data[self.config.EEPROM_ADDR_CLIP_DTMF] = val
 
         # Time Control
         if self.config.EEPROM_ADDR_TIME_START_H:
@@ -599,7 +617,8 @@ class BramsterApp:
 
         logging.info(
             f"Write to EEPROM - Status: {self.status_var.get()}, "
-            f"Mode: {self.mode_var.get()}, Skryba: {self.skryba_var.get()}"
+            f"Mode: {self.mode_var.get()}, Skryba: {self.skryba_var.get()}, "
+            f"CLIP/DTMF: {self.clip_dtmf_var.get()}"
         )
 
     def check_system_requirements(self) -> bool:
@@ -860,7 +879,8 @@ class BramsterApp:
         self.update_numbers_text(data)
         self.status_var.set(0)
         self.mode_var.set(1)
-        self.skryba_var.set(1)
+        self.clip_dtmf_var.set(1)  # Domyślnie CLIP
+        self.skryba_var.set(0)  # Domyślnie wyłączona
 
     def sync_from_numbers_list(self) -> bool:
         """Synchronizuje dane z listy numerów. Zwraca True jeśli sukces, False jeśli błąd."""
@@ -1208,6 +1228,7 @@ class BramsterApp:
                 kod_dostepu_text: Optional[str] = None
                 status_text: Optional[str] = None
                 mode_text: Optional[str] = None
+                clip_dtmf_text: Optional[str] = None
                 skryba_text: Optional[str] = None
                 time_text: Optional[str] = None
 
@@ -1227,6 +1248,8 @@ class BramsterApp:
                                 status_text = val
                             elif key == "Tryb":
                                 mode_text = val
+                            elif key == "Tryb sterowania":
+                                clip_dtmf_text = val
                             elif key == "Funkcja Skryba":
                                 skryba_text = val
                             elif key == "Kontrola Czasu":
@@ -1274,11 +1297,17 @@ class BramsterApp:
                     elif mode_text == self.config.LABELS["mode_public"]:
                         self.mode_var.set(1)
 
+                if clip_dtmf_text:
+                    if clip_dtmf_text == "CLIP":
+                        self.clip_dtmf_var.set(1)
+                    elif clip_dtmf_text == "DTMF":
+                        self.clip_dtmf_var.set(0)
+
                 if skryba_text:
-                    # Kompatybilnosc: CLIP/Wlaczona -> 1, DTMF/Wylaczona -> 0
-                    if skryba_text == self.config.LABELS["control_clip"] or skryba_text == "CLIP":
+                    # Kompatybilnosc: Wlaczona -> 1, Wylaczona -> 0
+                    if skryba_text == self.config.LABELS["control_clip"] or skryba_text == "Włączona":
                         self.skryba_var.set(1)
-                    elif skryba_text == self.config.LABELS["control_dtmf"] or skryba_text == "DTMF":
+                    elif skryba_text == self.config.LABELS["control_dtmf"] or skryba_text == "Wyłączona":
                         self.skryba_var.set(0)
                 
                 if time_text:
@@ -1397,6 +1426,7 @@ class BramsterApp:
                     kod_dostepu_text = self.ascii_var.get()
                     status_text = self.get_status_text(self.status_var.get())
                     mode_text = self.get_mode_text(self.mode_var.get())
+                    clip_dtmf_text = "CLIP" if self.clip_dtmf_var.get() == 1 else "DTMF"
                     skryba_text = self.get_skryba_text(self.skryba_var.get())
                     
                     # Format czasu: HH:MM - HH:MM lub "Wylaczony"
@@ -1408,6 +1438,7 @@ class BramsterApp:
                     writer.writerow(["Kod dostępu", kod_dostepu_text])
                     writer.writerow(["Status", status_text])
                     writer.writerow(["Tryb", mode_text])
+                    writer.writerow(["Tryb sterowania", clip_dtmf_text])
                     writer.writerow(["Funkcja Skryba", skryba_text])
                     writer.writerow(["Kontrola Czasu", time_text])
                     writer.writerow([])
@@ -1534,12 +1565,17 @@ class BramsterApp:
 
         # Processor selection removed - only AC800 supported
 
-        frame_status_mode = tk.Frame(self.root)
-        frame_status_mode.pack(fill="x", padx=10, pady=8)
+        # --- Układ 2x2 dla kontrolek ---
+        frame_controls = tk.Frame(self.root)
+        frame_controls.pack(fill="x", padx=10, pady=8)
+        
+        # Konfiguracja kolumn - uniform zapewnia identyczny rozmiar
+        frame_controls.columnconfigure(0, weight=1, uniform="controls")
+        frame_controls.columnconfigure(1, weight=1, uniform="controls")
 
-        # Zapisujemy referencje do ramki statusu
-        self.frame_status = tk.LabelFrame(frame_status_mode, text=self.config.LABELS["status_control"])
-        self.frame_status.pack(side="left", padx=(0, 5), expand=True, fill="x")
+        # Wiersz 1, Kolumna 1: Status sterownika
+        self.frame_status = tk.LabelFrame(frame_controls, text=self.config.LABELS["status_control"])
+        self.frame_status.grid(row=0, column=0, padx=(0, 5), pady=(0, 5), sticky="nsew")
 
         self.check_status_active = tk.Radiobutton(
             self.frame_status,
@@ -1557,9 +1593,9 @@ class BramsterApp:
         )
         self.check_status_blocked.pack(side="left", padx=8, pady=8)
 
-        # Zapisujemy referencje do ramki trybu
-        self.frame_mode = tk.LabelFrame(frame_status_mode, text=self.config.LABELS["mode_control"])
-        self.frame_mode.pack(side="left", padx=(5, 5), expand=True, fill="x")
+        # Wiersz 1, Kolumna 2: Tryb pracy
+        self.frame_mode = tk.LabelFrame(frame_controls, text=self.config.LABELS["mode_control"])
+        self.frame_mode.grid(row=0, column=1, padx=(5, 0), pady=(0, 5), sticky="nsew")
 
         self.check_mode_private = tk.Radiobutton(
             self.frame_mode,
@@ -1577,9 +1613,29 @@ class BramsterApp:
         )
         self.check_mode_public.pack(side="left", padx=8, pady=8)
 
-        # Zapisujemy referencje do ramki i przycisków, aby zmieniać ich tekst
-        self.frame_clip = tk.LabelFrame(frame_status_mode, text=self.config.LABELS["control_mode"])
-        self.frame_clip.pack(side="left", padx=(5, 0), expand=True, fill="x")
+        # Wiersz 2, Kolumna 1: Tryb sterowania CLIP/DTMF
+        self.frame_clip_dtmf = tk.LabelFrame(frame_controls, text=self.config.LABELS["clip_dtmf_mode"])
+        self.frame_clip_dtmf.grid(row=1, column=0, padx=(0, 5), pady=(5, 0), sticky="nsew")
+
+        self.check_clip = tk.Radiobutton(
+            self.frame_clip_dtmf,
+            text=self.config.LABELS["clip_mode"],
+            variable=self.clip_dtmf_var,
+            value=1
+        )
+        self.check_clip.pack(side="left", padx=8, pady=8)
+
+        self.check_dtmf = tk.Radiobutton(
+            self.frame_clip_dtmf,
+            text=self.config.LABELS["dtmf_mode"],
+            variable=self.clip_dtmf_var,
+            value=0
+        )
+        self.check_dtmf.pack(side="left", padx=8, pady=8)
+
+        # Wiersz 2, Kolumna 2: Funkcja Skryba
+        self.frame_clip = tk.LabelFrame(frame_controls, text=self.config.LABELS["control_mode"])
+        self.frame_clip.grid(row=1, column=1, padx=(5, 0), pady=(5, 0), sticky="nsew")
 
         self.check_skryba_on = tk.Radiobutton(
             self.frame_clip,
@@ -1596,21 +1652,6 @@ class BramsterApp:
             value=0
         )
         self.check_skryba_off.pack(side="left", padx=8, pady=8)
-        
-        # Spinbox dla limitu użytkowników Skryby
-        limit_label = tk.Label(self.frame_clip, text="Limit:")
-        limit_label.pack(side="left", padx=(15, 3))
-        
-        self.spin_skryba_limit = tk.Spinbox(
-            self.frame_clip,
-            from_=1,
-            to=800,
-            increment=1,
-            textvariable=self.skryba_limit_var,
-            width=5,
-            state="readonly"
-        )
-        self.spin_skryba_limit.pack(side="left", padx=3)
 
         # --- Time Control Frame ---
         # Zapisujemy referencje, aby móc ukrywać/pokazywać
