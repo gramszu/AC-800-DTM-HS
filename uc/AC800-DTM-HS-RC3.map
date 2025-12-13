@@ -439,10 +439,10 @@ END GROUP
                 0x0000000000002df4                steruj_wejscia_wyjscia_100ms
                 0x0000000000002e00                zapis_w_eeprom_stanu_wyjsc
                 0x0000000000002e7c                steruj_urzadzeniem_100MS
-                0x0000000000003126                steruj_urzadzeniem_10MS
-                0x0000000000003132                wolne_zdarzenie_timer
-                0x0000000000003210                ustaw_parametry_dla_bezpieczenstwa
-                0x0000000000003230                inicjalizuj_parametry_modulu
+                0x0000000000003146                steruj_urzadzeniem_10MS
+                0x0000000000003152                wolne_zdarzenie_timer
+                0x0000000000003230                ustaw_parametry_dla_bezpieczenstwa
+                0x0000000000003250                inicjalizuj_parametry_modulu
                 0x00000000000034d2                wykonanie_komend_ukladow
                 0x0000000000003b5a                wykonanie_komend
  .text          0x0000000000003b72      0x20a wewy.o

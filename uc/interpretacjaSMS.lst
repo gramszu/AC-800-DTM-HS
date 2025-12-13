@@ -2949,28 +2949,28 @@
  2223               		.file 17 "konfiguracja.h"
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 interpretacjaSMS.c
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:2      *ABS*:000000000000003e __SP_H__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:3      *ABS*:000000000000003d __SP_L__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:4      *ABS*:000000000000003f __SREG__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:5      *ABS*:000000000000003b __RAMPZ__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:6      *ABS*:0000000000000000 __tmp_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:7      *ABS*:0000000000000001 __zero_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:13     .text:0000000000000000 sprawdz_kod
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:110    .text:000000000000006a sprawdz_reset_ustawien
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:2165   .progmem.data:0000000000000023 res_ust.2651
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:140    .text:0000000000000082 interpretuj_instrukcje_sms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:2169   .progmem.data:0000000000000028 instrukcja_sms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:329    .text:0000000000000136 pobierz_long
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:408    .text:000000000000017c pomin_znak
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:505    .text:00000000000001d8 czy_jest_znak
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:620    .text:0000000000000242 pobierz_wyraz
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:747    .text:00000000000002c2 pobierz_numer_telefonu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:1002   .text:00000000000003dc interpretuj_wiadomosc_sms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:2161   .progmem.data:000000000000001c __c.2779
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:2157   .progmem.data:0000000000000018 __c.2793
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:2153   .progmem.data:0000000000000015 __c.2803
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:2149   .progmem.data:0000000000000011 __c.2815
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccQU231F.s:2145   .progmem.data:0000000000000000 __c.2828
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:13     .text:0000000000000000 sprawdz_kod
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:110    .text:000000000000006a sprawdz_reset_ustawien
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:2165   .progmem.data:0000000000000023 res_ust.2651
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:140    .text:0000000000000082 interpretuj_instrukcje_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:2169   .progmem.data:0000000000000028 instrukcja_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:329    .text:0000000000000136 pobierz_long
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:408    .text:000000000000017c pomin_znak
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:505    .text:00000000000001d8 czy_jest_znak
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:620    .text:0000000000000242 pobierz_wyraz
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:747    .text:00000000000002c2 pobierz_numer_telefonu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:1002   .text:00000000000003dc interpretuj_wiadomosc_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:2161   .progmem.data:000000000000001c __c.2779
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:2157   .progmem.data:0000000000000018 __c.2793
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:2153   .progmem.data:0000000000000015 __c.2803
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:2149   .progmem.data:0000000000000011 __c.2815
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccvsSFuj.s:2145   .progmem.data:0000000000000000 __c.2828
                             *COM*:0000000000000001 nr_usunietego_uzytkownika_z_smsa
                             *COM*:0000000000000001 stan_wyjscie
 

@@ -1775,367 +1775,369 @@
 1533:main.c        **** 
 1534:main.c        ****   if (autosync_czas_aktywny && !autosync_sms_wyslany &&
 1535:main.c        ****       modul_zalogowany_w_sieci) {
-1536:main.c        ****     // Odczekaj 3 sekundy po zalogowaniu do sieci
-1537:main.c        ****     if (autosync_timer_100ms < 30) {
-1538:main.c        ****       autosync_timer_100ms++;
-1539:main.c        ****     } else {
-1540:main.c        ****       // Sprawdź czy mamy zapisany numer i czy nie wysyłamy już SMS-a
-1541:main.c        ****       if (moj_numer_telefonu[0] != 0xFF && moj_numer_telefonu[0] != 0 &&
-1542:main.c        ****           !flaga_wysylanie_smsa) {
-1543:main.c        ****         // Wyślij SMS do siebie z treścią "Synchronizacja Czasu"
-1544:main.c        ****         strcpy((char *)numer_telefonu_wysylanego_smsa,
-1545:main.c        ****                (char *)moj_numer_telefonu);
-1546:main.c        ****         strcpy_P((char *)tekst_wysylanego_smsa, PSTR("Synchronizacja Czasu"));
-1547:main.c        ****         dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
-1548:main.c        ****         autosync_sms_wyslany = TRUE;
-1549:main.c        ****       } else {
-1550:main.c        ****         // Brak numeru lub błąd - po prostu czekamy na przychodzący SMS
-1551:main.c        ****         // System normalnie pracuje
-1552:main.c        ****         autosync_sms_wyslany = TRUE; // Nie próbuj ponownie
-1553:main.c        ****       }
-1554:main.c        ****     }
-1555:main.c        ****   }
-1556:main.c        **** 
-1557:main.c        ****   // Reset flagi gdy auto-sync zostanie wyłączony
-1558:main.c        ****   if (!autosync_czas_aktywny) {
-1559:main.c        ****     autosync_sms_wyslany = FALSE;
-1560:main.c        ****     autosync_timer_100ms = 0;
-1561:main.c        ****   }
-1562:main.c        **** 
-1563:main.c        ****   // Mechanizm wykrywania zablokowanej kolejki i czyszczenia starych komend
-1564:main.c        ****   // SMS
-1565:main.c        ****   const komenda_typ pierwsza_komenda = komendy_kolejka[0];
-1566:main.c        ****   if (pierwsza_komenda != KOMENDA_KOLEJKI_BRAK_KOMENDY) {
-1567:main.c        ****     // Sprawdz czy pierwsza komenda to SMS - jesli tak i stoi zbyt dlugo,
-1568:main.c        ****     // wyczysc
-1569:main.c        ****     if (pierwsza_komenda >= KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT &&
-1570:main.c        ****         pierwsza_komenda <= KOMENDA_KOLEJKI_WYSLIJ_SMSA_PDU) {
-1571:main.c        ****       // To jest komenda SMS - sprawdz czy stoi zbyt dlugo
-1572:main.c        ****       if (pierwsza_komenda == ostatnia_pierwsza_komenda) {
-1573:main.c        ****         // Ta sama komenda SMS jest na poczatku kolejki - kolejka moze stac
-1574:main.c        ****         if (licznik_kolejka_stoi_100ms < MAX_CZAS_KOLEJKA_STOI_100MS)
-1575:main.c        ****           ++licznik_kolejka_stoi_100ms;
-1576:main.c        ****         else {
-1577:main.c        ****           // Komenda SMS stoi juz 30 sekund - wyczysc wszystkie komendy SMS i
-1578:main.c        ****           // wznow dzialanie
-1579:main.c        ****           filtruj_komendy_z_przedzialu(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT,
-1580:main.c        ****                                        KOMENDA_KOLEJKI_WYSLIJ_SMSA_PDU);
-1581:main.c        ****           if (licznik_awaryjnych_resetow_kolejki < 0xFFFF)
-1582:main.c        ****             ++licznik_awaryjnych_resetow_kolejki;
-1583:main.c        **** 
-1584:main.c        ****           filtruj_i_dodaj_komende(KOMENDA_KOLEJKI_USUN_WSZYSTKIE_SMSY);
-1585:main.c        **** 
-1586:main.c        ****           // Resetuj blokade komend REPORT/USER aby wznowic dzialanie
-1587:main.c        ****           licznik_report_user = 0;
-1588:main.c        ****           timer_report_user_100ms = 0;
-1589:main.c        **** 
-1590:main.c        ****           // Resetuj liczniki kolejki
-1591:main.c        ****           licznik_kolejka_stoi_100ms = 0;
-1592:main.c        ****           ostatnia_pierwsza_komenda = KOMENDA_KOLEJKI_BRAK_KOMENDY;
-1593:main.c        **** 
-1594:main.c        ****           // Resetuj flage wysylania SMS (na wypadek zablokowania)
-1595:main.c        ****           flaga_wysylanie_smsa = 0;
-1596:main.c        ****         }
-1597:main.c        ****       } else {
-1598:main.c        ****         // Pierwsza komenda SMS sie zmienila - kolejka dziala
-1599:main.c        ****         ostatnia_pierwsza_komenda = pierwsza_komenda;
-1600:main.c        ****         licznik_kolejka_stoi_100ms = 0;
-1601:main.c        ****       }
-1602:main.c        ****     } else {
-1603:main.c        ****       // To nie jest komenda SMS - resetuj licznik (nie interesuje nas)
-1604:main.c        ****       ostatnia_pierwsza_komenda = pierwsza_komenda;
-1605:main.c        ****       licznik_kolejka_stoi_100ms = 0;
-1606:main.c        ****     }
-1607:main.c        ****   } else {
-1608:main.c        ****     // Kolejka jest pusta
-1609:main.c        ****     ostatnia_pierwsza_komenda = KOMENDA_KOLEJKI_BRAK_KOMENDY;
-1610:main.c        ****     licznik_kolejka_stoi_100ms = 0;
-1611:main.c        ****   }
-1612:main.c        **** 
-1613:main.c        ****   // Watchdog pilnujacy zakleszczonego wysylania SMS
-1614:main.c        ****   if (flaga_wysylanie_smsa) {
-1615:main.c        ****     if (licznik_watchdog_wysylanie_smsa_100ms < WATCHDOG_WYSYLANIA_SMS_100MS) {
-1616:main.c        ****       ++licznik_watchdog_wysylanie_smsa_100ms;
-1617:main.c        ****     } else {
-1618:main.c        ****       licznik_watchdog_wysylanie_smsa_100ms = 0;
-1619:main.c        ****       // Awaryjne odblokowanie
-1620:main.c        ****       watchdog_sms_disarm();
-1621:main.c        ****       flaga_wysylanie_smsa = 0;
-1622:main.c        ****       liczba_prob_wyslania_smsa = 0;
-1623:main.c        ****       czekanie_na_odebranie_zachety = FALSE;
-1624:main.c        ****       wysylanie_smsa_clipa = WYSYLANIE_SMSA_CLIPA_BRAK;
-1625:main.c        **** 
-1626:main.c        ****       if (liczba_kolejnych_watchdogow_wysylania < 255)
-1627:main.c        ****         ++liczba_kolejnych_watchdogow_wysylania;
-1628:main.c        ****       if (liczba_kolejnych_watchdogow_wysylania >= 3) {
-1629:main.c        ****         liczba_kolejnych_watchdogow_wysylania = 0;
-1630:main.c        ****         reset_modulu_SIM900();
-1631:main.c        ****       }
-1632:main.c        ****     }
-1633:main.c        ****   } else {
-1634:main.c        ****     licznik_watchdog_wysylanie_smsa_100ms = 0;
-1635:main.c        ****     liczba_kolejnych_watchdogow_wysylania = 0;
-1636:main.c        ****   }
-1637:main.c        **** 
-1638:main.c        ****   if (watchdog_sms_aktywny) {
-1639:main.c        ****     if (watchdog_sms_licznik_100ms < WATCHDOG_SMS_TIMEOUT_100MS)
-1640:main.c        ****       ++watchdog_sms_licznik_100ms;
-1641:main.c        ****     else {
-1642:main.c        ****       watchdog_sms_trwa_reset = TRUE;
-1643:main.c        ****       cli();
-1644:main.c        ****       wdt_enable(WDTO_15MS);
-1645:main.c        ****       while (1)
-1646:main.c        ****         ;
-1647:main.c        ****     }
-1648:main.c        ****   } else if (watchdog_sms_safe_mode_100ms) {
-1649:main.c        ****     --watchdog_sms_safe_mode_100ms;
-1650:main.c        ****   }
-1651:main.c        **** 
-1652:main.c        ****   // Obsluga szybkich blyskow LED
-1653:main.c        ****   if (liczba_blyskow_led > 0) {
-1654:main.c        ****     ++stan_cyklu_blysku;
-1655:main.c        ****     if (stan_cyklu_blysku >= 6) {
-1656:main.c        ****       stan_cyklu_blysku = 0;
-1657:main.c        ****       --liczba_blyskow_led;
-1658:main.c        ****     }
-1659:main.c        ****     ustaw_stan_led(stan_cyklu_blysku < 2);
-1660:main.c        ****     return;
-1661:main.c        ****   }
-1662:main.c        **** 
-1663:main.c        ****   // LED: ON gdy nie zalogowany, OFF gdy zalogowany (z mruganiem przy dobrym
-1664:main.c        ****   // sygnale)
-1665:main.c        ****   if (!modul_zalogowany_w_sieci) {
-1666:main.c        ****     // Nie zalogowany - dioda swiecei ciagle
-1667:main.c        ****     ustaw_stan_led(TRUE);
-1668:main.c        ****   } else {
-1669:main.c        ****     // Zalogowany - dioda zgaszona lub mruga w zaleznosci od sygnalu
-1670:main.c        ****     if (licznik_100ms_dioda_led) {
-1671:main.c        ****       // Mrugniecie (SMS, etc.)
-1672:main.c        ****       ustaw_stan_led(TRUE);
-1673:main.c        ****     } else {
-1674:main.c        ****       // Normalne dzialanie - mrugaj w zaleznosci od poziomu sygnalu
-1675:main.c        ****       static uchar licznik_dioda_led_poziom_sieci;
-1676:main.c        ****       if (poziom_sieci_gsm < 16) {
-1677:main.c        ****         if (++licznik_dioda_led_poziom_sieci >= 50)
-1678:main.c        ****           licznik_dioda_led_poziom_sieci = 1;
-1679:main.c        ****       } else
-1680:main.c        ****         licznik_dioda_led_poziom_sieci = 0;
-1681:main.c        **** 
-1682:main.c        ****       ustaw_stan_led(licznik_dioda_led_poziom_sieci == 40 ||
-1683:main.c        ****                      licznik_dioda_led_poziom_sieci == 43 ||
-1684:main.c        ****                      (licznik_dioda_led_poziom_sieci >= 46 &&
-1685:main.c        ****                       licznik_dioda_led_poziom_sieci <= 49));
-1686:main.c        ****     }
-1687:main.c        ****   }
-1688:main.c        ****   zapis_w_eeprom_stanu_wyjsc();
-1689:main.c        **** }
-1690:main.c        **** 
-1691:main.c        **** void steruj_urzadzeniem_10MS(void) {
-1692:main.c        ****   steruj_wejscia_10ms();
-1693:main.c        ****   steruj_SIM900_10MS();
-1694:main.c        ****   zapisz_bajt_w_EEPROM();
-1695:main.c        ****   // test_dioda_wyjscia();
-1696:main.c        ****   // test_wejscie();
-1697:main.c        **** }
-1698:main.c        **** 
-1699:main.c        **** void wolne_zdarzenie_timer(void) {
-1700:main.c        ****   WYKONAJ_CLI_SEI(WYLACZ_PRZERWANIE_TIMER());
-1701:main.c        ****   if (!CZY_WYKONAC_ZDARZENIE_TIMER()) {
-1702:main.c        ****     WYKONAJ_CLI_SEI(WLACZ_PRZERWANIE_TIMER());
-1703:main.c        ****     return;
-1704:main.c        ****   }
-1705:main.c        ****   wykonaj_zdarzenie_timer = FALSE;
-1706:main.c        ****   if (wykonac_watki_10MS) {
-1707:main.c        ****     wykonac_watki = WYKONAJ_WATKI_10MS;
-1708:main.c        ****     wykonac_watki_10MS = FALSE;
-1709:main.c        ****   }
-1710:main.c        ****   WYKONAJ_CLI_SEI(WLACZ_PRZERWANIE_TIMER());
-1711:main.c        ****   if (CZY_WYKONAC_WATKI_10MS()) {
-1712:main.c        ****     static uchar licznik_wybuc_watki_100MS = 0;
-1713:main.c        **** #define OPOZNIENIE_100_MS 10
-1714:main.c        ****     if (++licznik_wybuc_watki_100MS == OPOZNIENIE_100_MS) {
-1715:main.c        ****       licznik_wybuc_watki_100MS = 0;
-1716:main.c        ****       wykonac_watki = WYKONAJ_WATKI_100MS | WYKONAJ_WATKI_10MS;
-1717:main.c        ****     }
-1718:main.c        ****     NOP();
-1719:main.c        ****     cli();
-1720:main.c        ****     if (CZY_ODBIERANIE_DANYCH_SIM900()) {
-1721:main.c        ****       WYLACZ_PRZERWANIE_ODBIORU_DANYCH_SIM900();
-1722:main.c        ****       sei();
-1723:main.c        ****       if (liczba_odebranych_znakow_SIM900 != 0 &&
-1724:main.c        ****           ++licznik_opoznienie_oczekiwania_na_bajt_SIM900 >
-1725:main.c        ****               MAX_OPOZNIENIE_OCZEKIWANIA_NA_BAJT_SIM900_500_MS) {
-1726:main.c        ****         resetuj_odbior_SIM900_po_bledzie();
-1727:main.c        ****       } else {
-1728:main.c        ****         WYKONAJ_CLI_SEI(WLACZ_PRZERWANIE_ODBIORU_DANYCH_SIM900());
-1729:main.c        ****       }
-1730:main.c        ****     }
-1731:main.c        ****     sei();
-1732:main.c        ****   }
-1733:main.c        **** }
-1734:main.c        **** 
-1735:main.c        **** void ustaw_parametry_dla_bezpieczenstwa(void) {
-1736:main.c        ****   wdt_reset();
-1737:main.c        ****   ustaw_parametry_dla_bezpieczenstwa_rejestry();
-1738:main.c        ****   set_sleep_mode(SLEEP_MODE_IDLE);
-1739:main.c        **** }
-1740:main.c        **** 
-1741:main.c        **** void inicjalizuj_parametry_modulu(void) {
-1742:main.c        ****   memcpy_E(kod_modulu, ADRES_EEPROM_KOD_DOSTEPU, LICZBA_BAJTOW_KODU_DOSTEPU);
+1536:main.c        ****     // Odczekaj 25 sekund po zalogowaniu do sieci (stabilizacja modemu +
+1537:main.c        ****     // aktualizacja RTC)
+1538:main.c        ****     if (autosync_timer_100ms < 250) {
+1539:main.c        ****       autosync_timer_100ms++;
+1540:main.c        ****     } else {
+1541:main.c        ****       // Po 25 sekundach sprawdź czas z RTC modemu
+1542:main.c        ****       // Jeśli czas to 00:00:xx (sekundy dowolne) - wyślij SMS
+1543:main.c        ****       if (rtc_czas[0] == '0' && rtc_czas[1] == '0' && rtc_czas[3] == '0' &&
+1544:main.c        ****           rtc_czas[4] == '0') {
+1545:main.c        ****         // Czas jest 00:00:xx - sprawdź czy mamy numer i wyślij SMS
+1546:main.c        ****         if (moj_numer_telefonu[0] != 0xFF && moj_numer_telefonu[0] != 0 &&
+1547:main.c        ****             !flaga_wysylanie_smsa) {
+1548:main.c        ****           // Wyślij SMS do siebie z treścią "Synchronizacja Czasu"
+1549:main.c        ****           strcpy((char *)numer_telefonu_wysylanego_smsa,
+1550:main.c        ****                  (char *)moj_numer_telefonu);
+1551:main.c        ****           strcpy_P((char *)tekst_wysylanego_smsa, PSTR("Synchronizacja Czasu"));
+1552:main.c        ****           dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
+1553:main.c        ****         }
+1554:main.c        ****       }
+1555:main.c        ****       // Zawsze oznacz jako wysłany (albo próbowano wysłać, albo czas był OK)
+1556:main.c        ****       autosync_sms_wyslany = TRUE;
+1557:main.c        ****     }
+1558:main.c        ****   }
+1559:main.c        **** 
+1560:main.c        ****   // Reset flagi gdy auto-sync zostanie wyłączony
+1561:main.c        ****   if (!autosync_czas_aktywny) {
+1562:main.c        ****     autosync_sms_wyslany = FALSE;
+1563:main.c        ****     autosync_timer_100ms = 0;
+1564:main.c        ****   }
+1565:main.c        **** 
+1566:main.c        ****   // Mechanizm wykrywania zablokowanej kolejki i czyszczenia starych komend
+1567:main.c        ****   // SMS
+1568:main.c        ****   const komenda_typ pierwsza_komenda = komendy_kolejka[0];
+1569:main.c        ****   if (pierwsza_komenda != KOMENDA_KOLEJKI_BRAK_KOMENDY) {
+1570:main.c        ****     // Sprawdz czy pierwsza komenda to SMS - jesli tak i stoi zbyt dlugo,
+1571:main.c        ****     // wyczysc
+1572:main.c        ****     if (pierwsza_komenda >= KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT &&
+1573:main.c        ****         pierwsza_komenda <= KOMENDA_KOLEJKI_WYSLIJ_SMSA_PDU) {
+1574:main.c        ****       // To jest komenda SMS - sprawdz czy stoi zbyt dlugo
+1575:main.c        ****       if (pierwsza_komenda == ostatnia_pierwsza_komenda) {
+1576:main.c        ****         // Ta sama komenda SMS jest na poczatku kolejki - kolejka moze stac
+1577:main.c        ****         if (licznik_kolejka_stoi_100ms < MAX_CZAS_KOLEJKA_STOI_100MS)
+1578:main.c        ****           ++licznik_kolejka_stoi_100ms;
+1579:main.c        ****         else {
+1580:main.c        ****           // Komenda SMS stoi juz 30 sekund - wyczysc wszystkie komendy SMS i
+1581:main.c        ****           // wznow dzialanie
+1582:main.c        ****           filtruj_komendy_z_przedzialu(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT,
+1583:main.c        ****                                        KOMENDA_KOLEJKI_WYSLIJ_SMSA_PDU);
+1584:main.c        ****           if (licznik_awaryjnych_resetow_kolejki < 0xFFFF)
+1585:main.c        ****             ++licznik_awaryjnych_resetow_kolejki;
+1586:main.c        **** 
+1587:main.c        ****           filtruj_i_dodaj_komende(KOMENDA_KOLEJKI_USUN_WSZYSTKIE_SMSY);
+1588:main.c        **** 
+1589:main.c        ****           // Resetuj blokade komend REPORT/USER aby wznowic dzialanie
+1590:main.c        ****           licznik_report_user = 0;
+1591:main.c        ****           timer_report_user_100ms = 0;
+1592:main.c        **** 
+1593:main.c        ****           // Resetuj liczniki kolejki
+1594:main.c        ****           licznik_kolejka_stoi_100ms = 0;
+1595:main.c        ****           ostatnia_pierwsza_komenda = KOMENDA_KOLEJKI_BRAK_KOMENDY;
+1596:main.c        **** 
+1597:main.c        ****           // Resetuj flage wysylania SMS (na wypadek zablokowania)
+1598:main.c        ****           flaga_wysylanie_smsa = 0;
+1599:main.c        ****         }
+1600:main.c        ****       } else {
+1601:main.c        ****         // Pierwsza komenda SMS sie zmienila - kolejka dziala
+1602:main.c        ****         ostatnia_pierwsza_komenda = pierwsza_komenda;
+1603:main.c        ****         licznik_kolejka_stoi_100ms = 0;
+1604:main.c        ****       }
+1605:main.c        ****     } else {
+1606:main.c        ****       // To nie jest komenda SMS - resetuj licznik (nie interesuje nas)
+1607:main.c        ****       ostatnia_pierwsza_komenda = pierwsza_komenda;
+1608:main.c        ****       licznik_kolejka_stoi_100ms = 0;
+1609:main.c        ****     }
+1610:main.c        ****   } else {
+1611:main.c        ****     // Kolejka jest pusta
+1612:main.c        ****     ostatnia_pierwsza_komenda = KOMENDA_KOLEJKI_BRAK_KOMENDY;
+1613:main.c        ****     licznik_kolejka_stoi_100ms = 0;
+1614:main.c        ****   }
+1615:main.c        **** 
+1616:main.c        ****   // Watchdog pilnujacy zakleszczonego wysylania SMS
+1617:main.c        ****   if (flaga_wysylanie_smsa) {
+1618:main.c        ****     if (licznik_watchdog_wysylanie_smsa_100ms < WATCHDOG_WYSYLANIA_SMS_100MS) {
+1619:main.c        ****       ++licznik_watchdog_wysylanie_smsa_100ms;
+1620:main.c        ****     } else {
+1621:main.c        ****       licznik_watchdog_wysylanie_smsa_100ms = 0;
+1622:main.c        ****       // Awaryjne odblokowanie
+1623:main.c        ****       watchdog_sms_disarm();
+1624:main.c        ****       flaga_wysylanie_smsa = 0;
+1625:main.c        ****       liczba_prob_wyslania_smsa = 0;
+1626:main.c        ****       czekanie_na_odebranie_zachety = FALSE;
+1627:main.c        ****       wysylanie_smsa_clipa = WYSYLANIE_SMSA_CLIPA_BRAK;
+1628:main.c        **** 
+1629:main.c        ****       if (liczba_kolejnych_watchdogow_wysylania < 255)
+1630:main.c        ****         ++liczba_kolejnych_watchdogow_wysylania;
+1631:main.c        ****       if (liczba_kolejnych_watchdogow_wysylania >= 3) {
+1632:main.c        ****         liczba_kolejnych_watchdogow_wysylania = 0;
+1633:main.c        ****         reset_modulu_SIM900();
+1634:main.c        ****       }
+1635:main.c        ****     }
+1636:main.c        ****   } else {
+1637:main.c        ****     licznik_watchdog_wysylanie_smsa_100ms = 0;
+1638:main.c        ****     liczba_kolejnych_watchdogow_wysylania = 0;
+1639:main.c        ****   }
+1640:main.c        **** 
+1641:main.c        ****   if (watchdog_sms_aktywny) {
+1642:main.c        ****     if (watchdog_sms_licznik_100ms < WATCHDOG_SMS_TIMEOUT_100MS)
+1643:main.c        ****       ++watchdog_sms_licznik_100ms;
+1644:main.c        ****     else {
+1645:main.c        ****       watchdog_sms_trwa_reset = TRUE;
+1646:main.c        ****       cli();
+1647:main.c        ****       wdt_enable(WDTO_15MS);
+1648:main.c        ****       while (1)
+1649:main.c        ****         ;
+1650:main.c        ****     }
+1651:main.c        ****   } else if (watchdog_sms_safe_mode_100ms) {
+1652:main.c        ****     --watchdog_sms_safe_mode_100ms;
+1653:main.c        ****   }
+1654:main.c        **** 
+1655:main.c        ****   // Obsluga szybkich blyskow LED
+1656:main.c        ****   if (liczba_blyskow_led > 0) {
+1657:main.c        ****     ++stan_cyklu_blysku;
+1658:main.c        ****     if (stan_cyklu_blysku >= 6) {
+1659:main.c        ****       stan_cyklu_blysku = 0;
+1660:main.c        ****       --liczba_blyskow_led;
+1661:main.c        ****     }
+1662:main.c        ****     ustaw_stan_led(stan_cyklu_blysku < 2);
+1663:main.c        ****     return;
+1664:main.c        ****   }
+1665:main.c        **** 
+1666:main.c        ****   // LED: ON gdy nie zalogowany, OFF gdy zalogowany (z mruganiem przy dobrym
+1667:main.c        ****   // sygnale)
+1668:main.c        ****   if (!modul_zalogowany_w_sieci) {
+1669:main.c        ****     // Nie zalogowany - dioda swiecei ciagle
+1670:main.c        ****     ustaw_stan_led(TRUE);
+1671:main.c        ****   } else {
+1672:main.c        ****     // Zalogowany - dioda zgaszona lub mruga w zaleznosci od sygnalu
+1673:main.c        ****     if (licznik_100ms_dioda_led) {
+1674:main.c        ****       // Mrugniecie (SMS, etc.)
+1675:main.c        ****       ustaw_stan_led(TRUE);
+1676:main.c        ****     } else {
+1677:main.c        ****       // Normalne dzialanie - mrugaj w zaleznosci od poziomu sygnalu
+1678:main.c        ****       static uchar licznik_dioda_led_poziom_sieci;
+1679:main.c        ****       if (poziom_sieci_gsm < 16) {
+1680:main.c        ****         if (++licznik_dioda_led_poziom_sieci >= 50)
+1681:main.c        ****           licznik_dioda_led_poziom_sieci = 1;
+1682:main.c        ****       } else
+1683:main.c        ****         licznik_dioda_led_poziom_sieci = 0;
+1684:main.c        **** 
+1685:main.c        ****       ustaw_stan_led(licznik_dioda_led_poziom_sieci == 40 ||
+1686:main.c        ****                      licznik_dioda_led_poziom_sieci == 43 ||
+1687:main.c        ****                      (licznik_dioda_led_poziom_sieci >= 46 &&
+1688:main.c        ****                       licznik_dioda_led_poziom_sieci <= 49));
+1689:main.c        ****     }
+1690:main.c        ****   }
+1691:main.c        ****   zapis_w_eeprom_stanu_wyjsc();
+1692:main.c        **** }
+1693:main.c        **** 
+1694:main.c        **** void steruj_urzadzeniem_10MS(void) {
+1695:main.c        ****   steruj_wejscia_10ms();
+1696:main.c        ****   steruj_SIM900_10MS();
+1697:main.c        ****   zapisz_bajt_w_EEPROM();
+1698:main.c        ****   // test_dioda_wyjscia();
+1699:main.c        ****   // test_wejscie();
+1700:main.c        **** }
+1701:main.c        **** 
+1702:main.c        **** void wolne_zdarzenie_timer(void) {
+1703:main.c        ****   WYKONAJ_CLI_SEI(WYLACZ_PRZERWANIE_TIMER());
+1704:main.c        ****   if (!CZY_WYKONAC_ZDARZENIE_TIMER()) {
+1705:main.c        ****     WYKONAJ_CLI_SEI(WLACZ_PRZERWANIE_TIMER());
+1706:main.c        ****     return;
+1707:main.c        ****   }
+1708:main.c        ****   wykonaj_zdarzenie_timer = FALSE;
+1709:main.c        ****   if (wykonac_watki_10MS) {
+1710:main.c        ****     wykonac_watki = WYKONAJ_WATKI_10MS;
+1711:main.c        ****     wykonac_watki_10MS = FALSE;
+1712:main.c        ****   }
+1713:main.c        ****   WYKONAJ_CLI_SEI(WLACZ_PRZERWANIE_TIMER());
+1714:main.c        ****   if (CZY_WYKONAC_WATKI_10MS()) {
+1715:main.c        ****     static uchar licznik_wybuc_watki_100MS = 0;
+1716:main.c        **** #define OPOZNIENIE_100_MS 10
+1717:main.c        ****     if (++licznik_wybuc_watki_100MS == OPOZNIENIE_100_MS) {
+1718:main.c        ****       licznik_wybuc_watki_100MS = 0;
+1719:main.c        ****       wykonac_watki = WYKONAJ_WATKI_100MS | WYKONAJ_WATKI_10MS;
+1720:main.c        ****     }
+1721:main.c        ****     NOP();
+1722:main.c        ****     cli();
+1723:main.c        ****     if (CZY_ODBIERANIE_DANYCH_SIM900()) {
+1724:main.c        ****       WYLACZ_PRZERWANIE_ODBIORU_DANYCH_SIM900();
+1725:main.c        ****       sei();
+1726:main.c        ****       if (liczba_odebranych_znakow_SIM900 != 0 &&
+1727:main.c        ****           ++licznik_opoznienie_oczekiwania_na_bajt_SIM900 >
+1728:main.c        ****               MAX_OPOZNIENIE_OCZEKIWANIA_NA_BAJT_SIM900_500_MS) {
+1729:main.c        ****         resetuj_odbior_SIM900_po_bledzie();
+1730:main.c        ****       } else {
+1731:main.c        ****         WYKONAJ_CLI_SEI(WLACZ_PRZERWANIE_ODBIORU_DANYCH_SIM900());
+1732:main.c        ****       }
+1733:main.c        ****     }
+1734:main.c        ****     sei();
+1735:main.c        ****   }
+1736:main.c        **** }
+1737:main.c        **** 
+1738:main.c        **** void ustaw_parametry_dla_bezpieczenstwa(void) {
+1739:main.c        ****   wdt_reset();
+1740:main.c        ****   ustaw_parametry_dla_bezpieczenstwa_rejestry();
+1741:main.c        ****   set_sleep_mode(SLEEP_MODE_IDLE);
+1742:main.c        **** }
 1743:main.c        **** 
-1744:main.c        ****   // Auto-naprawa: Jeśli kod jest pusty (FF) lub zerowy, ustaw ABCD
-1745:main.c        ****   if (kod_modulu[0] == 0xFF || kod_modulu[0] == 0x00) {
-1746:main.c        ****     kod_modulu[0] = bufor_eeprom[0] = 'A';
-1747:main.c        ****     kod_modulu[1] = bufor_eeprom[1] = 'B';
-1748:main.c        ****     kod_modulu[2] = bufor_eeprom[2] = 'C';
-1749:main.c        ****     kod_modulu[3] = bufor_eeprom[3] = 'D';
-1750:main.c        ****     // Zapisz do EEPROM natychmiast (BLOCKING)
-1751:main.c        ****     while (!eeprom_is_ready())
-1752:main.c        ****       ;
-1753:main.c        ****     eeprom_update_block(kod_modulu, (void *)ADRES_EEPROM_KOD_DOSTEPU,
-1754:main.c        ****                         LICZBA_BAJTOW_KODU_DOSTEPU);
-1755:main.c        ****   }
-1756:main.c        **** 
-1757:main.c        ****   // Auto-naprawa: Jeśli tryb pracy jest nieokreślony (0xFF), ustaw Publiczny
-1758:main.c        ****   // (1)
-1759:main.c        ****   tryb_pracy = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_TRYB_PRACY);
-1760:main.c        ****   if (tryb_pracy == 0xFF) {
-1761:main.c        ****     tryb_pracy = 1; // Domyślnie Publiczny
-1762:main.c        ****     while (!eeprom_is_ready())
-1763:main.c        ****       ;
-1764:main.c        ****     eeprom_update_byte((uint8_t *)ADRES_EEPROM_TRYB_PRACY, 1);
-1765:main.c        ****   }
-1766:main.c        **** 
-1767:main.c        ****   // --- Inicjalizacja trybu CLIP/DTMF ---
-1768:main.c        ****   tryb_clip = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_TRYB_CLIP_DTMF);
-1769:main.c        ****   if (tryb_clip == 0xFF) {
-1770:main.c        ****     tryb_clip = 1; // Domyślnie CLIP (1)
-1771:main.c        ****     while (!eeprom_is_ready())
-1772:main.c        ****       ;
-1773:main.c        ****     eeprom_update_byte((uint8_t *)ADRES_EEPROM_TRYB_CLIP_DTMF, 1);
-1774:main.c        ****   }
-1775:main.c        **** 
-1776:main.c        ****   // Inicjalizacja parametrow czasowych
-1777:main.c        ****   czas_start_h = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_START_H);
-1778:main.c        ****   czas_start_m = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_START_M);
-1779:main.c        ****   czas_stop_h = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_STOP_H);
-1780:main.c        ****   czas_stop_m = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_STOP_M);
-1781:main.c        **** 
-1782:main.c        ****   // Inicjalizacja SKRYBA
-1783:main.c        ****   skryba_wlaczona = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA);
-1784:main.c        ****   if (skryba_wlaczona == 0xFF)
-1785:main.c        ****     skryba_wlaczona = FALSE;
-1786:main.c        **** 
-1787:main.c        ****   // Odczyt limitu Skryby z EEPROM
-1788:main.c        ****   uchar limit_l =
-1789:main.c        ****       eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA_LIMIT_L);
-1790:main.c        ****   uchar limit_h =
-1791:main.c        ****       eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA_LIMIT_H);
-1792:main.c        ****   if (limit_l == 0xFF && limit_h == 0xFF) {
-1793:main.c        ****     // Nie ustawiono - domyslnie 800
-1794:main.c        ****     skryba_limit = 800;
-1795:main.c        ****   } else {
-1796:main.c        ****     skryba_limit = limit_l | (limit_h << 8);
-1797:main.c        ****     // Walidacja zakresu
-1798:main.c        ****     if (skryba_limit < 1 || skryba_limit > MAX_LICZBA_NUMEROW_TELEFONOW_BRAMA) {
-1799:main.c        ****       skryba_limit = 800;
-1800:main.c        ****     }
-1801:main.c        ****   }
-1802:main.c        ****   // Debug initialization
-1803:main.c        ****   zapisz_debug_do_eeprom(skryba_wlaczona ? 1 : 0, (uchar)(skryba_limit & 0xFF));
-1804:main.c        **** 
-1805:main.c        ****   // Auto-naprawa Harmonogramu: Jeśli wartości są nieprawidłowe (ale nie
-1806:main.c        ****   // 0xFF), ustaw na OFF
-1807:main.c        ****   if ((czas_start_h > 23 && czas_start_h != 0xFF) ||
-1808:main.c        ****       (czas_start_m > 59 && czas_start_m != 0xFF) ||
-1809:main.c        ****       (czas_stop_h > 23 && czas_stop_h != 0xFF) ||
-1810:main.c        ****       (czas_stop_m > 59 && czas_stop_m != 0xFF)) {
-1811:main.c        ****     // Zapisz wartosci wylaczajace (0xFF) - BLOCKING
-1812:main.c        ****     while (!eeprom_is_ready())
-1813:main.c        ****       ;
-1814:main.c        ****     eeprom_update_byte((uint8_t *)ADRES_EEPROM_CZAS_START_H, 0xFF);
+1744:main.c        **** void inicjalizuj_parametry_modulu(void) {
+1745:main.c        ****   memcpy_E(kod_modulu, ADRES_EEPROM_KOD_DOSTEPU, LICZBA_BAJTOW_KODU_DOSTEPU);
+1746:main.c        **** 
+1747:main.c        ****   // Auto-naprawa: Jeśli kod jest pusty (FF) lub zerowy, ustaw ABCD
+1748:main.c        ****   if (kod_modulu[0] == 0xFF || kod_modulu[0] == 0x00) {
+1749:main.c        ****     kod_modulu[0] = bufor_eeprom[0] = 'A';
+1750:main.c        ****     kod_modulu[1] = bufor_eeprom[1] = 'B';
+1751:main.c        ****     kod_modulu[2] = bufor_eeprom[2] = 'C';
+1752:main.c        ****     kod_modulu[3] = bufor_eeprom[3] = 'D';
+1753:main.c        ****     // Zapisz do EEPROM natychmiast (BLOCKING)
+1754:main.c        ****     while (!eeprom_is_ready())
+1755:main.c        ****       ;
+1756:main.c        ****     eeprom_update_block(kod_modulu, (void *)ADRES_EEPROM_KOD_DOSTEPU,
+1757:main.c        ****                         LICZBA_BAJTOW_KODU_DOSTEPU);
+1758:main.c        ****   }
+1759:main.c        **** 
+1760:main.c        ****   // Auto-naprawa: Jeśli tryb pracy jest nieokreślony (0xFF), ustaw Publiczny
+1761:main.c        ****   // (1)
+1762:main.c        ****   tryb_pracy = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_TRYB_PRACY);
+1763:main.c        ****   if (tryb_pracy == 0xFF) {
+1764:main.c        ****     tryb_pracy = 1; // Domyślnie Publiczny
+1765:main.c        ****     while (!eeprom_is_ready())
+1766:main.c        ****       ;
+1767:main.c        ****     eeprom_update_byte((uint8_t *)ADRES_EEPROM_TRYB_PRACY, 1);
+1768:main.c        ****   }
+1769:main.c        **** 
+1770:main.c        ****   // --- Inicjalizacja trybu CLIP/DTMF ---
+1771:main.c        ****   tryb_clip = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_TRYB_CLIP_DTMF);
+1772:main.c        ****   if (tryb_clip == 0xFF) {
+1773:main.c        ****     tryb_clip = 1; // Domyślnie CLIP (1)
+1774:main.c        ****     while (!eeprom_is_ready())
+1775:main.c        ****       ;
+1776:main.c        ****     eeprom_update_byte((uint8_t *)ADRES_EEPROM_TRYB_CLIP_DTMF, 1);
+1777:main.c        ****   }
+1778:main.c        **** 
+1779:main.c        ****   // Inicjalizacja parametrow czasowych
+1780:main.c        ****   czas_start_h = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_START_H);
+1781:main.c        ****   czas_start_m = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_START_M);
+1782:main.c        ****   czas_stop_h = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_STOP_H);
+1783:main.c        ****   czas_stop_m = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_STOP_M);
+1784:main.c        **** 
+1785:main.c        ****   // Inicjalizacja SKRYBA
+1786:main.c        ****   skryba_wlaczona = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA);
+1787:main.c        ****   if (skryba_wlaczona == 0xFF)
+1788:main.c        ****     skryba_wlaczona = FALSE;
+1789:main.c        **** 
+1790:main.c        ****   // Odczyt limitu Skryby z EEPROM
+1791:main.c        ****   uchar limit_l =
+1792:main.c        ****       eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA_LIMIT_L);
+1793:main.c        ****   uchar limit_h =
+1794:main.c        ****       eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA_LIMIT_H);
+1795:main.c        ****   if (limit_l == 0xFF && limit_h == 0xFF) {
+1796:main.c        ****     // Nie ustawiono - domyslnie 800
+1797:main.c        ****     skryba_limit = 800;
+1798:main.c        ****   } else {
+1799:main.c        ****     skryba_limit = limit_l | (limit_h << 8);
+1800:main.c        ****     // Walidacja zakresu
+1801:main.c        ****     if (skryba_limit < 1 || skryba_limit > MAX_LICZBA_NUMEROW_TELEFONOW_BRAMA) {
+1802:main.c        ****       skryba_limit = 800;
+1803:main.c        ****     }
+1804:main.c        ****   }
+1805:main.c        ****   // Debug initialization
+1806:main.c        ****   zapisz_debug_do_eeprom(skryba_wlaczona ? 1 : 0, (uchar)(skryba_limit & 0xFF));
+1807:main.c        **** 
+1808:main.c        ****   // Auto-naprawa Harmonogramu: Jeśli wartości są nieprawidłowe (ale nie
+1809:main.c        ****   // 0xFF), ustaw na OFF
+1810:main.c        ****   if ((czas_start_h > 23 && czas_start_h != 0xFF) ||
+1811:main.c        ****       (czas_start_m > 59 && czas_start_m != 0xFF) ||
+1812:main.c        ****       (czas_stop_h > 23 && czas_stop_h != 0xFF) ||
+1813:main.c        ****       (czas_stop_m > 59 && czas_stop_m != 0xFF)) {
+1814:main.c        ****     // Zapisz wartosci wylaczajace (0xFF) - BLOCKING
 1815:main.c        ****     while (!eeprom_is_ready())
 1816:main.c        ****       ;
-1817:main.c        ****     eeprom_update_byte((uint8_t *)ADRES_EEPROM_CZAS_START_M, 0xFF);
+1817:main.c        ****     eeprom_update_byte((uint8_t *)ADRES_EEPROM_CZAS_START_H, 0xFF);
 1818:main.c        ****     while (!eeprom_is_ready())
 1819:main.c        ****       ;
-1820:main.c        ****     eeprom_update_byte((uint8_t *)ADRES_EEPROM_CZAS_STOP_H, 0xFF);
+1820:main.c        ****     eeprom_update_byte((uint8_t *)ADRES_EEPROM_CZAS_START_M, 0xFF);
 1821:main.c        ****     while (!eeprom_is_ready())
 1822:main.c        ****       ;
-1823:main.c        ****     eeprom_update_byte((uint8_t *)ADRES_EEPROM_CZAS_STOP_M, 0xFF);
-1824:main.c        **** 
-1825:main.c        ****     czas_start_h = 0xFF;
-1826:main.c        ****     czas_start_m = 0xFF;
-1827:main.c        ****     czas_stop_h = 0xFF;
-1828:main.c        ****     czas_stop_m = 0xFF;
-1829:main.c        ****   }
-1830:main.c        **** 
-1831:main.c        ****   blokada_sterowania_czasowa =
-1832:main.c        ****       FALSE; // Domyślnie odblokowane, zaktualizuje sie przy odczycie czasu
+1823:main.c        ****     eeprom_update_byte((uint8_t *)ADRES_EEPROM_CZAS_STOP_H, 0xFF);
+1824:main.c        ****     while (!eeprom_is_ready())
+1825:main.c        ****       ;
+1826:main.c        ****     eeprom_update_byte((uint8_t *)ADRES_EEPROM_CZAS_STOP_M, 0xFF);
+1827:main.c        **** 
+1828:main.c        ****     czas_start_h = 0xFF;
+1829:main.c        ****     czas_start_m = 0xFF;
+1830:main.c        ****     czas_stop_h = 0xFF;
+1831:main.c        ****     czas_stop_m = 0xFF;
+1832:main.c        ****   }
 1833:main.c        **** 
-1834:main.c        ****   // Inicjalizacja blokady systemu (START/STOP)
-1835:main.c        ****   blokada_systemu =
-1836:main.c        ****       eeprom_read_byte((const uint8_t *)ADRES_EEPROM_BLOKADA_SYSTEMU);
-1837:main.c        ****   if (blokada_systemu == 0xFF) {
-1838:main.c        ****     blokada_systemu = FALSE; // Domyślnie odblokowany
-1839:main.c        ****   }
-1840:main.c        **** 
-1841:main.c        ****   // Inicjalizacja zmiennych debug SKRYBA (jesli 0xFF to wyczysc)
-1842:main.c        ****   for (uint16_t addr = ADRES_EEPROM_DEBUG_SKRYBA_1;
-1843:main.c        ****        addr <= ADRES_EEPROM_DEBUG_SKRYBA_5; ++addr) {
-1844:main.c        ****     if (eeprom_read_byte((const uint8_t *)addr) == 0xFF) {
-1845:main.c        ****       while (!eeprom_is_ready())
-1846:main.c        ****         ;
-1847:main.c        ****       eeprom_update_byte((uint8_t *)addr, 0);
-1848:main.c        ****     }
-1849:main.c        ****   }
-1850:main.c        **** 
-1851:main.c        ****   // Inicjalizacja zmiennych debug USER (jesli 0xFF to wyczysc)
-1852:main.c        ****   for (uint16_t addr = ADRES_EEPROM_DEBUG_USER_1;
-1853:main.c        ****        addr <= ADRES_EEPROM_DEBUG_USER_7; ++addr) {
-1854:main.c        ****     if (eeprom_read_byte((const uint8_t *)addr) == 0xFF) {
-1855:main.c        ****       while (!eeprom_is_ready())
-1856:main.c        ****         ;
-1857:main.c        ****       eeprom_update_byte((uint8_t *)addr, 0);
-1858:main.c        ****     }
-1859:main.c        ****   }
-1860:main.c        **** 
-1861:main.c        ****   // --- NOWE Z V7 (Ported) ---
-1862:main.c        ****   // Reset blokady komend REPORT/USER po inicjalizacji/resecie
-1863:main.c        ****   licznik_report_user = 0;
-1864:main.c        ****   timer_report_user_100ms = 0;
-1865:main.c        **** 
-1866:main.c        ****   // Reset flagi wysylania SMS po resecie
-1867:main.c        ****   flaga_wysylanie_smsa = 0;
+1834:main.c        ****   blokada_sterowania_czasowa =
+1835:main.c        ****       FALSE; // Domyślnie odblokowane, zaktualizuje sie przy odczycie czasu
+1836:main.c        **** 
+1837:main.c        ****   // Inicjalizacja blokady systemu (START/STOP)
+1838:main.c        ****   blokada_systemu =
+1839:main.c        ****       eeprom_read_byte((const uint8_t *)ADRES_EEPROM_BLOKADA_SYSTEMU);
+1840:main.c        ****   if (blokada_systemu == 0xFF) {
+1841:main.c        ****     blokada_systemu = FALSE; // Domyślnie odblokowany
+1842:main.c        ****   }
+1843:main.c        **** 
+1844:main.c        ****   // Inicjalizacja zmiennych debug SKRYBA (jesli 0xFF to wyczysc)
+1845:main.c        ****   for (uint16_t addr = ADRES_EEPROM_DEBUG_SKRYBA_1;
+1846:main.c        ****        addr <= ADRES_EEPROM_DEBUG_SKRYBA_5; ++addr) {
+1847:main.c        ****     if (eeprom_read_byte((const uint8_t *)addr) == 0xFF) {
+1848:main.c        ****       while (!eeprom_is_ready())
+1849:main.c        ****         ;
+1850:main.c        ****       eeprom_update_byte((uint8_t *)addr, 0);
+1851:main.c        ****     }
+1852:main.c        ****   }
+1853:main.c        **** 
+1854:main.c        ****   // Inicjalizacja zmiennych debug USER (jesli 0xFF to wyczysc)
+1855:main.c        ****   for (uint16_t addr = ADRES_EEPROM_DEBUG_USER_1;
+1856:main.c        ****        addr <= ADRES_EEPROM_DEBUG_USER_7; ++addr) {
+1857:main.c        ****     if (eeprom_read_byte((const uint8_t *)addr) == 0xFF) {
+1858:main.c        ****       while (!eeprom_is_ready())
+1859:main.c        ****         ;
+1860:main.c        ****       eeprom_update_byte((uint8_t *)addr, 0);
+1861:main.c        ****     }
+1862:main.c        ****   }
+1863:main.c        **** 
+1864:main.c        ****   // --- NOWE Z V7 (Ported) ---
+1865:main.c        ****   // Reset blokady komend REPORT/USER po inicjalizacji/resecie
+1866:main.c        ****   licznik_report_user = 0;
+1867:main.c        ****   timer_report_user_100ms = 0;
 1868:main.c        **** 
-1869:main.c        ****   // Zwieksz licznik resetow i zapisz debug
-1870:main.c        ****   static uchar licznik_resetow = 0;
-1871:main.c        ****   if (licznik_resetow < 255)
-1872:main.c        ****     ++licznik_resetow;
-1873:main.c        ****   while (!eeprom_is_ready())
-1874:main.c        ****     ;
-1875:main.c        ****   eeprom_update_byte((void *)EEPROM_DEBUG_LICZNIK_RESETOW, licznik_resetow);
+1869:main.c        ****   // Reset flagi wysylania SMS po resecie
+1870:main.c        ****   flaga_wysylanie_smsa = 0;
+1871:main.c        **** 
+1872:main.c        ****   // Zwieksz licznik resetow i zapisz debug
+1873:main.c        ****   static uchar licznik_resetow = 0;
+1874:main.c        ****   if (licznik_resetow < 255)
+1875:main.c        ****     ++licznik_resetow;
 1876:main.c        ****   while (!eeprom_is_ready())
 1877:main.c        ****     ;
-1878:main.c        ****   zapisz_debug_do_eeprom(0, 2); // Reset (komenda=0 oznacza reset)
-1879:main.c        **** 
-1880:main.c        ****   // Auto-sync czasu: Odczytaj numer własny z EEPROM
-1881:main.c        ****   eeprom_read_block(moj_numer_telefonu,
-1882:main.c        ****                     (const void *)ADRES_EEPROM_MOJE_NUMER_START,
-1883:main.c        ****                     MAX_LICZBA_ZNAKOW_TELEFON + 1);
-1884:main.c        ****   moj_numer_telefonu[MAX_LICZBA_ZNAKOW_TELEFON] = 0; // Ensure null termination
-1885:main.c        **** 
-1886:main.c        ****   // Sprawdź czy czas jest nieprawidłowy (00:00:xx) i czy mamy zapisany numer
-1887:main.c        ****   if (rtc_czas[0] == '0' && rtc_czas[1] == '0' && rtc_czas[3] == '0' &&
-1888:main.c        ****       rtc_czas[4] == '0' && moj_numer_telefonu[0] != 0xFF &&
-1889:main.c        ****       moj_numer_telefonu[0] != 0) {
-1890:main.c        ****     // Czas jest 00:00:xx i mamy zapisany numer - włącz auto-sync
-1891:main.c        ****     autosync_czas_aktywny = TRUE;
-1892:main.c        ****   }
-1893:main.c        **** }
-1894:main.c        **** 
-1895:main.c        **** static void opoznienie_startowe(void) {
- 189               		.loc 1 1895 0
+1878:main.c        ****   eeprom_update_byte((void *)EEPROM_DEBUG_LICZNIK_RESETOW, licznik_resetow);
+1879:main.c        ****   while (!eeprom_is_ready())
+1880:main.c        ****     ;
+1881:main.c        ****   zapisz_debug_do_eeprom(0, 2); // Reset (komenda=0 oznacza reset)
+1882:main.c        **** 
+1883:main.c        ****   // Auto-sync czasu: Odczytaj numer własny z EEPROM
+1884:main.c        ****   eeprom_read_block(moj_numer_telefonu,
+1885:main.c        ****                     (const void *)ADRES_EEPROM_MOJE_NUMER_START,
+1886:main.c        ****                     MAX_LICZBA_ZNAKOW_TELEFON + 1);
+1887:main.c        ****   moj_numer_telefonu[MAX_LICZBA_ZNAKOW_TELEFON] = 0; // Ensure null termination
+1888:main.c        **** 
+1889:main.c        ****   // Włącz auto-sync jeśli mamy zapisany numer
+1890:main.c        ****   // Sprawdzenie czasu nastąpi po zalogowaniu do sieci (w
+1891:main.c        ****   // steruj_urzadzeniem_100MS)
+1892:main.c        ****   if (moj_numer_telefonu[0] != 0xFF && moj_numer_telefonu[0] != 0) {
+1893:main.c        ****     autosync_czas_aktywny = TRUE;
+1894:main.c        ****   }
+1895:main.c        **** }
+1896:main.c        **** 
+1897:main.c        **** static void opoznienie_startowe(void) {
+ 189               		.loc 1 1897 0
  190               		.cfi_startproc
  191               	/* prologue: function */
  192               	/* frame size = 0 */
@@ -2372,17 +2374,17 @@
  236               	.LBE367:
  237               	.LBE366:
  238               	.LBE365:
-1896:main.c        ****   for (uchar i = 0; i < 5; ++i)
-1897:main.c        ****     _delay_ms(20);
-1898:main.c        ****   wdt_reset();
- 239               		.loc 1 1898 0
+1898:main.c        ****   for (uchar i = 0; i < 5; ++i)
+1899:main.c        ****     _delay_ms(20);
+1900:main.c        ****   wdt_reset();
+ 239               		.loc 1 1900 0
  240               	/* #APP */
- 241               	 ;  1898 "main.c" 1
+ 241               	 ;  1900 "main.c" 1
  242 00d4 A895      		wdr
  243               	 ;  0 "" 2
  244               	/* epilogue start */
-1899:main.c        **** }
- 245               		.loc 1 1899 0
+1901:main.c        **** }
+ 245               		.loc 1 1901 0
  246               	/* #NOAPP */
  247 00d6 0895      		ret
  248               		.cfi_endproc
@@ -12757,56 +12759,56 @@
  7584 2838 8091 0000 		lds r24,modul_zalogowany_w_sieci
  7585 283c 8823      		tst r24
  7586 283e 01F0      		breq .L826
-1537:main.c        ****       autosync_timer_100ms++;
- 7587               		.loc 1 1537 0 is_stmt 1
+1538:main.c        ****       autosync_timer_100ms++;
+ 7587               		.loc 1 1538 0 is_stmt 1
  7588 2840 8091 0000 		lds r24,autosync_timer_100ms.3742
  7589 2844 9091 0000 		lds r25,autosync_timer_100ms.3742+1
- 7590 2848 8E31      		cpi r24,30
+ 7590 2848 8A3F      		cpi r24,-6
  7591 284a 9105      		cpc r25,__zero_reg__
  7592 284c 00F0      		brlo .+2
  7593 284e 00C0      		rjmp .L827
-1538:main.c        ****     } else {
- 7594               		.loc 1 1538 0
+1539:main.c        ****     } else {
+ 7594               		.loc 1 1539 0
  7595 2850 0196      		adiw r24,1
  7596 2852 9093 0000 		sts autosync_timer_100ms.3742+1,r25
  7597 2856 8093 0000 		sts autosync_timer_100ms.3742,r24
  7598               	.L826:
-1558:main.c        ****     autosync_sms_wyslany = FALSE;
- 7599               		.loc 1 1558 0
+1561:main.c        ****     autosync_sms_wyslany = FALSE;
+ 7599               		.loc 1 1561 0
  7600 285a 8091 0000 		lds r24,autosync_czas_aktywny
  7601 285e 8111      		cpse r24,__zero_reg__
  7602 2860 00C0      		rjmp .L829
-1559:main.c        ****     autosync_timer_100ms = 0;
- 7603               		.loc 1 1559 0
+1562:main.c        ****     autosync_timer_100ms = 0;
+ 7603               		.loc 1 1562 0
  7604 2862 1092 0000 		sts autosync_sms_wyslany.3741,__zero_reg__
-1560:main.c        ****   }
- 7605               		.loc 1 1560 0
+1563:main.c        ****   }
+ 7605               		.loc 1 1563 0
  7606 2866 1092 0000 		sts autosync_timer_100ms.3742+1,__zero_reg__
  7607 286a 1092 0000 		sts autosync_timer_100ms.3742,__zero_reg__
  7608               	.L829:
-1565:main.c        ****   if (pierwsza_komenda != KOMENDA_KOLEJKI_BRAK_KOMENDY) {
- 7609               		.loc 1 1565 0
+1568:main.c        ****   if (pierwsza_komenda != KOMENDA_KOLEJKI_BRAK_KOMENDY) {
+ 7609               		.loc 1 1568 0
  7610 286e 8091 0000 		lds r24,komendy_kolejka
  7611               	.LVL574:
-1566:main.c        ****     // Sprawdz czy pierwsza komenda to SMS - jesli tak i stoi zbyt dlugo,
- 7612               		.loc 1 1566 0
+1569:main.c        ****     // Sprawdz czy pierwsza komenda to SMS - jesli tak i stoi zbyt dlugo,
+ 7612               		.loc 1 1569 0
  7613 2872 8823      		tst r24
  7614 2874 01F4      		brne .+2
  7615 2876 00C0      		rjmp .L830
-1569:main.c        ****         pierwsza_komenda <= KOMENDA_KOLEJKI_WYSLIJ_SMSA_PDU) {
- 7616               		.loc 1 1569 0
+1572:main.c        ****         pierwsza_komenda <= KOMENDA_KOLEJKI_WYSLIJ_SMSA_PDU) {
+ 7616               		.loc 1 1572 0
  7617 2878 9DE2      		ldi r25,lo8(45)
  7618 287a 980F      		add r25,r24
  7619 287c 9230      		cpi r25,lo8(2)
  7620 287e 00F0      		brlo .+2
  7621 2880 00C0      		rjmp .L831
-1572:main.c        ****         // Ta sama komenda SMS jest na poczatku kolejki - kolejka moze stac
- 7622               		.loc 1 1572 0
+1575:main.c        ****         // Ta sama komenda SMS jest na poczatku kolejki - kolejka moze stac
+ 7622               		.loc 1 1575 0
  7623 2882 9091 0000 		lds r25,ostatnia_pierwsza_komenda
  7624 2886 9813      		cpse r25,r24
  7625 2888 00C0      		rjmp .L831
-1574:main.c        ****           ++licznik_kolejka_stoi_100ms;
- 7626               		.loc 1 1574 0
+1577:main.c        ****           ++licznik_kolejka_stoi_100ms;
+ 7626               		.loc 1 1577 0
  7627 288a 8091 0000 		lds r24,licznik_kolejka_stoi_100ms
  7628 288e 9091 0000 		lds r25,licznik_kolejka_stoi_100ms+1
  7629               	.LVL575:
@@ -12814,21 +12816,21 @@
  7631 2894 9105      		cpc r25,__zero_reg__
  7632 2896 00F0      		brlo .+2
  7633 2898 00C0      		rjmp .L833
-1575:main.c        ****         else {
- 7634               		.loc 1 1575 0
+1578:main.c        ****         else {
+ 7634               		.loc 1 1578 0
  7635 289a 0196      		adiw r24,1
  7636 289c 9093 0000 		sts licznik_kolejka_stoi_100ms+1,r25
  7637 28a0 8093 0000 		sts licznik_kolejka_stoi_100ms,r24
  7638               	.LVL576:
  7639               	.L834:
-1614:main.c        ****     if (licznik_watchdog_wysylanie_smsa_100ms < WATCHDOG_WYSYLANIA_SMS_100MS) {
- 7640               		.loc 1 1614 0
+1617:main.c        ****     if (licznik_watchdog_wysylanie_smsa_100ms < WATCHDOG_WYSYLANIA_SMS_100MS) {
+ 7640               		.loc 1 1617 0
  7641 28a4 8091 0000 		lds r24,flaga_wysylanie_smsa
  7642 28a8 8823      		tst r24
  7643 28aa 01F4      		brne .+2
  7644 28ac 00C0      		rjmp .L836
-1615:main.c        ****       ++licznik_watchdog_wysylanie_smsa_100ms;
- 7645               		.loc 1 1615 0
+1618:main.c        ****       ++licznik_watchdog_wysylanie_smsa_100ms;
+ 7645               		.loc 1 1618 0
  7646 28ae 8091 0000 		lds r24,licznik_watchdog_wysylanie_smsa_100ms
  7647 28b2 9091 0000 		lds r25,licznik_watchdog_wysylanie_smsa_100ms+1
  7648 28b6 8C32      		cpi r24,44
@@ -12836,65 +12838,65 @@
  7650 28ba 9207      		cpc r25,r18
  7651 28bc 00F0      		brlo .+2
  7652 28be 00C0      		rjmp .L837
-1616:main.c        ****     } else {
- 7653               		.loc 1 1616 0
+1619:main.c        ****     } else {
+ 7653               		.loc 1 1619 0
  7654 28c0 0196      		adiw r24,1
  7655 28c2 9093 0000 		sts licznik_watchdog_wysylanie_smsa_100ms+1,r25
  7656 28c6 8093 0000 		sts licznik_watchdog_wysylanie_smsa_100ms,r24
  7657               	.L838:
-1638:main.c        ****     if (watchdog_sms_licznik_100ms < WATCHDOG_SMS_TIMEOUT_100MS)
- 7658               		.loc 1 1638 0
+1641:main.c        ****     if (watchdog_sms_licznik_100ms < WATCHDOG_SMS_TIMEOUT_100MS)
+ 7658               		.loc 1 1641 0
  7659 28ca 8091 0000 		lds r24,watchdog_sms_aktywny
  7660 28ce 8823      		tst r24
  7661 28d0 01F4      		brne .+2
  7662 28d2 00C0      		rjmp .L840
-1639:main.c        ****       ++watchdog_sms_licznik_100ms;
- 7663               		.loc 1 1639 0
+1642:main.c        ****       ++watchdog_sms_licznik_100ms;
+ 7663               		.loc 1 1642 0
  7664 28d4 8091 0000 		lds r24,watchdog_sms_licznik_100ms
  7665 28d8 9091 0000 		lds r25,watchdog_sms_licznik_100ms+1
  7666 28dc 8436      		cpi r24,100
  7667 28de 9105      		cpc r25,__zero_reg__
  7668 28e0 00F0      		brlo .+2
  7669 28e2 00C0      		rjmp .L841
-1640:main.c        ****     else {
- 7670               		.loc 1 1640 0
+1643:main.c        ****     else {
+ 7670               		.loc 1 1643 0
  7671 28e4 8091 0000 		lds r24,watchdog_sms_licznik_100ms
  7672 28e8 9091 0000 		lds r25,watchdog_sms_licznik_100ms+1
  7673 28ec 0196      		adiw r24,1
  7674 28ee 9093 0000 		sts watchdog_sms_licznik_100ms+1,r25
  7675 28f2 8093 0000 		sts watchdog_sms_licznik_100ms,r24
  7676               	.L842:
-1653:main.c        ****     ++stan_cyklu_blysku;
- 7677               		.loc 1 1653 0
+1656:main.c        ****     ++stan_cyklu_blysku;
+ 7677               		.loc 1 1656 0
  7678 28f6 8091 0000 		lds r24,liczba_blyskow_led
  7679 28fa 8823      		tst r24
  7680 28fc 01F4      		brne .+2
  7681 28fe 00C0      		rjmp .L844
-1654:main.c        ****     if (stan_cyklu_blysku >= 6) {
- 7682               		.loc 1 1654 0
+1657:main.c        ****     if (stan_cyklu_blysku >= 6) {
+ 7682               		.loc 1 1657 0
  7683 2900 9091 0000 		lds r25,stan_cyklu_blysku
  7684 2904 9F5F      		subi r25,lo8(-(1))
  7685 2906 9093 0000 		sts stan_cyklu_blysku,r25
-1655:main.c        ****       stan_cyklu_blysku = 0;
- 7686               		.loc 1 1655 0
+1658:main.c        ****       stan_cyklu_blysku = 0;
+ 7686               		.loc 1 1658 0
  7687 290a 9630      		cpi r25,lo8(6)
  7688 290c 00F0      		brlo .L845
-1656:main.c        ****       --liczba_blyskow_led;
- 7689               		.loc 1 1656 0
+1659:main.c        ****       --liczba_blyskow_led;
+ 7689               		.loc 1 1659 0
  7690 290e 1092 0000 		sts stan_cyklu_blysku,__zero_reg__
-1657:main.c        ****     }
- 7691               		.loc 1 1657 0
+1660:main.c        ****     }
+ 7691               		.loc 1 1660 0
  7692 2912 8150      		subi r24,lo8(-(-1))
  7693 2914 8093 0000 		sts liczba_blyskow_led,r24
  7694               	.L845:
-1659:main.c        ****     return;
- 7695               		.loc 1 1659 0
+1662:main.c        ****     return;
+ 7695               		.loc 1 1662 0
  7696 2918 8091 0000 		lds r24,stan_cyklu_blysku
  7697 291c 8230      		cpi r24,lo8(2)
  7698 291e 00F4      		brsh .+2
  7699 2920 00C0      		rjmp .L846
-1659:main.c        ****     return;
- 7700               		.loc 1 1659 0 is_stmt 0 discriminator 1
+1662:main.c        ****     return;
+ 7700               		.loc 1 1662 0 is_stmt 0 discriminator 1
  7701 2922 409A      		sbi 0x8,0
  7702 2924 0895      		ret
  7703               	.L823:
@@ -12903,175 +12905,195 @@
  7705 2926 4098      		cbi 0x8,0
  7706 2928 00C0      		rjmp .L822
  7707               	.L827:
-1541:main.c        ****           !flaga_wysylanie_smsa) {
- 7708               		.loc 1 1541 0
- 7709 292a 8091 0000 		lds r24,moj_numer_telefonu
- 7710 292e 8150      		subi r24,lo8(-(-1))
- 7711 2930 8E3F      		cpi r24,lo8(-2)
- 7712 2932 00F4      		brsh .L828
-1541:main.c        ****           !flaga_wysylanie_smsa) {
- 7713               		.loc 1 1541 0 is_stmt 0 discriminator 1
- 7714 2934 8091 0000 		lds r24,flaga_wysylanie_smsa
- 7715 2938 8111      		cpse r24,__zero_reg__
- 7716 293a 00C0      		rjmp .L828
-1544:main.c        ****                (char *)moj_numer_telefonu);
- 7717               		.loc 1 1544 0 is_stmt 1
- 7718 293c 60E0      		ldi r22,lo8(moj_numer_telefonu)
- 7719 293e 70E0      		ldi r23,hi8(moj_numer_telefonu)
- 7720 2940 80E0      		ldi r24,lo8(numer_telefonu_wysylanego_smsa)
- 7721 2942 90E0      		ldi r25,hi8(numer_telefonu_wysylanego_smsa)
- 7722 2944 0E94 0000 		call strcpy
- 7723               	.LVL577:
-1546:main.c        ****         dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
- 7724               		.loc 1 1546 0
- 7725 2948 60E0      		ldi r22,lo8(__c.3743)
- 7726 294a 70E0      		ldi r23,hi8(__c.3743)
- 7727 294c 80E0      		ldi r24,lo8(tekst_wysylanego_smsa)
- 7728 294e 90E0      		ldi r25,hi8(tekst_wysylanego_smsa)
- 7729 2950 0E94 0000 		call strcpy_P
- 7730               	.LVL578:
-1547:main.c        ****         autosync_sms_wyslany = TRUE;
- 7731               		.loc 1 1547 0
- 7732 2954 83ED      		ldi r24,lo8(-45)
- 7733 2956 0E94 0000 		call dodaj_komende
- 7734               	.LVL579:
- 7735               	.L828:
-1552:main.c        ****       }
- 7736               		.loc 1 1552 0
- 7737 295a 8FEF      		ldi r24,lo8(-1)
- 7738 295c 8093 0000 		sts autosync_sms_wyslany.3741,r24
- 7739 2960 00C0      		rjmp .L826
- 7740               	.LVL580:
- 7741               	.L833:
-1579:main.c        ****                                        KOMENDA_KOLEJKI_WYSLIJ_SMSA_PDU);
- 7742               		.loc 1 1579 0
- 7743 2962 64ED      		ldi r22,lo8(-44)
- 7744 2964 83ED      		ldi r24,lo8(-45)
- 7745 2966 0E94 0000 		call filtruj_komendy_z_przedzialu
- 7746               	.LVL581:
-1581:main.c        ****             ++licznik_awaryjnych_resetow_kolejki;
- 7747               		.loc 1 1581 0
- 7748 296a 8091 0000 		lds r24,licznik_awaryjnych_resetow_kolejki
- 7749 296e 9091 0000 		lds r25,licznik_awaryjnych_resetow_kolejki+1
- 7750 2972 8F3F      		cpi r24,-1
- 7751 2974 9807      		cpc r25,r24
- 7752 2976 01F0      		breq .L835
-1582:main.c        **** 
- 7753               		.loc 1 1582 0
- 7754 2978 0196      		adiw r24,1
- 7755 297a 9093 0000 		sts licznik_awaryjnych_resetow_kolejki+1,r25
- 7756 297e 8093 0000 		sts licznik_awaryjnych_resetow_kolejki,r24
- 7757               	.L835:
-1584:main.c        **** 
- 7758               		.loc 1 1584 0
- 7759 2982 82E9      		ldi r24,lo8(-110)
- 7760 2984 0E94 0000 		call filtruj_i_dodaj_komende
- 7761               	.LVL582:
-1587:main.c        ****           timer_report_user_100ms = 0;
- 7762               		.loc 1 1587 0
- 7763 2988 1092 0000 		sts licznik_report_user,__zero_reg__
-1588:main.c        **** 
- 7764               		.loc 1 1588 0
- 7765 298c 1092 0000 		sts timer_report_user_100ms+1,__zero_reg__
- 7766 2990 1092 0000 		sts timer_report_user_100ms,__zero_reg__
-1591:main.c        ****           ostatnia_pierwsza_komenda = KOMENDA_KOLEJKI_BRAK_KOMENDY;
- 7767               		.loc 1 1591 0
- 7768 2994 1092 0000 		sts licznik_kolejka_stoi_100ms+1,__zero_reg__
- 7769 2998 1092 0000 		sts licznik_kolejka_stoi_100ms,__zero_reg__
-1592:main.c        **** 
- 7770               		.loc 1 1592 0
- 7771 299c 1092 0000 		sts ostatnia_pierwsza_komenda,__zero_reg__
-1595:main.c        ****         }
- 7772               		.loc 1 1595 0
- 7773 29a0 1092 0000 		sts flaga_wysylanie_smsa,__zero_reg__
- 7774 29a4 00C0      		rjmp .L834
- 7775               	.LVL583:
- 7776               	.L831:
-1604:main.c        ****       licznik_kolejka_stoi_100ms = 0;
- 7777               		.loc 1 1604 0
- 7778 29a6 8093 0000 		sts ostatnia_pierwsza_komenda,r24
- 7779               	.L881:
-1610:main.c        ****   }
- 7780               		.loc 1 1610 0
- 7781 29aa 1092 0000 		sts licznik_kolejka_stoi_100ms+1,__zero_reg__
- 7782 29ae 1092 0000 		sts licznik_kolejka_stoi_100ms,__zero_reg__
- 7783 29b2 00C0      		rjmp .L834
- 7784               	.L830:
-1609:main.c        ****     licznik_kolejka_stoi_100ms = 0;
- 7785               		.loc 1 1609 0
- 7786 29b4 1092 0000 		sts ostatnia_pierwsza_komenda,__zero_reg__
- 7787 29b8 00C0      		rjmp .L881
- 7788               	.LVL584:
- 7789               	.L837:
-1618:main.c        ****       // Awaryjne odblokowanie
- 7790               		.loc 1 1618 0
- 7791 29ba 1092 0000 		sts licznik_watchdog_wysylanie_smsa_100ms+1,__zero_reg__
- 7792 29be 1092 0000 		sts licznik_watchdog_wysylanie_smsa_100ms,__zero_reg__
-1620:main.c        ****       flaga_wysylanie_smsa = 0;
- 7793               		.loc 1 1620 0
- 7794 29c2 0E94 0000 		call watchdog_sms_disarm
- 7795               	.LVL585:
-1621:main.c        ****       liczba_prob_wyslania_smsa = 0;
- 7796               		.loc 1 1621 0
- 7797 29c6 1092 0000 		sts flaga_wysylanie_smsa,__zero_reg__
-1622:main.c        ****       czekanie_na_odebranie_zachety = FALSE;
- 7798               		.loc 1 1622 0
- 7799 29ca 1092 0000 		sts liczba_prob_wyslania_smsa,__zero_reg__
-1623:main.c        ****       wysylanie_smsa_clipa = WYSYLANIE_SMSA_CLIPA_BRAK;
- 7800               		.loc 1 1623 0
- 7801 29ce 1092 0000 		sts czekanie_na_odebranie_zachety,__zero_reg__
-1624:main.c        **** 
- 7802               		.loc 1 1624 0
- 7803 29d2 1092 0000 		sts wysylanie_smsa_clipa,__zero_reg__
-1626:main.c        ****         ++liczba_kolejnych_watchdogow_wysylania;
- 7804               		.loc 1 1626 0
- 7805 29d6 8091 0000 		lds r24,liczba_kolejnych_watchdogow_wysylania
- 7806 29da 8F3F      		cpi r24,lo8(-1)
- 7807 29dc 01F0      		breq .L839
-1627:main.c        ****       if (liczba_kolejnych_watchdogow_wysylania >= 3) {
- 7808               		.loc 1 1627 0
- 7809 29de 8F5F      		subi r24,lo8(-(1))
- 7810 29e0 8093 0000 		sts liczba_kolejnych_watchdogow_wysylania,r24
- 7811               	.L839:
-1628:main.c        ****         liczba_kolejnych_watchdogow_wysylania = 0;
- 7812               		.loc 1 1628 0
- 7813 29e4 8091 0000 		lds r24,liczba_kolejnych_watchdogow_wysylania
- 7814 29e8 8330      		cpi r24,lo8(3)
- 7815 29ea 00F4      		brsh .+2
- 7816 29ec 00C0      		rjmp .L838
-1629:main.c        ****         reset_modulu_SIM900();
- 7817               		.loc 1 1629 0
- 7818 29ee 1092 0000 		sts liczba_kolejnych_watchdogow_wysylania,__zero_reg__
-1630:main.c        ****       }
- 7819               		.loc 1 1630 0
- 7820 29f2 0E94 0000 		call reset_modulu_SIM900
- 7821               	.LVL586:
- 7822 29f6 00C0      		rjmp .L838
- 7823               	.L836:
-1634:main.c        ****     liczba_kolejnych_watchdogow_wysylania = 0;
- 7824               		.loc 1 1634 0
- 7825 29f8 1092 0000 		sts licznik_watchdog_wysylanie_smsa_100ms+1,__zero_reg__
- 7826 29fc 1092 0000 		sts licznik_watchdog_wysylanie_smsa_100ms,__zero_reg__
-1635:main.c        ****   }
- 7827               		.loc 1 1635 0
- 7828 2a00 1092 0000 		sts liczba_kolejnych_watchdogow_wysylania,__zero_reg__
- 7829 2a04 00C0      		rjmp .L838
- 7830               	.L841:
-1642:main.c        ****       cli();
- 7831               		.loc 1 1642 0
- 7832 2a06 8FEF      		ldi r24,lo8(-1)
- 7833 2a08 8093 0000 		sts watchdog_sms_trwa_reset,r24
-1643:main.c        ****       wdt_enable(WDTO_15MS);
- 7834               		.loc 1 1643 0
- 7835               	/* #APP */
- 7836               	 ;  1643 "main.c" 1
- 7837 2a0c F894      		cli
- 7838               	 ;  0 "" 2
- 7839               	.LVL587:
- 7840               	/* #NOAPP */
- 7841               	.LBB624:
- 7842               	.LBB625:
- 7843               		.file 7 "/usr/local/avr8-gnu-toolchain/avr/include/avr/wdt.h"
+1543:main.c        ****           rtc_czas[4] == '0') {
+ 7708               		.loc 1 1543 0
+ 7709 292a 8091 0000 		lds r24,rtc_czas
+ 7710 292e 8033      		cpi r24,lo8(48)
+ 7711 2930 01F4      		brne .L828
+1543:main.c        ****           rtc_czas[4] == '0') {
+ 7712               		.loc 1 1543 0 is_stmt 0 discriminator 1
+ 7713 2932 8091 0000 		lds r24,rtc_czas+1
+ 7714 2936 8033      		cpi r24,lo8(48)
+ 7715 2938 01F4      		brne .L828
+1543:main.c        ****           rtc_czas[4] == '0') {
+ 7716               		.loc 1 1543 0 discriminator 2
+ 7717 293a 8091 0000 		lds r24,rtc_czas+3
+ 7718 293e 8033      		cpi r24,lo8(48)
+ 7719 2940 01F4      		brne .L828
+1543:main.c        ****           rtc_czas[4] == '0') {
+ 7720               		.loc 1 1543 0 discriminator 3
+ 7721 2942 8091 0000 		lds r24,rtc_czas+4
+ 7722 2946 8033      		cpi r24,lo8(48)
+ 7723 2948 01F4      		brne .L828
+1546:main.c        ****             !flaga_wysylanie_smsa) {
+ 7724               		.loc 1 1546 0 is_stmt 1
+ 7725 294a 8091 0000 		lds r24,moj_numer_telefonu
+ 7726 294e 8150      		subi r24,lo8(-(-1))
+ 7727 2950 8E3F      		cpi r24,lo8(-2)
+ 7728 2952 00F4      		brsh .L828
+1546:main.c        ****             !flaga_wysylanie_smsa) {
+ 7729               		.loc 1 1546 0 is_stmt 0 discriminator 1
+ 7730 2954 8091 0000 		lds r24,flaga_wysylanie_smsa
+ 7731 2958 8111      		cpse r24,__zero_reg__
+ 7732 295a 00C0      		rjmp .L828
+1549:main.c        ****                  (char *)moj_numer_telefonu);
+ 7733               		.loc 1 1549 0 is_stmt 1
+ 7734 295c 60E0      		ldi r22,lo8(moj_numer_telefonu)
+ 7735 295e 70E0      		ldi r23,hi8(moj_numer_telefonu)
+ 7736 2960 80E0      		ldi r24,lo8(numer_telefonu_wysylanego_smsa)
+ 7737 2962 90E0      		ldi r25,hi8(numer_telefonu_wysylanego_smsa)
+ 7738 2964 0E94 0000 		call strcpy
+ 7739               	.LVL577:
+1551:main.c        ****           dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
+ 7740               		.loc 1 1551 0
+ 7741 2968 60E0      		ldi r22,lo8(__c.3743)
+ 7742 296a 70E0      		ldi r23,hi8(__c.3743)
+ 7743 296c 80E0      		ldi r24,lo8(tekst_wysylanego_smsa)
+ 7744 296e 90E0      		ldi r25,hi8(tekst_wysylanego_smsa)
+ 7745 2970 0E94 0000 		call strcpy_P
+ 7746               	.LVL578:
+1552:main.c        ****         }
+ 7747               		.loc 1 1552 0
+ 7748 2974 83ED      		ldi r24,lo8(-45)
+ 7749 2976 0E94 0000 		call dodaj_komende
+ 7750               	.LVL579:
+ 7751               	.L828:
+1556:main.c        ****     }
+ 7752               		.loc 1 1556 0
+ 7753 297a 8FEF      		ldi r24,lo8(-1)
+ 7754 297c 8093 0000 		sts autosync_sms_wyslany.3741,r24
+ 7755 2980 00C0      		rjmp .L826
+ 7756               	.LVL580:
+ 7757               	.L833:
+1582:main.c        ****                                        KOMENDA_KOLEJKI_WYSLIJ_SMSA_PDU);
+ 7758               		.loc 1 1582 0
+ 7759 2982 64ED      		ldi r22,lo8(-44)
+ 7760 2984 83ED      		ldi r24,lo8(-45)
+ 7761 2986 0E94 0000 		call filtruj_komendy_z_przedzialu
+ 7762               	.LVL581:
+1584:main.c        ****             ++licznik_awaryjnych_resetow_kolejki;
+ 7763               		.loc 1 1584 0
+ 7764 298a 8091 0000 		lds r24,licznik_awaryjnych_resetow_kolejki
+ 7765 298e 9091 0000 		lds r25,licznik_awaryjnych_resetow_kolejki+1
+ 7766 2992 8F3F      		cpi r24,-1
+ 7767 2994 9807      		cpc r25,r24
+ 7768 2996 01F0      		breq .L835
+1585:main.c        **** 
+ 7769               		.loc 1 1585 0
+ 7770 2998 0196      		adiw r24,1
+ 7771 299a 9093 0000 		sts licznik_awaryjnych_resetow_kolejki+1,r25
+ 7772 299e 8093 0000 		sts licznik_awaryjnych_resetow_kolejki,r24
+ 7773               	.L835:
+1587:main.c        **** 
+ 7774               		.loc 1 1587 0
+ 7775 29a2 82E9      		ldi r24,lo8(-110)
+ 7776 29a4 0E94 0000 		call filtruj_i_dodaj_komende
+ 7777               	.LVL582:
+1590:main.c        ****           timer_report_user_100ms = 0;
+ 7778               		.loc 1 1590 0
+ 7779 29a8 1092 0000 		sts licznik_report_user,__zero_reg__
+1591:main.c        **** 
+ 7780               		.loc 1 1591 0
+ 7781 29ac 1092 0000 		sts timer_report_user_100ms+1,__zero_reg__
+ 7782 29b0 1092 0000 		sts timer_report_user_100ms,__zero_reg__
+1594:main.c        ****           ostatnia_pierwsza_komenda = KOMENDA_KOLEJKI_BRAK_KOMENDY;
+ 7783               		.loc 1 1594 0
+ 7784 29b4 1092 0000 		sts licznik_kolejka_stoi_100ms+1,__zero_reg__
+ 7785 29b8 1092 0000 		sts licznik_kolejka_stoi_100ms,__zero_reg__
+1595:main.c        **** 
+ 7786               		.loc 1 1595 0
+ 7787 29bc 1092 0000 		sts ostatnia_pierwsza_komenda,__zero_reg__
+1598:main.c        ****         }
+ 7788               		.loc 1 1598 0
+ 7789 29c0 1092 0000 		sts flaga_wysylanie_smsa,__zero_reg__
+ 7790 29c4 00C0      		rjmp .L834
+ 7791               	.LVL583:
+ 7792               	.L831:
+1607:main.c        ****       licznik_kolejka_stoi_100ms = 0;
+ 7793               		.loc 1 1607 0
+ 7794 29c6 8093 0000 		sts ostatnia_pierwsza_komenda,r24
+ 7795               	.L881:
+1613:main.c        ****   }
+ 7796               		.loc 1 1613 0
+ 7797 29ca 1092 0000 		sts licznik_kolejka_stoi_100ms+1,__zero_reg__
+ 7798 29ce 1092 0000 		sts licznik_kolejka_stoi_100ms,__zero_reg__
+ 7799 29d2 00C0      		rjmp .L834
+ 7800               	.L830:
+1612:main.c        ****     licznik_kolejka_stoi_100ms = 0;
+ 7801               		.loc 1 1612 0
+ 7802 29d4 1092 0000 		sts ostatnia_pierwsza_komenda,__zero_reg__
+ 7803 29d8 00C0      		rjmp .L881
+ 7804               	.LVL584:
+ 7805               	.L837:
+1621:main.c        ****       // Awaryjne odblokowanie
+ 7806               		.loc 1 1621 0
+ 7807 29da 1092 0000 		sts licznik_watchdog_wysylanie_smsa_100ms+1,__zero_reg__
+ 7808 29de 1092 0000 		sts licznik_watchdog_wysylanie_smsa_100ms,__zero_reg__
+1623:main.c        ****       flaga_wysylanie_smsa = 0;
+ 7809               		.loc 1 1623 0
+ 7810 29e2 0E94 0000 		call watchdog_sms_disarm
+ 7811               	.LVL585:
+1624:main.c        ****       liczba_prob_wyslania_smsa = 0;
+ 7812               		.loc 1 1624 0
+ 7813 29e6 1092 0000 		sts flaga_wysylanie_smsa,__zero_reg__
+1625:main.c        ****       czekanie_na_odebranie_zachety = FALSE;
+ 7814               		.loc 1 1625 0
+ 7815 29ea 1092 0000 		sts liczba_prob_wyslania_smsa,__zero_reg__
+1626:main.c        ****       wysylanie_smsa_clipa = WYSYLANIE_SMSA_CLIPA_BRAK;
+ 7816               		.loc 1 1626 0
+ 7817 29ee 1092 0000 		sts czekanie_na_odebranie_zachety,__zero_reg__
+1627:main.c        **** 
+ 7818               		.loc 1 1627 0
+ 7819 29f2 1092 0000 		sts wysylanie_smsa_clipa,__zero_reg__
+1629:main.c        ****         ++liczba_kolejnych_watchdogow_wysylania;
+ 7820               		.loc 1 1629 0
+ 7821 29f6 8091 0000 		lds r24,liczba_kolejnych_watchdogow_wysylania
+ 7822 29fa 8F3F      		cpi r24,lo8(-1)
+ 7823 29fc 01F0      		breq .L839
+1630:main.c        ****       if (liczba_kolejnych_watchdogow_wysylania >= 3) {
+ 7824               		.loc 1 1630 0
+ 7825 29fe 8F5F      		subi r24,lo8(-(1))
+ 7826 2a00 8093 0000 		sts liczba_kolejnych_watchdogow_wysylania,r24
+ 7827               	.L839:
+1631:main.c        ****         liczba_kolejnych_watchdogow_wysylania = 0;
+ 7828               		.loc 1 1631 0
+ 7829 2a04 8091 0000 		lds r24,liczba_kolejnych_watchdogow_wysylania
+ 7830 2a08 8330      		cpi r24,lo8(3)
+ 7831 2a0a 00F4      		brsh .+2
+ 7832 2a0c 00C0      		rjmp .L838
+1632:main.c        ****         reset_modulu_SIM900();
+ 7833               		.loc 1 1632 0
+ 7834 2a0e 1092 0000 		sts liczba_kolejnych_watchdogow_wysylania,__zero_reg__
+1633:main.c        ****       }
+ 7835               		.loc 1 1633 0
+ 7836 2a12 0E94 0000 		call reset_modulu_SIM900
+ 7837               	.LVL586:
+ 7838 2a16 00C0      		rjmp .L838
+ 7839               	.L836:
+1637:main.c        ****     liczba_kolejnych_watchdogow_wysylania = 0;
+ 7840               		.loc 1 1637 0
+ 7841 2a18 1092 0000 		sts licznik_watchdog_wysylanie_smsa_100ms+1,__zero_reg__
+ 7842 2a1c 1092 0000 		sts licznik_watchdog_wysylanie_smsa_100ms,__zero_reg__
+1638:main.c        ****   }
+ 7843               		.loc 1 1638 0
+ 7844 2a20 1092 0000 		sts liczba_kolejnych_watchdogow_wysylania,__zero_reg__
+ 7845 2a24 00C0      		rjmp .L838
+ 7846               	.L841:
+1645:main.c        ****       cli();
+ 7847               		.loc 1 1645 0
+ 7848 2a26 8FEF      		ldi r24,lo8(-1)
+ 7849 2a28 8093 0000 		sts watchdog_sms_trwa_reset,r24
+1646:main.c        ****       wdt_enable(WDTO_15MS);
+ 7850               		.loc 1 1646 0
+ 7851               	/* #APP */
+ 7852               	 ;  1646 "main.c" 1
+ 7853 2a2c F894      		cli
+ 7854               	 ;  0 "" 2
+ 7855               	.LVL587:
+ 7856               	/* #NOAPP */
+ 7857               	.LBB624:
+ 7858               	.LBB625:
+ 7859               		.file 7 "/usr/local/avr8-gnu-toolchain/avr/include/avr/wdt.h"
    1:/usr/local/avr8-gnu-toolchain/avr/include/avr/wdt.h **** /* Copyright (c) 2002, 2004 Marek Michalkiewicz
    2:/usr/local/avr8-gnu-toolchain/avr/include/avr/wdt.h ****    Copyright (c) 2005, 2006, 2007 Eric B. Weddington
    3:/usr/local/avr8-gnu-toolchain/avr/include/avr/wdt.h ****    All rights reserved.
@@ -13545,868 +13567,848 @@
  471:/usr/local/avr8-gnu-toolchain/avr/include/avr/wdt.h **** 	else
  472:/usr/local/avr8-gnu-toolchain/avr/include/avr/wdt.h **** 	{
  473:/usr/local/avr8-gnu-toolchain/avr/include/avr/wdt.h **** 		__asm__ __volatile__ (
- 7844               		.loc 7 473 0
- 7845 2a0e 88E1      		ldi r24,lo8(24)
- 7846 2a10 98E0      		ldi r25,lo8(8)
- 7847               	/* #APP */
- 7848               	 ;  473 "/usr/local/avr8-gnu-toolchain/avr/include/avr/wdt.h" 1
- 7849 2a12 0FB6      		in __tmp_reg__,__SREG__
- 7850 2a14 F894      		cli
- 7851 2a16 A895      		wdr
- 7852 2a18 8093 6000 		sts 96, r24
- 7853 2a1c 0FBE      		out __SREG__,__tmp_reg__
- 7854 2a1e 9093 6000 		sts 96, r25
- 7855               	 	
- 7856               	 ;  0 "" 2
- 7857               	/* #NOAPP */
- 7858               	.L843:
- 7859 2a22 00C0      		rjmp .L843
- 7860               	.LVL588:
- 7861               	.L840:
- 7862               	.LBE625:
- 7863               	.LBE624:
-1648:main.c        ****     --watchdog_sms_safe_mode_100ms;
- 7864               		.loc 1 1648 0
- 7865 2a24 8091 0000 		lds r24,watchdog_sms_safe_mode_100ms
- 7866 2a28 9091 0000 		lds r25,watchdog_sms_safe_mode_100ms+1
- 7867 2a2c 892B      		or r24,r25
- 7868 2a2e 01F4      		brne .+2
- 7869 2a30 00C0      		rjmp .L842
-1649:main.c        ****   }
- 7870               		.loc 1 1649 0
- 7871 2a32 8091 0000 		lds r24,watchdog_sms_safe_mode_100ms
- 7872 2a36 9091 0000 		lds r25,watchdog_sms_safe_mode_100ms+1
- 7873 2a3a 0197      		sbiw r24,1
- 7874 2a3c 9093 0000 		sts watchdog_sms_safe_mode_100ms+1,r25
- 7875 2a40 8093 0000 		sts watchdog_sms_safe_mode_100ms,r24
- 7876 2a44 00C0      		rjmp .L842
- 7877               	.L846:
-1659:main.c        ****     return;
- 7878               		.loc 1 1659 0 discriminator 2
- 7879 2a46 4098      		cbi 0x8,0
- 7880               	/* epilogue start */
-1689:main.c        **** 
- 7881               		.loc 1 1689 0 discriminator 2
- 7882 2a48 0895      		ret
- 7883               	.L844:
-1665:main.c        ****     // Nie zalogowany - dioda swiecei ciagle
- 7884               		.loc 1 1665 0
- 7885 2a4a 8091 0000 		lds r24,modul_zalogowany_w_sieci
- 7886 2a4e 8111      		cpse r24,__zero_reg__
- 7887 2a50 00C0      		rjmp .L848
- 7888               	.L853:
- 7889               	.LBB626:
-1682:main.c        ****                      licznik_dioda_led_poziom_sieci == 43 ||
- 7890               		.loc 1 1682 0 discriminator 6
- 7891 2a52 4098      		cbi 0x8,0
- 7892 2a54 00C0      		rjmp .L849
- 7893               	.L848:
- 7894               	.LBE626:
-1670:main.c        ****       // Mrugniecie (SMS, etc.)
- 7895               		.loc 1 1670 0
- 7896 2a56 8091 0000 		lds r24,licznik_100ms_dioda_led
- 7897 2a5a 8111      		cpse r24,__zero_reg__
- 7898 2a5c 00C0      		rjmp .L853
- 7899               	.LBB627:
-1676:main.c        ****         if (++licznik_dioda_led_poziom_sieci >= 50)
- 7900               		.loc 1 1676 0
- 7901 2a5e 8091 0000 		lds r24,poziom_sieci_gsm
- 7902 2a62 8031      		cpi r24,lo8(16)
- 7903 2a64 00F4      		brsh .L851
-1677:main.c        ****           licznik_dioda_led_poziom_sieci = 1;
- 7904               		.loc 1 1677 0
- 7905 2a66 8091 0000 		lds r24,licznik_dioda_led_poziom_sieci.3747
- 7906 2a6a 8F5F      		subi r24,lo8(-(1))
- 7907 2a6c 8093 0000 		sts licznik_dioda_led_poziom_sieci.3747,r24
- 7908 2a70 8233      		cpi r24,lo8(50)
- 7909 2a72 00F0      		brlo .L852
-1678:main.c        ****       } else
- 7910               		.loc 1 1678 0
- 7911 2a74 81E0      		ldi r24,lo8(1)
- 7912 2a76 8093 0000 		sts licznik_dioda_led_poziom_sieci.3747,r24
- 7913               	.L852:
-1682:main.c        ****                      licznik_dioda_led_poziom_sieci == 43 ||
- 7914               		.loc 1 1682 0
- 7915 2a7a 8091 0000 		lds r24,licznik_dioda_led_poziom_sieci.3747
- 7916 2a7e 8832      		cpi r24,lo8(40)
- 7917 2a80 01F0      		breq .L853
-1682:main.c        ****                      licznik_dioda_led_poziom_sieci == 43 ||
- 7918               		.loc 1 1682 0 is_stmt 0 discriminator 1
- 7919 2a82 8B32      		cpi r24,lo8(43)
- 7920 2a84 01F0      		breq .L853
-1682:main.c        ****                      licznik_dioda_led_poziom_sieci == 43 ||
- 7921               		.loc 1 1682 0 discriminator 3
- 7922 2a86 8E52      		subi r24,lo8(-(-46))
- 7923 2a88 8430      		cpi r24,lo8(4)
- 7924 2a8a 00F0      		brlo .L853
-1682:main.c        ****                      licznik_dioda_led_poziom_sieci == 43 ||
- 7925               		.loc 1 1682 0 discriminator 5
- 7926 2a8c 409A      		sbi 0x8,0
- 7927               	.L849:
- 7928               	.LBE627:
-1688:main.c        **** }
- 7929               		.loc 1 1688 0 is_stmt 1
- 7930 2a8e 0C94 0000 		jmp zapis_w_eeprom_stanu_wyjsc
- 7931               	.LVL589:
- 7932               	.L851:
- 7933               	.LBB628:
-1680:main.c        **** 
- 7934               		.loc 1 1680 0
- 7935 2a92 1092 0000 		sts licznik_dioda_led_poziom_sieci.3747,__zero_reg__
- 7936 2a96 00C0      		rjmp .L852
- 7937               	.LBE628:
- 7938               		.cfi_endproc
- 7939               	.LFE65:
- 7941               	.global	steruj_urzadzeniem_10MS
- 7943               	steruj_urzadzeniem_10MS:
- 7944               	.LFB66:
-1691:main.c        ****   steruj_wejscia_10ms();
- 7945               		.loc 1 1691 0
- 7946               		.cfi_startproc
- 7947               	/* prologue: function */
- 7948               	/* frame size = 0 */
- 7949               	/* stack size = 0 */
- 7950               	.L__stack_usage = 0
-1692:main.c        ****   steruj_SIM900_10MS();
- 7951               		.loc 1 1692 0
- 7952 2a98 0E94 0000 		call steruj_wejscia_10ms
- 7953               	.LVL590:
-1693:main.c        ****   zapisz_bajt_w_EEPROM();
- 7954               		.loc 1 1693 0
- 7955 2a9c 0E94 0000 		call steruj_SIM900_10MS
- 7956               	.LVL591:
-1694:main.c        ****   // test_dioda_wyjscia();
- 7957               		.loc 1 1694 0
- 7958 2aa0 0C94 0000 		jmp zapisz_bajt_w_EEPROM
- 7959               	.LVL592:
- 7960               		.cfi_endproc
- 7961               	.LFE66:
- 7963               	.global	wolne_zdarzenie_timer
- 7965               	wolne_zdarzenie_timer:
- 7966               	.LFB67:
-1699:main.c        ****   WYKONAJ_CLI_SEI(WYLACZ_PRZERWANIE_TIMER());
- 7967               		.loc 1 1699 0
- 7968               		.cfi_startproc
- 7969               	/* prologue: function */
- 7970               	/* frame size = 0 */
- 7971               	/* stack size = 0 */
- 7972               	.L__stack_usage = 0
-1700:main.c        ****   if (!CZY_WYKONAC_ZDARZENIE_TIMER()) {
- 7973               		.loc 1 1700 0
- 7974               	/* #APP */
- 7975               	 ;  1700 "main.c" 1
- 7976 2aa4 F894      		cli
- 7977               	 ;  0 "" 2
- 7978               	/* #NOAPP */
- 7979 2aa6 8091 6E00 		lds r24,110
- 7980 2aaa 8D7F      		andi r24,lo8(-3)
- 7981 2aac 8093 6E00 		sts 110,r24
- 7982               	/* #APP */
- 7983               	 ;  1700 "main.c" 1
- 7984 2ab0 7894      		sei
- 7985               	 ;  0 "" 2
- 7986               	 ;  1700 "main.c" 1
- 7987 2ab2 0000      		nop
- 7988               	 ;  0 "" 2
-1701:main.c        ****     WYKONAJ_CLI_SEI(WLACZ_PRZERWANIE_TIMER());
- 7989               		.loc 1 1701 0
- 7990               	/* #NOAPP */
- 7991 2ab4 8091 0000 		lds r24,wykonaj_zdarzenie_timer
- 7992 2ab8 8111      		cpse r24,__zero_reg__
- 7993 2aba 00C0      		rjmp .L884
-1702:main.c        ****     return;
- 7994               		.loc 1 1702 0
- 7995               	/* #APP */
- 7996               	 ;  1702 "main.c" 1
- 7997 2abc F894      		cli
- 7998               	 ;  0 "" 2
- 7999               	/* #NOAPP */
- 8000 2abe 8091 6E00 		lds r24,110
- 8001 2ac2 8260      		ori r24,lo8(2)
- 8002 2ac4 8093 6E00 		sts 110,r24
- 8003               	/* #APP */
- 8004               	 ;  1702 "main.c" 1
- 8005 2ac8 7894      		sei
- 8006               	 ;  0 "" 2
- 8007               	 ;  1702 "main.c" 1
- 8008 2aca 0000      		nop
- 8009               	 ;  0 "" 2
-1703:main.c        ****   }
- 8010               		.loc 1 1703 0
- 8011               	/* #NOAPP */
- 8012 2acc 0895      		ret
- 8013               	.L884:
-1705:main.c        ****   if (wykonac_watki_10MS) {
- 8014               		.loc 1 1705 0
- 8015 2ace 1092 0000 		sts wykonaj_zdarzenie_timer,__zero_reg__
-1706:main.c        ****     wykonac_watki = WYKONAJ_WATKI_10MS;
- 8016               		.loc 1 1706 0
- 8017 2ad2 8091 0000 		lds r24,wykonac_watki_10MS
- 8018 2ad6 8823      		tst r24
- 8019 2ad8 01F0      		breq .L886
-1707:main.c        ****     wykonac_watki_10MS = FALSE;
- 8020               		.loc 1 1707 0
- 8021 2ada 81E0      		ldi r24,lo8(1)
- 8022 2adc 8093 0000 		sts wykonac_watki,r24
-1708:main.c        ****   }
- 8023               		.loc 1 1708 0
- 8024 2ae0 1092 0000 		sts wykonac_watki_10MS,__zero_reg__
- 8025               	.L886:
-1710:main.c        ****   if (CZY_WYKONAC_WATKI_10MS()) {
- 8026               		.loc 1 1710 0
- 8027               	/* #APP */
- 8028               	 ;  1710 "main.c" 1
- 8029 2ae4 F894      		cli
- 8030               	 ;  0 "" 2
- 8031               	/* #NOAPP */
- 8032 2ae6 8091 6E00 		lds r24,110
- 8033 2aea 8260      		ori r24,lo8(2)
- 8034 2aec 8093 6E00 		sts 110,r24
- 8035               	/* #APP */
- 8036               	 ;  1710 "main.c" 1
- 8037 2af0 7894      		sei
- 8038               	 ;  0 "" 2
- 8039               	 ;  1710 "main.c" 1
- 8040 2af2 0000      		nop
- 8041               	 ;  0 "" 2
-1711:main.c        ****     static uchar licznik_wybuc_watki_100MS = 0;
- 8042               		.loc 1 1711 0
- 8043               	/* #NOAPP */
- 8044 2af4 8091 0000 		lds r24,wykonac_watki
- 8045 2af8 80FF      		sbrs r24,0
- 8046 2afa 00C0      		rjmp .L883
- 8047               	.LBB632:
-1714:main.c        ****       licznik_wybuc_watki_100MS = 0;
- 8048               		.loc 1 1714 0
- 8049 2afc 8091 0000 		lds r24,licznik_wybuc_watki_100MS.3754
- 8050 2b00 8F5F      		subi r24,lo8(-(1))
- 8051 2b02 8A30      		cpi r24,lo8(10)
- 8052 2b04 01F0      		breq .L887
- 8053 2b06 8093 0000 		sts licznik_wybuc_watki_100MS.3754,r24
- 8054               	.L888:
-1718:main.c        ****     cli();
- 8055               		.loc 1 1718 0
- 8056               	/* #APP */
- 8057               	 ;  1718 "main.c" 1
- 8058 2b0a 0000      		nop
- 8059               	 ;  0 "" 2
-1719:main.c        ****     if (CZY_ODBIERANIE_DANYCH_SIM900()) {
- 8060               		.loc 1 1719 0
- 8061               	 ;  1719 "main.c" 1
- 8062 2b0c F894      		cli
- 8063               	 ;  0 "" 2
-1720:main.c        ****       WYLACZ_PRZERWANIE_ODBIORU_DANYCH_SIM900();
- 8064               		.loc 1 1720 0
- 8065               	/* #NOAPP */
- 8066 2b0e 00B6      		in __tmp_reg__,0x30
- 8067 2b10 01FE      		sbrs __tmp_reg__,1
- 8068 2b12 00C0      		rjmp .L889
-1721:main.c        ****       sei();
- 8069               		.loc 1 1721 0
- 8070 2b14 8091 C100 		lds r24,193
- 8071 2b18 8F77      		andi r24,lo8(127)
- 8072 2b1a 8093 C100 		sts 193,r24
-1722:main.c        ****       if (liczba_odebranych_znakow_SIM900 != 0 &&
- 8073               		.loc 1 1722 0
- 8074               	/* #APP */
- 8075               	 ;  1722 "main.c" 1
- 8076 2b1e 7894      		sei
- 8077               	 ;  0 "" 2
-1723:main.c        ****           ++licznik_opoznienie_oczekiwania_na_bajt_SIM900 >
- 8078               		.loc 1 1723 0
- 8079               	/* #NOAPP */
- 8080 2b20 8091 0000 		lds r24,liczba_odebranych_znakow_SIM900
- 8081 2b24 9091 0000 		lds r25,liczba_odebranych_znakow_SIM900+1
- 8082 2b28 892B      		or r24,r25
- 8083 2b2a 01F0      		breq .L890
-1724:main.c        ****               MAX_OPOZNIENIE_OCZEKIWANIA_NA_BAJT_SIM900_500_MS) {
- 8084               		.loc 1 1724 0
- 8085 2b2c 8091 0000 		lds r24,licznik_opoznienie_oczekiwania_na_bajt_SIM900
- 8086 2b30 8F5F      		subi r24,lo8(-(1))
-1723:main.c        ****           ++licznik_opoznienie_oczekiwania_na_bajt_SIM900 >
- 8087               		.loc 1 1723 0
- 8088 2b32 8093 0000 		sts licznik_opoznienie_oczekiwania_na_bajt_SIM900,r24
- 8089 2b36 8333      		cpi r24,lo8(51)
- 8090 2b38 00F0      		brlo .L890
-1726:main.c        ****       } else {
- 8091               		.loc 1 1726 0
- 8092 2b3a 459A      		sbi 0x8,5
- 8093 2b3c 8091 C100 		lds r24,193
- 8094 2b40 8F77      		andi r24,lo8(127)
- 8095 2b42 8093 C100 		sts 193,r24
- 8096 2b46 80B7      		in r24,0x30
- 8097 2b48 8D7F      		andi r24,lo8(-3)
- 8098 2b4a 80BF      		out 0x30,r24
- 8099 2b4c 1092 0000 		sts poczatek_polecenia_SIM900+1,__zero_reg__
- 8100 2b50 1092 0000 		sts poczatek_polecenia_SIM900,__zero_reg__
- 8101 2b54 1092 0000 		sts zakonczenie_polecenia_SIM900+1,__zero_reg__
- 8102 2b58 1092 0000 		sts zakonczenie_polecenia_SIM900,__zero_reg__
- 8103 2b5c 1092 0000 		sts czy_jest_nowe_polecenie_SIM900,__zero_reg__
- 8104               	.L889:
-1731:main.c        ****   }
- 8105               		.loc 1 1731 0
- 8106               	/* #APP */
- 8107               	 ;  1731 "main.c" 1
- 8108 2b60 7894      		sei
- 8109               	 ;  0 "" 2
- 8110               	/* #NOAPP */
- 8111               	.L883:
- 8112               	/* epilogue start */
- 8113               	.LBE632:
-1733:main.c        **** 
- 8114               		.loc 1 1733 0
- 8115 2b62 0895      		ret
- 8116               	.L887:
- 8117               	.LBB633:
-1715:main.c        ****       wykonac_watki = WYKONAJ_WATKI_100MS | WYKONAJ_WATKI_10MS;
- 8118               		.loc 1 1715 0
- 8119 2b64 1092 0000 		sts licznik_wybuc_watki_100MS.3754,__zero_reg__
-1716:main.c        ****     }
- 8120               		.loc 1 1716 0
- 8121 2b68 83E0      		ldi r24,lo8(3)
- 8122 2b6a 8093 0000 		sts wykonac_watki,r24
- 8123 2b6e 00C0      		rjmp .L888
- 8124               	.L890:
-1728:main.c        ****       }
- 8125               		.loc 1 1728 0
- 8126               	/* #APP */
- 8127               	 ;  1728 "main.c" 1
- 8128 2b70 F894      		cli
- 8129               	 ;  0 "" 2
- 8130               	/* #NOAPP */
- 8131 2b72 8091 C100 		lds r24,193
- 8132 2b76 8068      		ori r24,lo8(-128)
- 8133 2b78 8093 C100 		sts 193,r24
- 8134               	/* #APP */
- 8135               	 ;  1728 "main.c" 1
- 8136 2b7c 7894      		sei
- 8137               	 ;  0 "" 2
- 8138               	 ;  1728 "main.c" 1
- 8139 2b7e 0000      		nop
- 8140               	 ;  0 "" 2
- 8141               	/* #NOAPP */
- 8142 2b80 00C0      		rjmp .L889
- 8143               	.LBE633:
- 8144               		.cfi_endproc
- 8145               	.LFE67:
- 8147               	.global	ustaw_parametry_dla_bezpieczenstwa
- 8149               	ustaw_parametry_dla_bezpieczenstwa:
- 8150               	.LFB68:
-1735:main.c        ****   wdt_reset();
- 8151               		.loc 1 1735 0
- 8152               		.cfi_startproc
- 8153               	/* prologue: function */
- 8154               	/* frame size = 0 */
- 8155               	/* stack size = 0 */
- 8156               	.L__stack_usage = 0
-1736:main.c        ****   ustaw_parametry_dla_bezpieczenstwa_rejestry();
- 8157               		.loc 1 1736 0
- 8158               	/* #APP */
- 8159               	 ;  1736 "main.c" 1
- 8160 2b82 A895      		wdr
- 8161               	 ;  0 "" 2
-1737:main.c        ****   set_sleep_mode(SLEEP_MODE_IDLE);
- 8162               		.loc 1 1737 0
- 8163               	/* #NOAPP */
- 8164 2b84 82E0      		ldi r24,lo8(2)
- 8165 2b86 84BD      		out 0x24,r24
- 8166 2b88 83E0      		ldi r24,lo8(3)
- 8167 2b8a 85BD      		out 0x25,r24
- 8168 2b8c 8FE3      		ldi r24,lo8(63)
- 8169 2b8e 87BD      		out 0x27,r24
- 8170 2b90 EEE6      		ldi r30,lo8(110)
- 8171 2b92 F0E0      		ldi r31,0
- 8172 2b94 8081      		ld r24,Z
- 8173 2b96 8260      		ori r24,lo8(2)
- 8174 2b98 8083      		st Z,r24
-1738:main.c        **** }
- 8175               		.loc 1 1738 0
- 8176 2b9a 83B7      		in r24,0x33
- 8177 2b9c 817F      		andi r24,lo8(-15)
- 8178 2b9e 83BF      		out 0x33,r24
- 8179               	/* epilogue start */
-1739:main.c        **** 
- 8180               		.loc 1 1739 0
- 8181 2ba0 0895      		ret
- 8182               		.cfi_endproc
- 8183               	.LFE68:
- 8185               	.global	inicjalizuj_parametry_modulu
- 8187               	inicjalizuj_parametry_modulu:
- 8188               	.LFB69:
-1741:main.c        ****   memcpy_E(kod_modulu, ADRES_EEPROM_KOD_DOSTEPU, LICZBA_BAJTOW_KODU_DOSTEPU);
- 8189               		.loc 1 1741 0
- 8190               		.cfi_startproc
- 8191 2ba2 CF93      		push r28
- 8192               	.LCFI92:
- 8193               		.cfi_def_cfa_offset 3
- 8194               		.cfi_offset 28, -2
- 8195 2ba4 DF93      		push r29
- 8196               	.LCFI93:
- 8197               		.cfi_def_cfa_offset 4
- 8198               		.cfi_offset 29, -3
- 8199               	/* prologue: function */
- 8200               	/* frame size = 0 */
- 8201               	/* stack size = 2 */
- 8202               	.L__stack_usage = 2
+ 7860               		.loc 7 473 0
+ 7861 2a2e 88E1      		ldi r24,lo8(24)
+ 7862 2a30 98E0      		ldi r25,lo8(8)
+ 7863               	/* #APP */
+ 7864               	 ;  473 "/usr/local/avr8-gnu-toolchain/avr/include/avr/wdt.h" 1
+ 7865 2a32 0FB6      		in __tmp_reg__,__SREG__
+ 7866 2a34 F894      		cli
+ 7867 2a36 A895      		wdr
+ 7868 2a38 8093 6000 		sts 96, r24
+ 7869 2a3c 0FBE      		out __SREG__,__tmp_reg__
+ 7870 2a3e 9093 6000 		sts 96, r25
+ 7871               	 	
+ 7872               	 ;  0 "" 2
+ 7873               	/* #NOAPP */
+ 7874               	.L843:
+ 7875 2a42 00C0      		rjmp .L843
+ 7876               	.LVL588:
+ 7877               	.L840:
+ 7878               	.LBE625:
+ 7879               	.LBE624:
+1651:main.c        ****     --watchdog_sms_safe_mode_100ms;
+ 7880               		.loc 1 1651 0
+ 7881 2a44 8091 0000 		lds r24,watchdog_sms_safe_mode_100ms
+ 7882 2a48 9091 0000 		lds r25,watchdog_sms_safe_mode_100ms+1
+ 7883 2a4c 892B      		or r24,r25
+ 7884 2a4e 01F4      		brne .+2
+ 7885 2a50 00C0      		rjmp .L842
+1652:main.c        ****   }
+ 7886               		.loc 1 1652 0
+ 7887 2a52 8091 0000 		lds r24,watchdog_sms_safe_mode_100ms
+ 7888 2a56 9091 0000 		lds r25,watchdog_sms_safe_mode_100ms+1
+ 7889 2a5a 0197      		sbiw r24,1
+ 7890 2a5c 9093 0000 		sts watchdog_sms_safe_mode_100ms+1,r25
+ 7891 2a60 8093 0000 		sts watchdog_sms_safe_mode_100ms,r24
+ 7892 2a64 00C0      		rjmp .L842
+ 7893               	.L846:
+1662:main.c        ****     return;
+ 7894               		.loc 1 1662 0 discriminator 2
+ 7895 2a66 4098      		cbi 0x8,0
+ 7896               	/* epilogue start */
+1692:main.c        **** 
+ 7897               		.loc 1 1692 0 discriminator 2
+ 7898 2a68 0895      		ret
+ 7899               	.L844:
+1668:main.c        ****     // Nie zalogowany - dioda swiecei ciagle
+ 7900               		.loc 1 1668 0
+ 7901 2a6a 8091 0000 		lds r24,modul_zalogowany_w_sieci
+ 7902 2a6e 8111      		cpse r24,__zero_reg__
+ 7903 2a70 00C0      		rjmp .L848
+ 7904               	.L853:
+ 7905               	.LBB626:
+1685:main.c        ****                      licznik_dioda_led_poziom_sieci == 43 ||
+ 7906               		.loc 1 1685 0 discriminator 6
+ 7907 2a72 4098      		cbi 0x8,0
+ 7908 2a74 00C0      		rjmp .L849
+ 7909               	.L848:
+ 7910               	.LBE626:
+1673:main.c        ****       // Mrugniecie (SMS, etc.)
+ 7911               		.loc 1 1673 0
+ 7912 2a76 8091 0000 		lds r24,licznik_100ms_dioda_led
+ 7913 2a7a 8111      		cpse r24,__zero_reg__
+ 7914 2a7c 00C0      		rjmp .L853
+ 7915               	.LBB627:
+1679:main.c        ****         if (++licznik_dioda_led_poziom_sieci >= 50)
+ 7916               		.loc 1 1679 0
+ 7917 2a7e 8091 0000 		lds r24,poziom_sieci_gsm
+ 7918 2a82 8031      		cpi r24,lo8(16)
+ 7919 2a84 00F4      		brsh .L851
+1680:main.c        ****           licznik_dioda_led_poziom_sieci = 1;
+ 7920               		.loc 1 1680 0
+ 7921 2a86 8091 0000 		lds r24,licznik_dioda_led_poziom_sieci.3747
+ 7922 2a8a 8F5F      		subi r24,lo8(-(1))
+ 7923 2a8c 8093 0000 		sts licznik_dioda_led_poziom_sieci.3747,r24
+ 7924 2a90 8233      		cpi r24,lo8(50)
+ 7925 2a92 00F0      		brlo .L852
+1681:main.c        ****       } else
+ 7926               		.loc 1 1681 0
+ 7927 2a94 81E0      		ldi r24,lo8(1)
+ 7928 2a96 8093 0000 		sts licznik_dioda_led_poziom_sieci.3747,r24
+ 7929               	.L852:
+1685:main.c        ****                      licznik_dioda_led_poziom_sieci == 43 ||
+ 7930               		.loc 1 1685 0
+ 7931 2a9a 8091 0000 		lds r24,licznik_dioda_led_poziom_sieci.3747
+ 7932 2a9e 8832      		cpi r24,lo8(40)
+ 7933 2aa0 01F0      		breq .L853
+1685:main.c        ****                      licznik_dioda_led_poziom_sieci == 43 ||
+ 7934               		.loc 1 1685 0 is_stmt 0 discriminator 1
+ 7935 2aa2 8B32      		cpi r24,lo8(43)
+ 7936 2aa4 01F0      		breq .L853
+1685:main.c        ****                      licznik_dioda_led_poziom_sieci == 43 ||
+ 7937               		.loc 1 1685 0 discriminator 3
+ 7938 2aa6 8E52      		subi r24,lo8(-(-46))
+ 7939 2aa8 8430      		cpi r24,lo8(4)
+ 7940 2aaa 00F0      		brlo .L853
+1685:main.c        ****                      licznik_dioda_led_poziom_sieci == 43 ||
+ 7941               		.loc 1 1685 0 discriminator 5
+ 7942 2aac 409A      		sbi 0x8,0
+ 7943               	.L849:
+ 7944               	.LBE627:
+1691:main.c        **** }
+ 7945               		.loc 1 1691 0 is_stmt 1
+ 7946 2aae 0C94 0000 		jmp zapis_w_eeprom_stanu_wyjsc
+ 7947               	.LVL589:
+ 7948               	.L851:
+ 7949               	.LBB628:
+1683:main.c        **** 
+ 7950               		.loc 1 1683 0
+ 7951 2ab2 1092 0000 		sts licznik_dioda_led_poziom_sieci.3747,__zero_reg__
+ 7952 2ab6 00C0      		rjmp .L852
+ 7953               	.LBE628:
+ 7954               		.cfi_endproc
+ 7955               	.LFE65:
+ 7957               	.global	steruj_urzadzeniem_10MS
+ 7959               	steruj_urzadzeniem_10MS:
+ 7960               	.LFB66:
+1694:main.c        ****   steruj_wejscia_10ms();
+ 7961               		.loc 1 1694 0
+ 7962               		.cfi_startproc
+ 7963               	/* prologue: function */
+ 7964               	/* frame size = 0 */
+ 7965               	/* stack size = 0 */
+ 7966               	.L__stack_usage = 0
+1695:main.c        ****   steruj_SIM900_10MS();
+ 7967               		.loc 1 1695 0
+ 7968 2ab8 0E94 0000 		call steruj_wejscia_10ms
+ 7969               	.LVL590:
+1696:main.c        ****   zapisz_bajt_w_EEPROM();
+ 7970               		.loc 1 1696 0
+ 7971 2abc 0E94 0000 		call steruj_SIM900_10MS
+ 7972               	.LVL591:
+1697:main.c        ****   // test_dioda_wyjscia();
+ 7973               		.loc 1 1697 0
+ 7974 2ac0 0C94 0000 		jmp zapisz_bajt_w_EEPROM
+ 7975               	.LVL592:
+ 7976               		.cfi_endproc
+ 7977               	.LFE66:
+ 7979               	.global	wolne_zdarzenie_timer
+ 7981               	wolne_zdarzenie_timer:
+ 7982               	.LFB67:
+1702:main.c        ****   WYKONAJ_CLI_SEI(WYLACZ_PRZERWANIE_TIMER());
+ 7983               		.loc 1 1702 0
+ 7984               		.cfi_startproc
+ 7985               	/* prologue: function */
+ 7986               	/* frame size = 0 */
+ 7987               	/* stack size = 0 */
+ 7988               	.L__stack_usage = 0
+1703:main.c        ****   if (!CZY_WYKONAC_ZDARZENIE_TIMER()) {
+ 7989               		.loc 1 1703 0
+ 7990               	/* #APP */
+ 7991               	 ;  1703 "main.c" 1
+ 7992 2ac4 F894      		cli
+ 7993               	 ;  0 "" 2
+ 7994               	/* #NOAPP */
+ 7995 2ac6 8091 6E00 		lds r24,110
+ 7996 2aca 8D7F      		andi r24,lo8(-3)
+ 7997 2acc 8093 6E00 		sts 110,r24
+ 7998               	/* #APP */
+ 7999               	 ;  1703 "main.c" 1
+ 8000 2ad0 7894      		sei
+ 8001               	 ;  0 "" 2
+ 8002               	 ;  1703 "main.c" 1
+ 8003 2ad2 0000      		nop
+ 8004               	 ;  0 "" 2
+1704:main.c        ****     WYKONAJ_CLI_SEI(WLACZ_PRZERWANIE_TIMER());
+ 8005               		.loc 1 1704 0
+ 8006               	/* #NOAPP */
+ 8007 2ad4 8091 0000 		lds r24,wykonaj_zdarzenie_timer
+ 8008 2ad8 8111      		cpse r24,__zero_reg__
+ 8009 2ada 00C0      		rjmp .L884
+1705:main.c        ****     return;
+ 8010               		.loc 1 1705 0
+ 8011               	/* #APP */
+ 8012               	 ;  1705 "main.c" 1
+ 8013 2adc F894      		cli
+ 8014               	 ;  0 "" 2
+ 8015               	/* #NOAPP */
+ 8016 2ade 8091 6E00 		lds r24,110
+ 8017 2ae2 8260      		ori r24,lo8(2)
+ 8018 2ae4 8093 6E00 		sts 110,r24
+ 8019               	/* #APP */
+ 8020               	 ;  1705 "main.c" 1
+ 8021 2ae8 7894      		sei
+ 8022               	 ;  0 "" 2
+ 8023               	 ;  1705 "main.c" 1
+ 8024 2aea 0000      		nop
+ 8025               	 ;  0 "" 2
+1706:main.c        ****   }
+ 8026               		.loc 1 1706 0
+ 8027               	/* #NOAPP */
+ 8028 2aec 0895      		ret
+ 8029               	.L884:
+1708:main.c        ****   if (wykonac_watki_10MS) {
+ 8030               		.loc 1 1708 0
+ 8031 2aee 1092 0000 		sts wykonaj_zdarzenie_timer,__zero_reg__
+1709:main.c        ****     wykonac_watki = WYKONAJ_WATKI_10MS;
+ 8032               		.loc 1 1709 0
+ 8033 2af2 8091 0000 		lds r24,wykonac_watki_10MS
+ 8034 2af6 8823      		tst r24
+ 8035 2af8 01F0      		breq .L886
+1710:main.c        ****     wykonac_watki_10MS = FALSE;
+ 8036               		.loc 1 1710 0
+ 8037 2afa 81E0      		ldi r24,lo8(1)
+ 8038 2afc 8093 0000 		sts wykonac_watki,r24
+1711:main.c        ****   }
+ 8039               		.loc 1 1711 0
+ 8040 2b00 1092 0000 		sts wykonac_watki_10MS,__zero_reg__
+ 8041               	.L886:
+1713:main.c        ****   if (CZY_WYKONAC_WATKI_10MS()) {
+ 8042               		.loc 1 1713 0
+ 8043               	/* #APP */
+ 8044               	 ;  1713 "main.c" 1
+ 8045 2b04 F894      		cli
+ 8046               	 ;  0 "" 2
+ 8047               	/* #NOAPP */
+ 8048 2b06 8091 6E00 		lds r24,110
+ 8049 2b0a 8260      		ori r24,lo8(2)
+ 8050 2b0c 8093 6E00 		sts 110,r24
+ 8051               	/* #APP */
+ 8052               	 ;  1713 "main.c" 1
+ 8053 2b10 7894      		sei
+ 8054               	 ;  0 "" 2
+ 8055               	 ;  1713 "main.c" 1
+ 8056 2b12 0000      		nop
+ 8057               	 ;  0 "" 2
+1714:main.c        ****     static uchar licznik_wybuc_watki_100MS = 0;
+ 8058               		.loc 1 1714 0
+ 8059               	/* #NOAPP */
+ 8060 2b14 8091 0000 		lds r24,wykonac_watki
+ 8061 2b18 80FF      		sbrs r24,0
+ 8062 2b1a 00C0      		rjmp .L883
+ 8063               	.LBB632:
+1717:main.c        ****       licznik_wybuc_watki_100MS = 0;
+ 8064               		.loc 1 1717 0
+ 8065 2b1c 8091 0000 		lds r24,licznik_wybuc_watki_100MS.3754
+ 8066 2b20 8F5F      		subi r24,lo8(-(1))
+ 8067 2b22 8A30      		cpi r24,lo8(10)
+ 8068 2b24 01F0      		breq .L887
+ 8069 2b26 8093 0000 		sts licznik_wybuc_watki_100MS.3754,r24
+ 8070               	.L888:
+1721:main.c        ****     cli();
+ 8071               		.loc 1 1721 0
+ 8072               	/* #APP */
+ 8073               	 ;  1721 "main.c" 1
+ 8074 2b2a 0000      		nop
+ 8075               	 ;  0 "" 2
+1722:main.c        ****     if (CZY_ODBIERANIE_DANYCH_SIM900()) {
+ 8076               		.loc 1 1722 0
+ 8077               	 ;  1722 "main.c" 1
+ 8078 2b2c F894      		cli
+ 8079               	 ;  0 "" 2
+1723:main.c        ****       WYLACZ_PRZERWANIE_ODBIORU_DANYCH_SIM900();
+ 8080               		.loc 1 1723 0
+ 8081               	/* #NOAPP */
+ 8082 2b2e 00B6      		in __tmp_reg__,0x30
+ 8083 2b30 01FE      		sbrs __tmp_reg__,1
+ 8084 2b32 00C0      		rjmp .L889
+1724:main.c        ****       sei();
+ 8085               		.loc 1 1724 0
+ 8086 2b34 8091 C100 		lds r24,193
+ 8087 2b38 8F77      		andi r24,lo8(127)
+ 8088 2b3a 8093 C100 		sts 193,r24
+1725:main.c        ****       if (liczba_odebranych_znakow_SIM900 != 0 &&
+ 8089               		.loc 1 1725 0
+ 8090               	/* #APP */
+ 8091               	 ;  1725 "main.c" 1
+ 8092 2b3e 7894      		sei
+ 8093               	 ;  0 "" 2
+1726:main.c        ****           ++licznik_opoznienie_oczekiwania_na_bajt_SIM900 >
+ 8094               		.loc 1 1726 0
+ 8095               	/* #NOAPP */
+ 8096 2b40 8091 0000 		lds r24,liczba_odebranych_znakow_SIM900
+ 8097 2b44 9091 0000 		lds r25,liczba_odebranych_znakow_SIM900+1
+ 8098 2b48 892B      		or r24,r25
+ 8099 2b4a 01F0      		breq .L890
+1727:main.c        ****               MAX_OPOZNIENIE_OCZEKIWANIA_NA_BAJT_SIM900_500_MS) {
+ 8100               		.loc 1 1727 0
+ 8101 2b4c 8091 0000 		lds r24,licznik_opoznienie_oczekiwania_na_bajt_SIM900
+ 8102 2b50 8F5F      		subi r24,lo8(-(1))
+1726:main.c        ****           ++licznik_opoznienie_oczekiwania_na_bajt_SIM900 >
+ 8103               		.loc 1 1726 0
+ 8104 2b52 8093 0000 		sts licznik_opoznienie_oczekiwania_na_bajt_SIM900,r24
+ 8105 2b56 8333      		cpi r24,lo8(51)
+ 8106 2b58 00F0      		brlo .L890
+1729:main.c        ****       } else {
+ 8107               		.loc 1 1729 0
+ 8108 2b5a 459A      		sbi 0x8,5
+ 8109 2b5c 8091 C100 		lds r24,193
+ 8110 2b60 8F77      		andi r24,lo8(127)
+ 8111 2b62 8093 C100 		sts 193,r24
+ 8112 2b66 80B7      		in r24,0x30
+ 8113 2b68 8D7F      		andi r24,lo8(-3)
+ 8114 2b6a 80BF      		out 0x30,r24
+ 8115 2b6c 1092 0000 		sts poczatek_polecenia_SIM900+1,__zero_reg__
+ 8116 2b70 1092 0000 		sts poczatek_polecenia_SIM900,__zero_reg__
+ 8117 2b74 1092 0000 		sts zakonczenie_polecenia_SIM900+1,__zero_reg__
+ 8118 2b78 1092 0000 		sts zakonczenie_polecenia_SIM900,__zero_reg__
+ 8119 2b7c 1092 0000 		sts czy_jest_nowe_polecenie_SIM900,__zero_reg__
+ 8120               	.L889:
+1734:main.c        ****   }
+ 8121               		.loc 1 1734 0
+ 8122               	/* #APP */
+ 8123               	 ;  1734 "main.c" 1
+ 8124 2b80 7894      		sei
+ 8125               	 ;  0 "" 2
+ 8126               	/* #NOAPP */
+ 8127               	.L883:
+ 8128               	/* epilogue start */
+ 8129               	.LBE632:
+1736:main.c        **** 
+ 8130               		.loc 1 1736 0
+ 8131 2b82 0895      		ret
+ 8132               	.L887:
+ 8133               	.LBB633:
+1718:main.c        ****       wykonac_watki = WYKONAJ_WATKI_100MS | WYKONAJ_WATKI_10MS;
+ 8134               		.loc 1 1718 0
+ 8135 2b84 1092 0000 		sts licznik_wybuc_watki_100MS.3754,__zero_reg__
+1719:main.c        ****     }
+ 8136               		.loc 1 1719 0
+ 8137 2b88 83E0      		ldi r24,lo8(3)
+ 8138 2b8a 8093 0000 		sts wykonac_watki,r24
+ 8139 2b8e 00C0      		rjmp .L888
+ 8140               	.L890:
+1731:main.c        ****       }
+ 8141               		.loc 1 1731 0
+ 8142               	/* #APP */
+ 8143               	 ;  1731 "main.c" 1
+ 8144 2b90 F894      		cli
+ 8145               	 ;  0 "" 2
+ 8146               	/* #NOAPP */
+ 8147 2b92 8091 C100 		lds r24,193
+ 8148 2b96 8068      		ori r24,lo8(-128)
+ 8149 2b98 8093 C100 		sts 193,r24
+ 8150               	/* #APP */
+ 8151               	 ;  1731 "main.c" 1
+ 8152 2b9c 7894      		sei
+ 8153               	 ;  0 "" 2
+ 8154               	 ;  1731 "main.c" 1
+ 8155 2b9e 0000      		nop
+ 8156               	 ;  0 "" 2
+ 8157               	/* #NOAPP */
+ 8158 2ba0 00C0      		rjmp .L889
+ 8159               	.LBE633:
+ 8160               		.cfi_endproc
+ 8161               	.LFE67:
+ 8163               	.global	ustaw_parametry_dla_bezpieczenstwa
+ 8165               	ustaw_parametry_dla_bezpieczenstwa:
+ 8166               	.LFB68:
+1738:main.c        ****   wdt_reset();
+ 8167               		.loc 1 1738 0
+ 8168               		.cfi_startproc
+ 8169               	/* prologue: function */
+ 8170               	/* frame size = 0 */
+ 8171               	/* stack size = 0 */
+ 8172               	.L__stack_usage = 0
+1739:main.c        ****   ustaw_parametry_dla_bezpieczenstwa_rejestry();
+ 8173               		.loc 1 1739 0
+ 8174               	/* #APP */
+ 8175               	 ;  1739 "main.c" 1
+ 8176 2ba2 A895      		wdr
+ 8177               	 ;  0 "" 2
+1740:main.c        ****   set_sleep_mode(SLEEP_MODE_IDLE);
+ 8178               		.loc 1 1740 0
+ 8179               	/* #NOAPP */
+ 8180 2ba4 82E0      		ldi r24,lo8(2)
+ 8181 2ba6 84BD      		out 0x24,r24
+ 8182 2ba8 83E0      		ldi r24,lo8(3)
+ 8183 2baa 85BD      		out 0x25,r24
+ 8184 2bac 8FE3      		ldi r24,lo8(63)
+ 8185 2bae 87BD      		out 0x27,r24
+ 8186 2bb0 EEE6      		ldi r30,lo8(110)
+ 8187 2bb2 F0E0      		ldi r31,0
+ 8188 2bb4 8081      		ld r24,Z
+ 8189 2bb6 8260      		ori r24,lo8(2)
+ 8190 2bb8 8083      		st Z,r24
+1741:main.c        **** }
+ 8191               		.loc 1 1741 0
+ 8192 2bba 83B7      		in r24,0x33
+ 8193 2bbc 817F      		andi r24,lo8(-15)
+ 8194 2bbe 83BF      		out 0x33,r24
+ 8195               	/* epilogue start */
 1742:main.c        **** 
- 8203               		.loc 1 1742 0
- 8204 2ba6 44E0      		ldi r20,lo8(4)
- 8205 2ba8 50E0      		ldi r21,0
- 8206 2baa 61E0      		ldi r22,lo8(1)
- 8207 2bac 70E0      		ldi r23,0
- 8208 2bae 80E0      		ldi r24,lo8(kod_modulu)
- 8209 2bb0 90E0      		ldi r25,hi8(kod_modulu)
- 8210 2bb2 0E94 0000 		call eeprom_read_block
- 8211               	.LVL593:
-1745:main.c        ****     kod_modulu[0] = bufor_eeprom[0] = 'A';
- 8212               		.loc 1 1745 0
- 8213 2bb6 8091 0000 		lds r24,kod_modulu
- 8214 2bba 8150      		subi r24,lo8(-(-1))
- 8215 2bbc 8E3F      		cpi r24,lo8(-2)
- 8216 2bbe 00F0      		brlo .L905
-1746:main.c        ****     kod_modulu[1] = bufor_eeprom[1] = 'B';
- 8217               		.loc 1 1746 0
- 8218 2bc0 81E4      		ldi r24,lo8(65)
- 8219 2bc2 8093 0000 		sts bufor_eeprom,r24
- 8220 2bc6 8093 0000 		sts kod_modulu,r24
-1747:main.c        ****     kod_modulu[2] = bufor_eeprom[2] = 'C';
- 8221               		.loc 1 1747 0
- 8222 2bca 82E4      		ldi r24,lo8(66)
- 8223 2bcc 8093 0000 		sts bufor_eeprom+1,r24
- 8224 2bd0 8093 0000 		sts kod_modulu+1,r24
-1748:main.c        ****     kod_modulu[3] = bufor_eeprom[3] = 'D';
- 8225               		.loc 1 1748 0
- 8226 2bd4 83E4      		ldi r24,lo8(67)
- 8227 2bd6 8093 0000 		sts bufor_eeprom+2,r24
- 8228 2bda 8093 0000 		sts kod_modulu+2,r24
-1749:main.c        ****     // Zapisz do EEPROM natychmiast (BLOCKING)
- 8229               		.loc 1 1749 0
- 8230 2bde 84E4      		ldi r24,lo8(68)
- 8231 2be0 8093 0000 		sts bufor_eeprom+3,r24
- 8232 2be4 8093 0000 		sts kod_modulu+3,r24
- 8233               	.L906:
-1751:main.c        ****       ;
- 8234               		.loc 1 1751 0 discriminator 1
- 8235 2be8 F999      		sbic 0x1f,1
- 8236 2bea 00C0      		rjmp .L906
-1753:main.c        ****                         LICZBA_BAJTOW_KODU_DOSTEPU);
- 8237               		.loc 1 1753 0
- 8238 2bec 44E0      		ldi r20,lo8(4)
- 8239 2bee 50E0      		ldi r21,0
- 8240 2bf0 61E0      		ldi r22,lo8(1)
- 8241 2bf2 70E0      		ldi r23,0
- 8242 2bf4 80E0      		ldi r24,lo8(kod_modulu)
- 8243 2bf6 90E0      		ldi r25,hi8(kod_modulu)
- 8244 2bf8 0E94 0000 		call eeprom_update_block
- 8245               	.LVL594:
- 8246               	.L905:
-1759:main.c        ****   if (tryb_pracy == 0xFF) {
- 8247               		.loc 1 1759 0
- 8248 2bfc 8EEF      		ldi r24,lo8(-2)
- 8249 2bfe 9FE0      		ldi r25,lo8(15)
- 8250 2c00 0E94 0000 		call eeprom_read_byte
- 8251               	.LVL595:
-1760:main.c        ****     tryb_pracy = 1; // Domyślnie Publiczny
- 8252               		.loc 1 1760 0
- 8253 2c04 8F3F      		cpi r24,lo8(-1)
- 8254 2c06 01F4      		brne .+2
- 8255 2c08 00C0      		rjmp .L907
-1759:main.c        ****   if (tryb_pracy == 0xFF) {
- 8256               		.loc 1 1759 0
- 8257 2c0a 8093 0000 		sts tryb_pracy,r24
- 8258               	.L908:
-1768:main.c        ****   if (tryb_clip == 0xFF) {
- 8259               		.loc 1 1768 0
- 8260 2c0e 8FEF      		ldi r24,lo8(-1)
- 8261 2c10 9FE0      		ldi r25,lo8(15)
- 8262 2c12 0E94 0000 		call eeprom_read_byte
- 8263               	.LVL596:
-1769:main.c        ****     tryb_clip = 1; // Domyślnie CLIP (1)
- 8264               		.loc 1 1769 0
- 8265 2c16 8F3F      		cpi r24,lo8(-1)
- 8266 2c18 01F4      		brne .+2
- 8267 2c1a 00C0      		rjmp .L910
-1768:main.c        ****   if (tryb_clip == 0xFF) {
- 8268               		.loc 1 1768 0
- 8269 2c1c 8093 0000 		sts tryb_clip,r24
- 8270               	.L911:
-1777:main.c        ****   czas_start_m = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_START_M);
- 8271               		.loc 1 1777 0
- 8272 2c20 8AEF      		ldi r24,lo8(-6)
- 8273 2c22 9FE0      		ldi r25,lo8(15)
- 8274 2c24 0E94 0000 		call eeprom_read_byte
- 8275               	.LVL597:
- 8276 2c28 8093 0000 		sts czas_start_h,r24
-1778:main.c        ****   czas_stop_h = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_STOP_H);
- 8277               		.loc 1 1778 0
- 8278 2c2c 8BEF      		ldi r24,lo8(-5)
- 8279 2c2e 9FE0      		ldi r25,lo8(15)
- 8280 2c30 0E94 0000 		call eeprom_read_byte
- 8281               	.LVL598:
- 8282 2c34 8093 0000 		sts czas_start_m,r24
-1779:main.c        ****   czas_stop_m = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_STOP_M);
- 8283               		.loc 1 1779 0
- 8284 2c38 8CEF      		ldi r24,lo8(-4)
- 8285 2c3a 9FE0      		ldi r25,lo8(15)
- 8286 2c3c 0E94 0000 		call eeprom_read_byte
- 8287               	.LVL599:
- 8288 2c40 8093 0000 		sts czas_stop_h,r24
-1780:main.c        **** 
- 8289               		.loc 1 1780 0
- 8290 2c44 8DEF      		ldi r24,lo8(-3)
- 8291 2c46 9FE0      		ldi r25,lo8(15)
- 8292 2c48 0E94 0000 		call eeprom_read_byte
- 8293               	.LVL600:
- 8294 2c4c 8093 0000 		sts czas_stop_m,r24
-1783:main.c        ****   if (skryba_wlaczona == 0xFF)
- 8295               		.loc 1 1783 0
- 8296 2c50 89EF      		ldi r24,lo8(-7)
- 8297 2c52 9FE0      		ldi r25,lo8(15)
- 8298 2c54 0E94 0000 		call eeprom_read_byte
- 8299               	.LVL601:
-1784:main.c        ****     skryba_wlaczona = FALSE;
- 8300               		.loc 1 1784 0
- 8301 2c58 8F3F      		cpi r24,lo8(-1)
- 8302 2c5a 01F4      		brne .+2
- 8303 2c5c 00C0      		rjmp .L913
-1783:main.c        ****   if (skryba_wlaczona == 0xFF)
- 8304               		.loc 1 1783 0
- 8305 2c5e 8093 0000 		sts skryba_wlaczona,r24
- 8306               	.L914:
-1788:main.c        ****       eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA_LIMIT_L);
- 8307               		.loc 1 1788 0
- 8308 2c62 85EF      		ldi r24,lo8(-11)
- 8309 2c64 9FE0      		ldi r25,lo8(15)
- 8310 2c66 0E94 0000 		call eeprom_read_byte
- 8311               	.LVL602:
- 8312 2c6a C82F      		mov r28,r24
- 8313               	.LVL603:
-1790:main.c        ****       eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA_LIMIT_H);
- 8314               		.loc 1 1790 0
- 8315 2c6c 86EF      		ldi r24,lo8(-10)
- 8316 2c6e 9FE0      		ldi r25,lo8(15)
- 8317               	.LVL604:
- 8318 2c70 0E94 0000 		call eeprom_read_byte
- 8319               	.LVL605:
-1792:main.c        ****     // Nie ustawiono - domyslnie 800
- 8320               		.loc 1 1792 0
- 8321 2c74 CF3F      		cpi r28,lo8(-1)
- 8322 2c76 01F0      		breq .+2
- 8323 2c78 00C0      		rjmp .L915
-1792:main.c        ****     // Nie ustawiono - domyslnie 800
- 8324               		.loc 1 1792 0 is_stmt 0 discriminator 1
- 8325 2c7a 8F3F      		cpi r24,lo8(-1)
- 8326 2c7c 01F0      		breq .+2
- 8327 2c7e 00C0      		rjmp .L915
- 8328               	.LVL606:
- 8329               	.L917:
-1794:main.c        ****   } else {
- 8330               		.loc 1 1794 0 is_stmt 1
- 8331 2c80 80E2      		ldi r24,lo8(32)
- 8332 2c82 93E0      		ldi r25,lo8(3)
- 8333 2c84 9093 0000 		sts skryba_limit+1,r25
- 8334 2c88 8093 0000 		sts skryba_limit,r24
- 8335               	.L916:
-1803:main.c        **** 
- 8336               		.loc 1 1803 0
- 8337 2c8c 81E0      		ldi r24,lo8(1)
- 8338 2c8e 9091 0000 		lds r25,skryba_wlaczona
- 8339 2c92 9111      		cpse r25,__zero_reg__
- 8340 2c94 00C0      		rjmp .L918
- 8341 2c96 80E0      		ldi r24,0
- 8342               	.L918:
- 8343 2c98 6091 0000 		lds r22,skryba_limit
- 8344 2c9c 0E94 0000 		call zapisz_debug_do_eeprom
- 8345               	.LVL607:
-1807:main.c        ****       (czas_start_m > 59 && czas_start_m != 0xFF) ||
- 8346               		.loc 1 1807 0
- 8347 2ca0 8091 0000 		lds r24,czas_start_h
- 8348 2ca4 8851      		subi r24,lo8(-(-24))
- 8349 2ca6 873E      		cpi r24,lo8(-25)
- 8350 2ca8 00F0      		brlo .L938
-1808:main.c        ****       (czas_stop_h > 23 && czas_stop_h != 0xFF) ||
- 8351               		.loc 1 1808 0 discriminator 1
- 8352 2caa 8091 0000 		lds r24,czas_start_m
- 8353 2cae 8C53      		subi r24,lo8(-(-60))
-1807:main.c        ****       (czas_start_m > 59 && czas_start_m != 0xFF) ||
- 8354               		.loc 1 1807 0 discriminator 1
- 8355 2cb0 833C      		cpi r24,lo8(-61)
- 8356 2cb2 00F0      		brlo .L938
-1809:main.c        ****       (czas_stop_m > 59 && czas_stop_m != 0xFF)) {
- 8357               		.loc 1 1809 0
- 8358 2cb4 8091 0000 		lds r24,czas_stop_h
- 8359 2cb8 8851      		subi r24,lo8(-(-24))
-1808:main.c        ****       (czas_stop_h > 23 && czas_stop_h != 0xFF) ||
- 8360               		.loc 1 1808 0
- 8361 2cba 873E      		cpi r24,lo8(-25)
- 8362 2cbc 00F0      		brlo .L938
-1810:main.c        ****     // Zapisz wartosci wylaczajace (0xFF) - BLOCKING
- 8363               		.loc 1 1810 0
- 8364 2cbe 8091 0000 		lds r24,czas_stop_m
- 8365 2cc2 8C53      		subi r24,lo8(-(-60))
-1809:main.c        ****       (czas_stop_m > 59 && czas_stop_m != 0xFF)) {
- 8366               		.loc 1 1809 0
- 8367 2cc4 833C      		cpi r24,lo8(-61)
- 8368 2cc6 00F4      		brsh .L920
- 8369               	.L938:
-1812:main.c        ****       ;
- 8370               		.loc 1 1812 0 discriminator 1
- 8371 2cc8 F999      		sbic 0x1f,1
- 8372 2cca 00C0      		rjmp .L938
-1814:main.c        ****     while (!eeprom_is_ready())
- 8373               		.loc 1 1814 0
- 8374 2ccc 6FEF      		ldi r22,lo8(-1)
- 8375 2cce 8AEF      		ldi r24,lo8(-6)
- 8376 2cd0 9FE0      		ldi r25,lo8(15)
- 8377 2cd2 0E94 0000 		call eeprom_update_byte
- 8378               	.LVL608:
- 8379               	.L921:
+ 8196               		.loc 1 1742 0
+ 8197 2bc0 0895      		ret
+ 8198               		.cfi_endproc
+ 8199               	.LFE68:
+ 8201               	.global	inicjalizuj_parametry_modulu
+ 8203               	inicjalizuj_parametry_modulu:
+ 8204               	.LFB69:
+1744:main.c        ****   memcpy_E(kod_modulu, ADRES_EEPROM_KOD_DOSTEPU, LICZBA_BAJTOW_KODU_DOSTEPU);
+ 8205               		.loc 1 1744 0
+ 8206               		.cfi_startproc
+ 8207 2bc2 CF93      		push r28
+ 8208               	.LCFI92:
+ 8209               		.cfi_def_cfa_offset 3
+ 8210               		.cfi_offset 28, -2
+ 8211 2bc4 DF93      		push r29
+ 8212               	.LCFI93:
+ 8213               		.cfi_def_cfa_offset 4
+ 8214               		.cfi_offset 29, -3
+ 8215               	/* prologue: function */
+ 8216               	/* frame size = 0 */
+ 8217               	/* stack size = 2 */
+ 8218               	.L__stack_usage = 2
+1745:main.c        **** 
+ 8219               		.loc 1 1745 0
+ 8220 2bc6 44E0      		ldi r20,lo8(4)
+ 8221 2bc8 50E0      		ldi r21,0
+ 8222 2bca 61E0      		ldi r22,lo8(1)
+ 8223 2bcc 70E0      		ldi r23,0
+ 8224 2bce 80E0      		ldi r24,lo8(kod_modulu)
+ 8225 2bd0 90E0      		ldi r25,hi8(kod_modulu)
+ 8226 2bd2 0E94 0000 		call eeprom_read_block
+ 8227               	.LVL593:
+1748:main.c        ****     kod_modulu[0] = bufor_eeprom[0] = 'A';
+ 8228               		.loc 1 1748 0
+ 8229 2bd6 8091 0000 		lds r24,kod_modulu
+ 8230 2bda 8150      		subi r24,lo8(-(-1))
+ 8231 2bdc 8E3F      		cpi r24,lo8(-2)
+ 8232 2bde 00F0      		brlo .L905
+1749:main.c        ****     kod_modulu[1] = bufor_eeprom[1] = 'B';
+ 8233               		.loc 1 1749 0
+ 8234 2be0 81E4      		ldi r24,lo8(65)
+ 8235 2be2 8093 0000 		sts bufor_eeprom,r24
+ 8236 2be6 8093 0000 		sts kod_modulu,r24
+1750:main.c        ****     kod_modulu[2] = bufor_eeprom[2] = 'C';
+ 8237               		.loc 1 1750 0
+ 8238 2bea 82E4      		ldi r24,lo8(66)
+ 8239 2bec 8093 0000 		sts bufor_eeprom+1,r24
+ 8240 2bf0 8093 0000 		sts kod_modulu+1,r24
+1751:main.c        ****     kod_modulu[3] = bufor_eeprom[3] = 'D';
+ 8241               		.loc 1 1751 0
+ 8242 2bf4 83E4      		ldi r24,lo8(67)
+ 8243 2bf6 8093 0000 		sts bufor_eeprom+2,r24
+ 8244 2bfa 8093 0000 		sts kod_modulu+2,r24
+1752:main.c        ****     // Zapisz do EEPROM natychmiast (BLOCKING)
+ 8245               		.loc 1 1752 0
+ 8246 2bfe 84E4      		ldi r24,lo8(68)
+ 8247 2c00 8093 0000 		sts bufor_eeprom+3,r24
+ 8248 2c04 8093 0000 		sts kod_modulu+3,r24
+ 8249               	.L906:
+1754:main.c        ****       ;
+ 8250               		.loc 1 1754 0 discriminator 1
+ 8251 2c08 F999      		sbic 0x1f,1
+ 8252 2c0a 00C0      		rjmp .L906
+1756:main.c        ****                         LICZBA_BAJTOW_KODU_DOSTEPU);
+ 8253               		.loc 1 1756 0
+ 8254 2c0c 44E0      		ldi r20,lo8(4)
+ 8255 2c0e 50E0      		ldi r21,0
+ 8256 2c10 61E0      		ldi r22,lo8(1)
+ 8257 2c12 70E0      		ldi r23,0
+ 8258 2c14 80E0      		ldi r24,lo8(kod_modulu)
+ 8259 2c16 90E0      		ldi r25,hi8(kod_modulu)
+ 8260 2c18 0E94 0000 		call eeprom_update_block
+ 8261               	.LVL594:
+ 8262               	.L905:
+1762:main.c        ****   if (tryb_pracy == 0xFF) {
+ 8263               		.loc 1 1762 0
+ 8264 2c1c 8EEF      		ldi r24,lo8(-2)
+ 8265 2c1e 9FE0      		ldi r25,lo8(15)
+ 8266 2c20 0E94 0000 		call eeprom_read_byte
+ 8267               	.LVL595:
+1763:main.c        ****     tryb_pracy = 1; // Domyślnie Publiczny
+ 8268               		.loc 1 1763 0
+ 8269 2c24 8F3F      		cpi r24,lo8(-1)
+ 8270 2c26 01F4      		brne .+2
+ 8271 2c28 00C0      		rjmp .L907
+1762:main.c        ****   if (tryb_pracy == 0xFF) {
+ 8272               		.loc 1 1762 0
+ 8273 2c2a 8093 0000 		sts tryb_pracy,r24
+ 8274               	.L908:
+1771:main.c        ****   if (tryb_clip == 0xFF) {
+ 8275               		.loc 1 1771 0
+ 8276 2c2e 8FEF      		ldi r24,lo8(-1)
+ 8277 2c30 9FE0      		ldi r25,lo8(15)
+ 8278 2c32 0E94 0000 		call eeprom_read_byte
+ 8279               	.LVL596:
+1772:main.c        ****     tryb_clip = 1; // Domyślnie CLIP (1)
+ 8280               		.loc 1 1772 0
+ 8281 2c36 8F3F      		cpi r24,lo8(-1)
+ 8282 2c38 01F4      		brne .+2
+ 8283 2c3a 00C0      		rjmp .L910
+1771:main.c        ****   if (tryb_clip == 0xFF) {
+ 8284               		.loc 1 1771 0
+ 8285 2c3c 8093 0000 		sts tryb_clip,r24
+ 8286               	.L911:
+1780:main.c        ****   czas_start_m = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_START_M);
+ 8287               		.loc 1 1780 0
+ 8288 2c40 8AEF      		ldi r24,lo8(-6)
+ 8289 2c42 9FE0      		ldi r25,lo8(15)
+ 8290 2c44 0E94 0000 		call eeprom_read_byte
+ 8291               	.LVL597:
+ 8292 2c48 8093 0000 		sts czas_start_h,r24
+1781:main.c        ****   czas_stop_h = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_STOP_H);
+ 8293               		.loc 1 1781 0
+ 8294 2c4c 8BEF      		ldi r24,lo8(-5)
+ 8295 2c4e 9FE0      		ldi r25,lo8(15)
+ 8296 2c50 0E94 0000 		call eeprom_read_byte
+ 8297               	.LVL598:
+ 8298 2c54 8093 0000 		sts czas_start_m,r24
+1782:main.c        ****   czas_stop_m = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_STOP_M);
+ 8299               		.loc 1 1782 0
+ 8300 2c58 8CEF      		ldi r24,lo8(-4)
+ 8301 2c5a 9FE0      		ldi r25,lo8(15)
+ 8302 2c5c 0E94 0000 		call eeprom_read_byte
+ 8303               	.LVL599:
+ 8304 2c60 8093 0000 		sts czas_stop_h,r24
+1783:main.c        **** 
+ 8305               		.loc 1 1783 0
+ 8306 2c64 8DEF      		ldi r24,lo8(-3)
+ 8307 2c66 9FE0      		ldi r25,lo8(15)
+ 8308 2c68 0E94 0000 		call eeprom_read_byte
+ 8309               	.LVL600:
+ 8310 2c6c 8093 0000 		sts czas_stop_m,r24
+1786:main.c        ****   if (skryba_wlaczona == 0xFF)
+ 8311               		.loc 1 1786 0
+ 8312 2c70 89EF      		ldi r24,lo8(-7)
+ 8313 2c72 9FE0      		ldi r25,lo8(15)
+ 8314 2c74 0E94 0000 		call eeprom_read_byte
+ 8315               	.LVL601:
+1787:main.c        ****     skryba_wlaczona = FALSE;
+ 8316               		.loc 1 1787 0
+ 8317 2c78 8F3F      		cpi r24,lo8(-1)
+ 8318 2c7a 01F4      		brne .+2
+ 8319 2c7c 00C0      		rjmp .L913
+1786:main.c        ****   if (skryba_wlaczona == 0xFF)
+ 8320               		.loc 1 1786 0
+ 8321 2c7e 8093 0000 		sts skryba_wlaczona,r24
+ 8322               	.L914:
+1791:main.c        ****       eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA_LIMIT_L);
+ 8323               		.loc 1 1791 0
+ 8324 2c82 85EF      		ldi r24,lo8(-11)
+ 8325 2c84 9FE0      		ldi r25,lo8(15)
+ 8326 2c86 0E94 0000 		call eeprom_read_byte
+ 8327               	.LVL602:
+ 8328 2c8a C82F      		mov r28,r24
+ 8329               	.LVL603:
+1793:main.c        ****       eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA_LIMIT_H);
+ 8330               		.loc 1 1793 0
+ 8331 2c8c 86EF      		ldi r24,lo8(-10)
+ 8332 2c8e 9FE0      		ldi r25,lo8(15)
+ 8333               	.LVL604:
+ 8334 2c90 0E94 0000 		call eeprom_read_byte
+ 8335               	.LVL605:
+1795:main.c        ****     // Nie ustawiono - domyslnie 800
+ 8336               		.loc 1 1795 0
+ 8337 2c94 CF3F      		cpi r28,lo8(-1)
+ 8338 2c96 01F0      		breq .+2
+ 8339 2c98 00C0      		rjmp .L915
+1795:main.c        ****     // Nie ustawiono - domyslnie 800
+ 8340               		.loc 1 1795 0 is_stmt 0 discriminator 1
+ 8341 2c9a 8F3F      		cpi r24,lo8(-1)
+ 8342 2c9c 01F0      		breq .+2
+ 8343 2c9e 00C0      		rjmp .L915
+ 8344               	.LVL606:
+ 8345               	.L917:
+1797:main.c        ****   } else {
+ 8346               		.loc 1 1797 0 is_stmt 1
+ 8347 2ca0 80E2      		ldi r24,lo8(32)
+ 8348 2ca2 93E0      		ldi r25,lo8(3)
+ 8349 2ca4 9093 0000 		sts skryba_limit+1,r25
+ 8350 2ca8 8093 0000 		sts skryba_limit,r24
+ 8351               	.L916:
+1806:main.c        **** 
+ 8352               		.loc 1 1806 0
+ 8353 2cac 81E0      		ldi r24,lo8(1)
+ 8354 2cae 9091 0000 		lds r25,skryba_wlaczona
+ 8355 2cb2 9111      		cpse r25,__zero_reg__
+ 8356 2cb4 00C0      		rjmp .L918
+ 8357 2cb6 80E0      		ldi r24,0
+ 8358               	.L918:
+ 8359 2cb8 6091 0000 		lds r22,skryba_limit
+ 8360 2cbc 0E94 0000 		call zapisz_debug_do_eeprom
+ 8361               	.LVL607:
+1810:main.c        ****       (czas_start_m > 59 && czas_start_m != 0xFF) ||
+ 8362               		.loc 1 1810 0
+ 8363 2cc0 8091 0000 		lds r24,czas_start_h
+ 8364 2cc4 8851      		subi r24,lo8(-(-24))
+ 8365 2cc6 873E      		cpi r24,lo8(-25)
+ 8366 2cc8 00F0      		brlo .L938
+1811:main.c        ****       (czas_stop_h > 23 && czas_stop_h != 0xFF) ||
+ 8367               		.loc 1 1811 0 discriminator 1
+ 8368 2cca 8091 0000 		lds r24,czas_start_m
+ 8369 2cce 8C53      		subi r24,lo8(-(-60))
+1810:main.c        ****       (czas_start_m > 59 && czas_start_m != 0xFF) ||
+ 8370               		.loc 1 1810 0 discriminator 1
+ 8371 2cd0 833C      		cpi r24,lo8(-61)
+ 8372 2cd2 00F0      		brlo .L938
+1812:main.c        ****       (czas_stop_m > 59 && czas_stop_m != 0xFF)) {
+ 8373               		.loc 1 1812 0
+ 8374 2cd4 8091 0000 		lds r24,czas_stop_h
+ 8375 2cd8 8851      		subi r24,lo8(-(-24))
+1811:main.c        ****       (czas_stop_h > 23 && czas_stop_h != 0xFF) ||
+ 8376               		.loc 1 1811 0
+ 8377 2cda 873E      		cpi r24,lo8(-25)
+ 8378 2cdc 00F0      		brlo .L938
+1813:main.c        ****     // Zapisz wartosci wylaczajace (0xFF) - BLOCKING
+ 8379               		.loc 1 1813 0
+ 8380 2cde 8091 0000 		lds r24,czas_stop_m
+ 8381 2ce2 8C53      		subi r24,lo8(-(-60))
+1812:main.c        ****       (czas_stop_m > 59 && czas_stop_m != 0xFF)) {
+ 8382               		.loc 1 1812 0
+ 8383 2ce4 833C      		cpi r24,lo8(-61)
+ 8384 2ce6 00F4      		brsh .L920
+ 8385               	.L938:
 1815:main.c        ****       ;
- 8380               		.loc 1 1815 0 discriminator 1
- 8381 2cd6 F999      		sbic 0x1f,1
- 8382 2cd8 00C0      		rjmp .L921
+ 8386               		.loc 1 1815 0 discriminator 1
+ 8387 2ce8 F999      		sbic 0x1f,1
+ 8388 2cea 00C0      		rjmp .L938
 1817:main.c        ****     while (!eeprom_is_ready())
- 8383               		.loc 1 1817 0
- 8384 2cda 6FEF      		ldi r22,lo8(-1)
- 8385 2cdc 8BEF      		ldi r24,lo8(-5)
- 8386 2cde 9FE0      		ldi r25,lo8(15)
- 8387 2ce0 0E94 0000 		call eeprom_update_byte
- 8388               	.LVL609:
- 8389               	.L922:
+ 8389               		.loc 1 1817 0
+ 8390 2cec 6FEF      		ldi r22,lo8(-1)
+ 8391 2cee 8AEF      		ldi r24,lo8(-6)
+ 8392 2cf0 9FE0      		ldi r25,lo8(15)
+ 8393 2cf2 0E94 0000 		call eeprom_update_byte
+ 8394               	.LVL608:
+ 8395               	.L921:
 1818:main.c        ****       ;
- 8390               		.loc 1 1818 0 discriminator 1
- 8391 2ce4 F999      		sbic 0x1f,1
- 8392 2ce6 00C0      		rjmp .L922
+ 8396               		.loc 1 1818 0 discriminator 1
+ 8397 2cf6 F999      		sbic 0x1f,1
+ 8398 2cf8 00C0      		rjmp .L921
 1820:main.c        ****     while (!eeprom_is_ready())
- 8393               		.loc 1 1820 0
- 8394 2ce8 6FEF      		ldi r22,lo8(-1)
- 8395 2cea 8CEF      		ldi r24,lo8(-4)
- 8396 2cec 9FE0      		ldi r25,lo8(15)
- 8397 2cee 0E94 0000 		call eeprom_update_byte
- 8398               	.LVL610:
- 8399               	.L923:
+ 8399               		.loc 1 1820 0
+ 8400 2cfa 6FEF      		ldi r22,lo8(-1)
+ 8401 2cfc 8BEF      		ldi r24,lo8(-5)
+ 8402 2cfe 9FE0      		ldi r25,lo8(15)
+ 8403 2d00 0E94 0000 		call eeprom_update_byte
+ 8404               	.LVL609:
+ 8405               	.L922:
 1821:main.c        ****       ;
- 8400               		.loc 1 1821 0 discriminator 1
- 8401 2cf2 F999      		sbic 0x1f,1
- 8402 2cf4 00C0      		rjmp .L923
-1823:main.c        **** 
- 8403               		.loc 1 1823 0
- 8404 2cf6 6FEF      		ldi r22,lo8(-1)
- 8405 2cf8 8DEF      		ldi r24,lo8(-3)
- 8406 2cfa 9FE0      		ldi r25,lo8(15)
- 8407 2cfc 0E94 0000 		call eeprom_update_byte
- 8408               	.LVL611:
-1825:main.c        ****     czas_start_m = 0xFF;
- 8409               		.loc 1 1825 0
- 8410 2d00 8FEF      		ldi r24,lo8(-1)
- 8411 2d02 8093 0000 		sts czas_start_h,r24
-1826:main.c        ****     czas_stop_h = 0xFF;
- 8412               		.loc 1 1826 0
- 8413 2d06 8093 0000 		sts czas_start_m,r24
-1827:main.c        ****     czas_stop_m = 0xFF;
- 8414               		.loc 1 1827 0
- 8415 2d0a 8093 0000 		sts czas_stop_h,r24
-1828:main.c        ****   }
- 8416               		.loc 1 1828 0
- 8417 2d0e 8093 0000 		sts czas_stop_m,r24
- 8418               	.L920:
-1831:main.c        ****       FALSE; // Domyślnie odblokowane, zaktualizuje sie przy odczycie czasu
- 8419               		.loc 1 1831 0
- 8420 2d12 1092 0000 		sts blokada_sterowania_czasowa,__zero_reg__
-1836:main.c        ****   if (blokada_systemu == 0xFF) {
- 8421               		.loc 1 1836 0
- 8422 2d16 87EF      		ldi r24,lo8(-9)
- 8423 2d18 9FE0      		ldi r25,lo8(15)
- 8424 2d1a 0E94 0000 		call eeprom_read_byte
- 8425               	.LVL612:
-1837:main.c        ****     blokada_systemu = FALSE; // Domyślnie odblokowany
- 8426               		.loc 1 1837 0
- 8427 2d1e 8F3F      		cpi r24,lo8(-1)
- 8428 2d20 01F4      		brne .+2
- 8429 2d22 00C0      		rjmp .L924
-1835:main.c        ****       eeprom_read_byte((const uint8_t *)ADRES_EEPROM_BLOKADA_SYSTEMU);
- 8430               		.loc 1 1835 0
- 8431 2d24 8093 0000 		sts blokada_systemu,r24
- 8432               	.L925:
-1741:main.c        ****   memcpy_E(kod_modulu, ADRES_EEPROM_KOD_DOSTEPU, LICZBA_BAJTOW_KODU_DOSTEPU);
- 8433               		.loc 1 1741 0
- 8434 2d28 C0EF      		ldi r28,lo8(-16)
- 8435 2d2a DFE0      		ldi r29,lo8(15)
- 8436               	.LVL613:
- 8437               	.L928:
- 8438               	.LBB634:
-1844:main.c        ****       while (!eeprom_is_ready())
- 8439               		.loc 1 1844 0
- 8440 2d2c CE01      		movw r24,r28
- 8441 2d2e 0E94 0000 		call eeprom_read_byte
- 8442               	.LVL614:
- 8443 2d32 8F3F      		cpi r24,lo8(-1)
- 8444 2d34 01F4      		brne .L926
- 8445               	.L927:
-1845:main.c        ****         ;
- 8446               		.loc 1 1845 0 discriminator 1
- 8447 2d36 F999      		sbic 0x1f,1
- 8448 2d38 00C0      		rjmp .L927
-1847:main.c        ****     }
- 8449               		.loc 1 1847 0
- 8450 2d3a 60E0      		ldi r22,0
- 8451 2d3c CE01      		movw r24,r28
- 8452 2d3e 0E94 0000 		call eeprom_update_byte
- 8453               	.LVL615:
- 8454               	.L926:
-1843:main.c        ****     if (eeprom_read_byte((const uint8_t *)addr) == 0xFF) {
- 8455               		.loc 1 1843 0
- 8456 2d42 2196      		adiw r28,1
- 8457               	.LVL616:
-1842:main.c        ****        addr <= ADRES_EEPROM_DEBUG_SKRYBA_5; ++addr) {
- 8458               		.loc 1 1842 0
- 8459 2d44 C53F      		cpi r28,-11
- 8460 2d46 8FE0      		ldi r24,15
- 8461 2d48 D807      		cpc r29,r24
- 8462 2d4a 01F4      		brne .L928
- 8463               	.LBE634:
- 8464               	.LBB635:
-1852:main.c        ****        addr <= ADRES_EEPROM_DEBUG_USER_7; ++addr) {
- 8465               		.loc 1 1852 0
- 8466 2d4c C6EE      		ldi r28,lo8(-26)
- 8467 2d4e DFE0      		ldi r29,lo8(15)
- 8468               	.LVL617:
- 8469               	.L931:
-1854:main.c        ****       while (!eeprom_is_ready())
- 8470               		.loc 1 1854 0
- 8471 2d50 CE01      		movw r24,r28
- 8472 2d52 0E94 0000 		call eeprom_read_byte
- 8473               	.LVL618:
- 8474 2d56 8F3F      		cpi r24,lo8(-1)
- 8475 2d58 01F4      		brne .L929
- 8476               	.L930:
-1855:main.c        ****         ;
- 8477               		.loc 1 1855 0 discriminator 1
- 8478 2d5a F999      		sbic 0x1f,1
- 8479 2d5c 00C0      		rjmp .L930
-1857:main.c        ****     }
- 8480               		.loc 1 1857 0
- 8481 2d5e 60E0      		ldi r22,0
- 8482 2d60 CE01      		movw r24,r28
- 8483 2d62 0E94 0000 		call eeprom_update_byte
- 8484               	.LVL619:
- 8485               	.L929:
-1853:main.c        ****     if (eeprom_read_byte((const uint8_t *)addr) == 0xFF) {
- 8486               		.loc 1 1853 0
- 8487 2d66 2196      		adiw r28,1
- 8488               	.LVL620:
-1852:main.c        ****        addr <= ADRES_EEPROM_DEBUG_USER_7; ++addr) {
- 8489               		.loc 1 1852 0
- 8490 2d68 CD3E      		cpi r28,-19
- 8491 2d6a 2FE0      		ldi r18,15
- 8492 2d6c D207      		cpc r29,r18
- 8493 2d6e 01F4      		brne .L931
- 8494               	.LBE635:
-1863:main.c        ****   timer_report_user_100ms = 0;
- 8495               		.loc 1 1863 0
- 8496 2d70 1092 0000 		sts licznik_report_user,__zero_reg__
-1864:main.c        **** 
- 8497               		.loc 1 1864 0
- 8498 2d74 1092 0000 		sts timer_report_user_100ms+1,__zero_reg__
- 8499 2d78 1092 0000 		sts timer_report_user_100ms,__zero_reg__
+ 8406               		.loc 1 1821 0 discriminator 1
+ 8407 2d04 F999      		sbic 0x1f,1
+ 8408 2d06 00C0      		rjmp .L922
+1823:main.c        ****     while (!eeprom_is_ready())
+ 8409               		.loc 1 1823 0
+ 8410 2d08 6FEF      		ldi r22,lo8(-1)
+ 8411 2d0a 8CEF      		ldi r24,lo8(-4)
+ 8412 2d0c 9FE0      		ldi r25,lo8(15)
+ 8413 2d0e 0E94 0000 		call eeprom_update_byte
+ 8414               	.LVL610:
+ 8415               	.L923:
+1824:main.c        ****       ;
+ 8416               		.loc 1 1824 0 discriminator 1
+ 8417 2d12 F999      		sbic 0x1f,1
+ 8418 2d14 00C0      		rjmp .L923
+1826:main.c        **** 
+ 8419               		.loc 1 1826 0
+ 8420 2d16 6FEF      		ldi r22,lo8(-1)
+ 8421 2d18 8DEF      		ldi r24,lo8(-3)
+ 8422 2d1a 9FE0      		ldi r25,lo8(15)
+ 8423 2d1c 0E94 0000 		call eeprom_update_byte
+ 8424               	.LVL611:
+1828:main.c        ****     czas_start_m = 0xFF;
+ 8425               		.loc 1 1828 0
+ 8426 2d20 8FEF      		ldi r24,lo8(-1)
+ 8427 2d22 8093 0000 		sts czas_start_h,r24
+1829:main.c        ****     czas_stop_h = 0xFF;
+ 8428               		.loc 1 1829 0
+ 8429 2d26 8093 0000 		sts czas_start_m,r24
+1830:main.c        ****     czas_stop_m = 0xFF;
+ 8430               		.loc 1 1830 0
+ 8431 2d2a 8093 0000 		sts czas_stop_h,r24
+1831:main.c        ****   }
+ 8432               		.loc 1 1831 0
+ 8433 2d2e 8093 0000 		sts czas_stop_m,r24
+ 8434               	.L920:
+1834:main.c        ****       FALSE; // Domyślnie odblokowane, zaktualizuje sie przy odczycie czasu
+ 8435               		.loc 1 1834 0
+ 8436 2d32 1092 0000 		sts blokada_sterowania_czasowa,__zero_reg__
+1839:main.c        ****   if (blokada_systemu == 0xFF) {
+ 8437               		.loc 1 1839 0
+ 8438 2d36 87EF      		ldi r24,lo8(-9)
+ 8439 2d38 9FE0      		ldi r25,lo8(15)
+ 8440 2d3a 0E94 0000 		call eeprom_read_byte
+ 8441               	.LVL612:
+1840:main.c        ****     blokada_systemu = FALSE; // Domyślnie odblokowany
+ 8442               		.loc 1 1840 0
+ 8443 2d3e 8F3F      		cpi r24,lo8(-1)
+ 8444 2d40 01F4      		brne .+2
+ 8445 2d42 00C0      		rjmp .L924
+1838:main.c        ****       eeprom_read_byte((const uint8_t *)ADRES_EEPROM_BLOKADA_SYSTEMU);
+ 8446               		.loc 1 1838 0
+ 8447 2d44 8093 0000 		sts blokada_systemu,r24
+ 8448               	.L925:
+1744:main.c        ****   memcpy_E(kod_modulu, ADRES_EEPROM_KOD_DOSTEPU, LICZBA_BAJTOW_KODU_DOSTEPU);
+ 8449               		.loc 1 1744 0
+ 8450 2d48 C0EF      		ldi r28,lo8(-16)
+ 8451 2d4a DFE0      		ldi r29,lo8(15)
+ 8452               	.LVL613:
+ 8453               	.L928:
+ 8454               	.LBB634:
+1847:main.c        ****       while (!eeprom_is_ready())
+ 8455               		.loc 1 1847 0
+ 8456 2d4c CE01      		movw r24,r28
+ 8457 2d4e 0E94 0000 		call eeprom_read_byte
+ 8458               	.LVL614:
+ 8459 2d52 8F3F      		cpi r24,lo8(-1)
+ 8460 2d54 01F4      		brne .L926
+ 8461               	.L927:
+1848:main.c        ****         ;
+ 8462               		.loc 1 1848 0 discriminator 1
+ 8463 2d56 F999      		sbic 0x1f,1
+ 8464 2d58 00C0      		rjmp .L927
+1850:main.c        ****     }
+ 8465               		.loc 1 1850 0
+ 8466 2d5a 60E0      		ldi r22,0
+ 8467 2d5c CE01      		movw r24,r28
+ 8468 2d5e 0E94 0000 		call eeprom_update_byte
+ 8469               	.LVL615:
+ 8470               	.L926:
+1846:main.c        ****     if (eeprom_read_byte((const uint8_t *)addr) == 0xFF) {
+ 8471               		.loc 1 1846 0
+ 8472 2d62 2196      		adiw r28,1
+ 8473               	.LVL616:
+1845:main.c        ****        addr <= ADRES_EEPROM_DEBUG_SKRYBA_5; ++addr) {
+ 8474               		.loc 1 1845 0
+ 8475 2d64 C53F      		cpi r28,-11
+ 8476 2d66 8FE0      		ldi r24,15
+ 8477 2d68 D807      		cpc r29,r24
+ 8478 2d6a 01F4      		brne .L928
+ 8479               	.LBE634:
+ 8480               	.LBB635:
+1855:main.c        ****        addr <= ADRES_EEPROM_DEBUG_USER_7; ++addr) {
+ 8481               		.loc 1 1855 0
+ 8482 2d6c C6EE      		ldi r28,lo8(-26)
+ 8483 2d6e DFE0      		ldi r29,lo8(15)
+ 8484               	.LVL617:
+ 8485               	.L931:
+1857:main.c        ****       while (!eeprom_is_ready())
+ 8486               		.loc 1 1857 0
+ 8487 2d70 CE01      		movw r24,r28
+ 8488 2d72 0E94 0000 		call eeprom_read_byte
+ 8489               	.LVL618:
+ 8490 2d76 8F3F      		cpi r24,lo8(-1)
+ 8491 2d78 01F4      		brne .L929
+ 8492               	.L930:
+1858:main.c        ****         ;
+ 8493               		.loc 1 1858 0 discriminator 1
+ 8494 2d7a F999      		sbic 0x1f,1
+ 8495 2d7c 00C0      		rjmp .L930
+1860:main.c        ****     }
+ 8496               		.loc 1 1860 0
+ 8497 2d7e 60E0      		ldi r22,0
+ 8498 2d80 CE01      		movw r24,r28
+ 8499 2d82 0E94 0000 		call eeprom_update_byte
+ 8500               	.LVL619:
+ 8501               	.L929:
+1856:main.c        ****     if (eeprom_read_byte((const uint8_t *)addr) == 0xFF) {
+ 8502               		.loc 1 1856 0
+ 8503 2d86 2196      		adiw r28,1
+ 8504               	.LVL620:
+1855:main.c        ****        addr <= ADRES_EEPROM_DEBUG_USER_7; ++addr) {
+ 8505               		.loc 1 1855 0
+ 8506 2d88 CD3E      		cpi r28,-19
+ 8507 2d8a 2FE0      		ldi r18,15
+ 8508 2d8c D207      		cpc r29,r18
+ 8509 2d8e 01F4      		brne .L931
+ 8510               	.LBE635:
+1866:main.c        ****   timer_report_user_100ms = 0;
+ 8511               		.loc 1 1866 0
+ 8512 2d90 1092 0000 		sts licznik_report_user,__zero_reg__
 1867:main.c        **** 
- 8500               		.loc 1 1867 0
- 8501 2d7c 1092 0000 		sts flaga_wysylanie_smsa,__zero_reg__
-1871:main.c        ****     ++licznik_resetow;
- 8502               		.loc 1 1871 0
- 8503 2d80 8091 0000 		lds r24,licznik_resetow.3798
- 8504 2d84 8F3F      		cpi r24,lo8(-1)
- 8505 2d86 01F0      		breq .L933
-1872:main.c        ****   while (!eeprom_is_ready())
- 8506               		.loc 1 1872 0
- 8507 2d88 8F5F      		subi r24,lo8(-(1))
- 8508 2d8a 8093 0000 		sts licznik_resetow.3798,r24
- 8509               	.L933:
-1873:main.c        ****     ;
- 8510               		.loc 1 1873 0 discriminator 1
- 8511 2d8e F999      		sbic 0x1f,1
- 8512 2d90 00C0      		rjmp .L933
+ 8513               		.loc 1 1867 0
+ 8514 2d94 1092 0000 		sts timer_report_user_100ms+1,__zero_reg__
+ 8515 2d98 1092 0000 		sts timer_report_user_100ms,__zero_reg__
+1870:main.c        **** 
+ 8516               		.loc 1 1870 0
+ 8517 2d9c 1092 0000 		sts flaga_wysylanie_smsa,__zero_reg__
+1874:main.c        ****     ++licznik_resetow;
+ 8518               		.loc 1 1874 0
+ 8519 2da0 8091 0000 		lds r24,licznik_resetow.3798
+ 8520 2da4 8F3F      		cpi r24,lo8(-1)
+ 8521 2da6 01F0      		breq .L933
 1875:main.c        ****   while (!eeprom_is_ready())
- 8513               		.loc 1 1875 0
- 8514 2d92 6091 0000 		lds r22,licznik_resetow.3798
- 8515 2d96 8CED      		ldi r24,lo8(-36)
- 8516 2d98 9FE0      		ldi r25,lo8(15)
- 8517 2d9a 0E94 0000 		call eeprom_update_byte
- 8518               	.LVL621:
- 8519               	.L934:
+ 8522               		.loc 1 1875 0
+ 8523 2da8 8F5F      		subi r24,lo8(-(1))
+ 8524 2daa 8093 0000 		sts licznik_resetow.3798,r24
+ 8525               	.L933:
 1876:main.c        ****     ;
- 8520               		.loc 1 1876 0 discriminator 1
- 8521 2d9e F999      		sbic 0x1f,1
- 8522 2da0 00C0      		rjmp .L934
-1878:main.c        **** 
- 8523               		.loc 1 1878 0
- 8524 2da2 62E0      		ldi r22,lo8(2)
- 8525 2da4 80E0      		ldi r24,0
- 8526 2da6 0E94 0000 		call zapisz_debug_do_eeprom
- 8527               	.LVL622:
-1881:main.c        ****                     (const void *)ADRES_EEPROM_MOJE_NUMER_START,
- 8528               		.loc 1 1881 0
- 8529 2daa 41E1      		ldi r20,lo8(17)
- 8530 2dac 50E0      		ldi r21,0
- 8531 2dae 68EC      		ldi r22,lo8(-56)
- 8532 2db0 7FE0      		ldi r23,lo8(15)
- 8533 2db2 80E0      		ldi r24,lo8(moj_numer_telefonu)
- 8534 2db4 90E0      		ldi r25,hi8(moj_numer_telefonu)
- 8535 2db6 0E94 0000 		call eeprom_read_block
- 8536               	.LVL623:
-1884:main.c        **** 
- 8537               		.loc 1 1884 0
- 8538 2dba 1092 0000 		sts moj_numer_telefonu+16,__zero_reg__
-1887:main.c        ****       rtc_czas[4] == '0' && moj_numer_telefonu[0] != 0xFF &&
- 8539               		.loc 1 1887 0
- 8540 2dbe 8091 0000 		lds r24,rtc_czas
- 8541 2dc2 8033      		cpi r24,lo8(48)
- 8542 2dc4 01F4      		brne .L904
-1887:main.c        ****       rtc_czas[4] == '0' && moj_numer_telefonu[0] != 0xFF &&
- 8543               		.loc 1 1887 0 is_stmt 0 discriminator 1
- 8544 2dc6 8091 0000 		lds r24,rtc_czas+1
- 8545 2dca 8033      		cpi r24,lo8(48)
- 8546 2dcc 01F4      		brne .L904
-1887:main.c        ****       rtc_czas[4] == '0' && moj_numer_telefonu[0] != 0xFF &&
- 8547               		.loc 1 1887 0 discriminator 2
- 8548 2dce 8091 0000 		lds r24,rtc_czas+3
- 8549 2dd2 8033      		cpi r24,lo8(48)
- 8550 2dd4 01F4      		brne .L904
-1887:main.c        ****       rtc_czas[4] == '0' && moj_numer_telefonu[0] != 0xFF &&
- 8551               		.loc 1 1887 0 discriminator 3
- 8552 2dd6 8091 0000 		lds r24,rtc_czas+4
- 8553 2dda 8033      		cpi r24,lo8(48)
- 8554 2ddc 01F4      		brne .L904
-1888:main.c        ****       moj_numer_telefonu[0] != 0) {
- 8555               		.loc 1 1888 0 is_stmt 1
+ 8526               		.loc 1 1876 0 discriminator 1
+ 8527 2dae F999      		sbic 0x1f,1
+ 8528 2db0 00C0      		rjmp .L933
+1878:main.c        ****   while (!eeprom_is_ready())
+ 8529               		.loc 1 1878 0
+ 8530 2db2 6091 0000 		lds r22,licznik_resetow.3798
+ 8531 2db6 8CED      		ldi r24,lo8(-36)
+ 8532 2db8 9FE0      		ldi r25,lo8(15)
+ 8533 2dba 0E94 0000 		call eeprom_update_byte
+ 8534               	.LVL621:
+ 8535               	.L934:
+1879:main.c        ****     ;
+ 8536               		.loc 1 1879 0 discriminator 1
+ 8537 2dbe F999      		sbic 0x1f,1
+ 8538 2dc0 00C0      		rjmp .L934
+1881:main.c        **** 
+ 8539               		.loc 1 1881 0
+ 8540 2dc2 62E0      		ldi r22,lo8(2)
+ 8541 2dc4 80E0      		ldi r24,0
+ 8542 2dc6 0E94 0000 		call zapisz_debug_do_eeprom
+ 8543               	.LVL622:
+1884:main.c        ****                     (const void *)ADRES_EEPROM_MOJE_NUMER_START,
+ 8544               		.loc 1 1884 0
+ 8545 2dca 41E1      		ldi r20,lo8(17)
+ 8546 2dcc 50E0      		ldi r21,0
+ 8547 2dce 68EC      		ldi r22,lo8(-56)
+ 8548 2dd0 7FE0      		ldi r23,lo8(15)
+ 8549 2dd2 80E0      		ldi r24,lo8(moj_numer_telefonu)
+ 8550 2dd4 90E0      		ldi r25,hi8(moj_numer_telefonu)
+ 8551 2dd6 0E94 0000 		call eeprom_read_block
+ 8552               	.LVL623:
+1887:main.c        **** 
+ 8553               		.loc 1 1887 0
+ 8554 2dda 1092 0000 		sts moj_numer_telefonu+16,__zero_reg__
+1892:main.c        ****     autosync_czas_aktywny = TRUE;
+ 8555               		.loc 1 1892 0
  8556 2dde 8091 0000 		lds r24,moj_numer_telefonu
  8557 2de2 8150      		subi r24,lo8(-(-1))
  8558 2de4 8E3F      		cpi r24,lo8(-2)
  8559 2de6 00F4      		brsh .L904
-1891:main.c        ****   }
- 8560               		.loc 1 1891 0
+1893:main.c        ****   }
+ 8560               		.loc 1 1893 0
  8561 2de8 8FEF      		ldi r24,lo8(-1)
  8562 2dea 8093 0000 		sts autosync_czas_aktywny,r24
  8563               	.L904:
  8564               	/* epilogue start */
-1893:main.c        **** 
- 8565               		.loc 1 1893 0
+1895:main.c        **** 
+ 8565               		.loc 1 1895 0
  8566 2dee DF91      		pop r29
  8567 2df0 CF91      		pop r28
  8568               	.LVL624:
  8569 2df2 0895      		ret
  8570               	.L907:
-1761:main.c        ****     while (!eeprom_is_ready())
- 8571               		.loc 1 1761 0
+1764:main.c        ****     while (!eeprom_is_ready())
+ 8571               		.loc 1 1764 0
  8572 2df4 81E0      		ldi r24,lo8(1)
  8573 2df6 8093 0000 		sts tryb_pracy,r24
  8574               	.L909:
-1762:main.c        ****       ;
- 8575               		.loc 1 1762 0 discriminator 1
+1765:main.c        ****       ;
+ 8575               		.loc 1 1765 0 discriminator 1
  8576 2dfa F999      		sbic 0x1f,1
  8577 2dfc 00C0      		rjmp .L909
-1764:main.c        ****   }
- 8578               		.loc 1 1764 0
+1767:main.c        ****   }
+ 8578               		.loc 1 1767 0
  8579 2dfe 61E0      		ldi r22,lo8(1)
  8580 2e00 8EEF      		ldi r24,lo8(-2)
  8581 2e02 9FE0      		ldi r25,lo8(15)
@@ -14414,17 +14416,17 @@
  8583               	.LVL625:
  8584 2e08 00C0      		rjmp .L908
  8585               	.L910:
-1770:main.c        ****     while (!eeprom_is_ready())
- 8586               		.loc 1 1770 0
+1773:main.c        ****     while (!eeprom_is_ready())
+ 8586               		.loc 1 1773 0
  8587 2e0a 81E0      		ldi r24,lo8(1)
  8588 2e0c 8093 0000 		sts tryb_clip,r24
  8589               	.L912:
-1771:main.c        ****       ;
- 8590               		.loc 1 1771 0 discriminator 1
+1774:main.c        ****       ;
+ 8590               		.loc 1 1774 0 discriminator 1
  8591 2e10 F999      		sbic 0x1f,1
  8592 2e12 00C0      		rjmp .L912
-1773:main.c        ****   }
- 8593               		.loc 1 1773 0
+1776:main.c        ****   }
+ 8593               		.loc 1 1776 0
  8594 2e14 61E0      		ldi r22,lo8(1)
  8595 2e16 8FEF      		ldi r24,lo8(-1)
  8596 2e18 9FE0      		ldi r25,lo8(15)
@@ -14432,21 +14434,21 @@
  8598               	.LVL626:
  8599 2e1e 00C0      		rjmp .L911
  8600               	.L913:
-1785:main.c        **** 
- 8601               		.loc 1 1785 0
+1788:main.c        **** 
+ 8601               		.loc 1 1788 0
  8602 2e20 1092 0000 		sts skryba_wlaczona,__zero_reg__
  8603 2e24 00C0      		rjmp .L914
  8604               	.LVL627:
  8605               	.L915:
-1796:main.c        ****     // Walidacja zakresu
- 8606               		.loc 1 1796 0
+1799:main.c        ****     // Walidacja zakresu
+ 8606               		.loc 1 1799 0
  8607 2e26 982F      		mov r25,r24
  8608 2e28 8C2F      		mov r24,r28
  8609               	.LVL628:
  8610 2e2a 9093 0000 		sts skryba_limit+1,r25
  8611 2e2e 8093 0000 		sts skryba_limit,r24
-1798:main.c        ****       skryba_limit = 800;
- 8612               		.loc 1 1798 0
+1801:main.c        ****       skryba_limit = 800;
+ 8612               		.loc 1 1801 0
  8613 2e32 0197      		sbiw r24,1
  8614 2e34 8032      		cpi r24,32
  8615 2e36 9340      		sbci r25,3
@@ -14455,8 +14457,8 @@
  8618 2e3c 00C0      		rjmp .L916
  8619               	.LVL629:
  8620               	.L924:
-1838:main.c        ****   }
- 8621               		.loc 1 1838 0
+1841:main.c        ****   }
+ 8621               		.loc 1 1841 0
  8622 2e3e 1092 0000 		sts blokada_systemu,__zero_reg__
  8623 2e42 00C0      		rjmp .L925
  8624               		.cfi_endproc
@@ -15871,11 +15873,11 @@
  9856               	.global	main
  9858               	main:
  9859               	.LFB71:
-1900:main.c        **** 
-1901:main.c        **** #include "test_debug.h"
 1902:main.c        **** 
-1903:main.c        **** int main(void) {
- 9860               		.loc 1 1903 0
+1903:main.c        **** #include "test_debug.h"
+1904:main.c        **** 
+1905:main.c        **** int main(void) {
+ 9860               		.loc 1 1905 0
  9861               		.cfi_startproc
  9862               	/* prologue: function */
  9863               	/* frame size = 0 */
@@ -15901,160 +15903,160 @@
  9883               	/* #NOAPP */
  9884               	.LBE695:
  9885               	.LBE694:
-1904:main.c        ****   // POMOC_DODAJ2('*', 'u');
-1905:main.c        ****   { // inicjalizacja
-1906:main.c        **** #ifndef DEBUG
-1907:main.c        ****     wdt_enable(WDTO_120MS);
-1908:main.c        ****     opoznienie_startowe();
- 9886               		.loc 1 1908 0
+1906:main.c        ****   // POMOC_DODAJ2('*', 'u');
+1907:main.c        ****   { // inicjalizacja
+1908:main.c        **** #ifndef DEBUG
+1909:main.c        ****     wdt_enable(WDTO_120MS);
+1910:main.c        ****     opoznienie_startowe();
+ 9886               		.loc 1 1910 0
  9887 0014 0E94 0000 		call opoznienie_startowe
  9888               	.LVL738:
-1909:main.c        ****     opoznienie_startowe();
- 9889               		.loc 1 1909 0
+1911:main.c        ****     opoznienie_startowe();
+ 9889               		.loc 1 1911 0
  9890 0018 0E94 0000 		call opoznienie_startowe
  9891               	.LVL739:
-1910:main.c        ****     opoznienie_startowe();
- 9892               		.loc 1 1910 0
+1912:main.c        ****     opoznienie_startowe();
+ 9892               		.loc 1 1912 0
  9893 001c 0E94 0000 		call opoznienie_startowe
  9894               	.LVL740:
-1911:main.c        ****     opoznienie_startowe();
- 9895               		.loc 1 1911 0
+1913:main.c        ****     opoznienie_startowe();
+ 9895               		.loc 1 1913 0
  9896 0020 0E94 0000 		call opoznienie_startowe
  9897               	.LVL741:
-1912:main.c        **** #endif
-1913:main.c        ****     inicjalizacja_portow();
- 9898               		.loc 1 1913 0
+1914:main.c        **** #endif
+1915:main.c        ****     inicjalizacja_portow();
+ 9898               		.loc 1 1915 0
  9899 0024 81E0      		ldi r24,lo8(1)
  9900 0026 87B9      		out 0x7,r24
  9901 0028 88B9      		out 0x8,r24
  9902 002a 80E2      		ldi r24,lo8(32)
  9903 002c 8AB9      		out 0xa,r24
-1914:main.c        ****     inicjalizuj_parametry_modulu();
- 9904               		.loc 1 1914 0
+1916:main.c        ****     inicjalizuj_parametry_modulu();
+ 9904               		.loc 1 1916 0
  9905 002e 0E94 0000 		call inicjalizuj_parametry_modulu
  9906               	.LVL742:
-1915:main.c        ****     inicjalizacja_SIM900();
- 9907               		.loc 1 1915 0
+1917:main.c        ****     inicjalizacja_SIM900();
+ 9907               		.loc 1 1917 0
  9908 0032 0E94 0000 		call inicjalizacja_SIM900
  9909               	.LVL743:
-1916:main.c        **** #ifdef DEBUG
-1917:main.c        ****     debug_main();
-1918:main.c        **** #endif
-1919:main.c        ****     ustaw_parametry_dla_bezpieczenstwa();
- 9910               		.loc 1 1919 0
+1918:main.c        **** #ifdef DEBUG
+1919:main.c        ****     debug_main();
+1920:main.c        **** #endif
+1921:main.c        ****     ustaw_parametry_dla_bezpieczenstwa();
+ 9910               		.loc 1 1921 0
  9911 0036 0E94 0000 		call ustaw_parametry_dla_bezpieczenstwa
  9912               	.LVL744:
-1920:main.c        ****   }
-1921:main.c        **** 
-1922:main.c        ****   sei();
- 9913               		.loc 1 1922 0
+1922:main.c        ****   }
+1923:main.c        **** 
+1924:main.c        ****   sei();
+ 9913               		.loc 1 1924 0
  9914               	/* #APP */
- 9915               	 ;  1922 "main.c" 1
+ 9915               	 ;  1924 "main.c" 1
  9916 003a 7894      		sei
  9917               	 ;  0 "" 2
  9918               	/* #NOAPP */
  9919               	.L1080:
-1923:main.c        **** 
-1924:main.c        ****   for (;;) {
-1925:main.c        ****     // wykonanie watkw moe trwa maksymalnie 10 ms
-1926:main.c        ****     if (CZY_WYKONAC_WATKI_10MS())
- 9920               		.loc 1 1926 0
+1925:main.c        **** 
+1926:main.c        ****   for (;;) {
+1927:main.c        ****     // wykonanie watkw moe trwa maksymalnie 10 ms
+1928:main.c        ****     if (CZY_WYKONAC_WATKI_10MS())
+ 9920               		.loc 1 1928 0
  9921 003c 8091 0000 		lds r24,wykonac_watki
  9922 0040 80FD      		sbrc r24,0
-1927:main.c        ****       ustaw_parametry_dla_bezpieczenstwa();
- 9923               		.loc 1 1927 0
+1929:main.c        ****       ustaw_parametry_dla_bezpieczenstwa();
+ 9923               		.loc 1 1929 0
  9924 0042 0E94 0000 		call ustaw_parametry_dla_bezpieczenstwa
  9925               	.LVL745:
  9926               	.L1076:
-1928:main.c        ****     if (CZY_WYKONAC_WATKI_100MS()) {
- 9927               		.loc 1 1928 0
+1930:main.c        ****     if (CZY_WYKONAC_WATKI_100MS()) {
+ 9927               		.loc 1 1930 0
  9928 0046 8091 0000 		lds r24,wykonac_watki
  9929 004a 81FD      		sbrc r24,1
-1929:main.c        ****       steruj_urzadzeniem_100MS();
- 9930               		.loc 1 1929 0
+1931:main.c        ****       steruj_urzadzeniem_100MS();
+ 9930               		.loc 1 1931 0
  9931 004c 0E94 0000 		call steruj_urzadzeniem_100MS
  9932               	.LVL746:
  9933               	.L1077:
-1930:main.c        **** #ifdef TEST_PCB
-1931:main.c        ****       testPCB();
-1932:main.c        **** #endif
-1933:main.c        ****     }
-1934:main.c        ****     if (CZY_WYKONAC_WATKI_10MS()) {
- 9934               		.loc 1 1934 0
+1932:main.c        **** #ifdef TEST_PCB
+1933:main.c        ****       testPCB();
+1934:main.c        **** #endif
+1935:main.c        ****     }
+1936:main.c        ****     if (CZY_WYKONAC_WATKI_10MS()) {
+ 9934               		.loc 1 1936 0
  9935 0050 8091 0000 		lds r24,wykonac_watki
  9936 0054 80FF      		sbrs r24,0
  9937 0056 00C0      		rjmp .L1078
-1935:main.c        ****       steruj_urzadzeniem_10MS();
- 9938               		.loc 1 1935 0
+1937:main.c        ****       steruj_urzadzeniem_10MS();
+ 9938               		.loc 1 1937 0
  9939 0058 0E94 0000 		call steruj_urzadzeniem_10MS
  9940               	.LVL747:
-1936:main.c        ****       wykonanie_komend();
- 9941               		.loc 1 1936 0
+1938:main.c        ****       wykonanie_komend();
+ 9941               		.loc 1 1938 0
  9942 005c 0E94 0000 		call wykonanie_komend
  9943               	.LVL748:
-1937:main.c        **** 
-1938:main.c        ****       RESETUJ_WYKONANIE_WATKOW();
- 9944               		.loc 1 1938 0
+1939:main.c        **** 
+1940:main.c        ****       RESETUJ_WYKONANIE_WATKOW();
+ 9944               		.loc 1 1940 0
  9945 0060 1092 0000 		sts wykonac_watki,__zero_reg__
  9946               	.L1078:
-1939:main.c        ****     }
-1940:main.c        **** 
-1941:main.c        ****     { // tryb SLEEP
-1942:main.c        ****       cli();
- 9947               		.loc 1 1942 0
+1941:main.c        ****     }
+1942:main.c        **** 
+1943:main.c        ****     { // tryb SLEEP
+1944:main.c        ****       cli();
+ 9947               		.loc 1 1944 0
  9948               	/* #APP */
- 9949               	 ;  1942 "main.c" 1
+ 9949               	 ;  1944 "main.c" 1
  9950 0064 F894      		cli
  9951               	 ;  0 "" 2
-1943:main.c        ****       if (!wykonaj_zdarzenie_timer) {
- 9952               		.loc 1 1943 0
+1945:main.c        ****       if (!wykonaj_zdarzenie_timer) {
+ 9952               		.loc 1 1945 0
  9953               	/* #NOAPP */
  9954 0066 8091 0000 		lds r24,wykonaj_zdarzenie_timer
  9955 006a 8111      		cpse r24,__zero_reg__
  9956 006c 00C0      		rjmp .L1079
-1944:main.c        ****         sleep_enable();
- 9957               		.loc 1 1944 0
+1946:main.c        ****         sleep_enable();
+ 9957               		.loc 1 1946 0
  9958 006e 83B7      		in r24,0x33
  9959 0070 8160      		ori r24,lo8(1)
  9960 0072 83BF      		out 0x33,r24
-1945:main.c        ****         sei();
- 9961               		.loc 1 1945 0
+1947:main.c        ****         sei();
+ 9961               		.loc 1 1947 0
  9962               	/* #APP */
- 9963               	 ;  1945 "main.c" 1
+ 9963               	 ;  1947 "main.c" 1
  9964 0074 7894      		sei
  9965               	 ;  0 "" 2
-1946:main.c        ****         sleep_cpu();
- 9966               		.loc 1 1946 0
- 9967               	 ;  1946 "main.c" 1
+1948:main.c        ****         sleep_cpu();
+ 9966               		.loc 1 1948 0
+ 9967               	 ;  1948 "main.c" 1
  9968 0076 8895      		sleep
  9969               		
  9970               	 ;  0 "" 2
-1947:main.c        ****         cli();
- 9971               		.loc 1 1947 0
- 9972               	 ;  1947 "main.c" 1
+1949:main.c        ****         cli();
+ 9971               		.loc 1 1949 0
+ 9972               	 ;  1949 "main.c" 1
  9973 0078 F894      		cli
  9974               	 ;  0 "" 2
-1948:main.c        ****         sleep_disable();
- 9975               		.loc 1 1948 0
+1950:main.c        ****         sleep_disable();
+ 9975               		.loc 1 1950 0
  9976               	/* #NOAPP */
  9977 007a 83B7      		in r24,0x33
  9978 007c 8E7F      		andi r24,lo8(-2)
  9979 007e 83BF      		out 0x33,r24
  9980               	.L1079:
-1949:main.c        ****       }
-1950:main.c        ****       sei();
- 9981               		.loc 1 1950 0
+1951:main.c        ****       }
+1952:main.c        ****       sei();
+ 9981               		.loc 1 1952 0
  9982               	/* #APP */
- 9983               	 ;  1950 "main.c" 1
+ 9983               	 ;  1952 "main.c" 1
  9984 0080 7894      		sei
  9985               	 ;  0 "" 2
-1951:main.c        ****       wolne_zdarzenie_timer();
- 9986               		.loc 1 1951 0
+1953:main.c        ****       wolne_zdarzenie_timer();
+ 9986               		.loc 1 1953 0
  9987               	/* #NOAPP */
  9988 0082 0E94 0000 		call wolne_zdarzenie_timer
  9989               	.LVL749:
-1926:main.c        ****       ustaw_parametry_dla_bezpieczenstwa();
- 9990               		.loc 1 1926 0
+1928:main.c        ****       ustaw_parametry_dla_bezpieczenstwa();
+ 9990               		.loc 1 1928 0
  9991 0086 00C0      		rjmp .L1080
  9992               		.cfi_endproc
  9993               	.LFE71:
@@ -16579,207 +16581,207 @@
  10612               		.file 26 "<built-in>"
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 main.c
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:2      *ABS*:000000000000003e __SP_H__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:3      *ABS*:000000000000003d __SP_L__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:4      *ABS*:000000000000003f __SREG__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:5      *ABS*:000000000000003b __RAMPZ__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:6      *ABS*:0000000000000000 __tmp_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:7      *ABS*:0000000000000001 __zero_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:12     .text:0000000000000000 watchdog_sms_disarm
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10469  .bss:000000000000001f watchdog_sms_aktywny
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10464  .bss:000000000000001d watchdog_sms_licznik_100ms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:33     .text:000000000000000e czy_numer_istnieje
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:100    .text:000000000000004e usun_zablokowany_sms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10579  .bss:0000000000000037 aktualnie_wysylane_polecenie_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:128    .text:0000000000000062 zareaguj_na_usuniety_sms_z_powodu_limitu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10319  .bss:0000000000000052 licznik_usunietych_sms_przez_limit
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10400  .bss:000000000000000e liczba_blyskow_led
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10395  .bss:000000000000000d stan_cyklu_blysku
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:166    .text:000000000000008e polozenie_polecenia_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:187    .text:0000000000000098 opoznienie_startowe
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:252    .text:00000000000000d8 zapisz_debug_do_eeprom
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10327  .bss:0000000000000059 licznik_report_user
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10325  .bss:0000000000000057 timer_report_user_100ms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10533  .bss:000000000000002e flaga_wysylanie_smsa
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:368    .text:000000000000015c test_dioda_wyjscia
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10299  .bss:000000000000004c opoznienie_1s.2970
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10189  .bss:000000000000004b stan.2971
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:411    .text:000000000000018a test_wejscie
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:443    .text:000000000000019a __vector_16
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10375  .bss:0000000000000009 licznik_wybudz_watki_10MS
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10385  .bss:000000000000000b wykonac_watki_10MS
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10390  .bss:000000000000000c wykonaj_zdarzenie_timer
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:658    .text:000000000000029c generuj_raport_sieci
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10296  .progmem.data:00000000000002e7 tekst_gsm.3004
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10292  .progmem.data:00000000000002e0 __c.3006
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10288  .progmem.data:00000000000002da text_sygnal.3008
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10370  .bss:0000000000000008 modul_zalogowany_w_sieci
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:840    .text:0000000000000364 generuj_raport_uzytkownikow_1
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10284  .progmem.data:00000000000002d3 tekst_gsm.3012
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:1026   .text:0000000000000416 generuj_raport_uzytkownikow
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10280  .progmem.data:00000000000002c6 tekst_gsm.3023
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:1202   .text:00000000000004b8 generuj_raport_stanu_urzadzenia
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10344  .bss:0000000000000002 blokada_systemu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10276  .progmem.data:00000000000002b2 __c.3037
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10272  .progmem.data:00000000000002a2 __c.3039
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10338  .data:0000000000000000 tryb_pracy
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10268  .progmem.data:0000000000000293 __c.3041
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10264  .progmem.data:0000000000000283 __c.3043
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10417  .data:0000000000000001 tryb_clip
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10260  .progmem.data:000000000000027d __c.3045
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10256  .progmem.data:0000000000000277 __c.3047
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10252  .progmem.data:0000000000000267 __c.3049
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10428  .bss:0000000000000015 skryba_wlaczona
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10248  .progmem.data:0000000000000256 __c.3051
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10244  .progmem.data:0000000000000244 __c.3053
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10240  .progmem.data:000000000000023b __c.3055
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:12     .text:0000000000000000 watchdog_sms_disarm
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10469  .bss:000000000000001f watchdog_sms_aktywny
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10464  .bss:000000000000001d watchdog_sms_licznik_100ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:33     .text:000000000000000e czy_numer_istnieje
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:100    .text:000000000000004e usun_zablokowany_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10579  .bss:0000000000000037 aktualnie_wysylane_polecenie_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:128    .text:0000000000000062 zareaguj_na_usuniety_sms_z_powodu_limitu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10319  .bss:0000000000000052 licznik_usunietych_sms_przez_limit
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10400  .bss:000000000000000e liczba_blyskow_led
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10395  .bss:000000000000000d stan_cyklu_blysku
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:166    .text:000000000000008e polozenie_polecenia_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:187    .text:0000000000000098 opoznienie_startowe
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:252    .text:00000000000000d8 zapisz_debug_do_eeprom
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10327  .bss:0000000000000059 licznik_report_user
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10325  .bss:0000000000000057 timer_report_user_100ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10533  .bss:000000000000002e flaga_wysylanie_smsa
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:368    .text:000000000000015c test_dioda_wyjscia
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10299  .bss:000000000000004c opoznienie_1s.2970
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10189  .bss:000000000000004b stan.2971
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:411    .text:000000000000018a test_wejscie
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:443    .text:000000000000019a __vector_16
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10375  .bss:0000000000000009 licznik_wybudz_watki_10MS
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10385  .bss:000000000000000b wykonac_watki_10MS
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10390  .bss:000000000000000c wykonaj_zdarzenie_timer
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:658    .text:000000000000029c generuj_raport_sieci
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10296  .progmem.data:00000000000002e7 tekst_gsm.3004
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10292  .progmem.data:00000000000002e0 __c.3006
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10288  .progmem.data:00000000000002da text_sygnal.3008
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10370  .bss:0000000000000008 modul_zalogowany_w_sieci
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:840    .text:0000000000000364 generuj_raport_uzytkownikow_1
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10284  .progmem.data:00000000000002d3 tekst_gsm.3012
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:1026   .text:0000000000000416 generuj_raport_uzytkownikow
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10280  .progmem.data:00000000000002c6 tekst_gsm.3023
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:1202   .text:00000000000004b8 generuj_raport_stanu_urzadzenia
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10344  .bss:0000000000000002 blokada_systemu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10276  .progmem.data:00000000000002b2 __c.3037
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10272  .progmem.data:00000000000002a2 __c.3039
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10338  .data:0000000000000000 tryb_pracy
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10268  .progmem.data:0000000000000293 __c.3041
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10264  .progmem.data:0000000000000283 __c.3043
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10417  .data:0000000000000001 tryb_clip
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10260  .progmem.data:000000000000027d __c.3045
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10256  .progmem.data:0000000000000277 __c.3047
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10252  .progmem.data:0000000000000267 __c.3049
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10428  .bss:0000000000000015 skryba_wlaczona
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10248  .progmem.data:0000000000000256 __c.3051
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10244  .progmem.data:0000000000000244 __c.3053
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10240  .progmem.data:000000000000023b __c.3055
                             *COM*:0000000000000011 moj_numer_telefonu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10232  .progmem.data:0000000000000229 tekst_demo.3059
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10236  .progmem.data:0000000000000236 __c.3057
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:1508   .text:0000000000000688 czy_numer_jest_super_userem
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:1602   .text:00000000000006e8 ustaw_wyjscie_clip
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10232  .progmem.data:0000000000000229 tekst_demo.3059
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10236  .progmem.data:0000000000000236 __c.3057
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:1508   .text:0000000000000688 czy_numer_jest_super_userem
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:1602   .text:00000000000006e8 ustaw_wyjscie_clip
                             *COM*:0000000000000001 stan_wyjscie
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:1644   .text:0000000000000708 wykonanie_polecenia_sms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10434  .bss:0000000000000016 sms_pomijaj_aktualizacje_czasu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10439  .bss:0000000000000017 sms_timestamp_sekunda
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10444  .bss:0000000000000018 sms_timestamp_minuta
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10449  .bss:0000000000000019 sms_timestamp_godzina
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10350  .bss:0000000000000003 autosync_czas_aktywny
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:1644   .text:0000000000000708 wykonanie_polecenia_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10434  .bss:0000000000000016 sms_pomijaj_aktualizacje_czasu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10439  .bss:0000000000000017 sms_timestamp_sekunda
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10444  .bss:0000000000000018 sms_timestamp_minuta
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10449  .bss:0000000000000019 sms_timestamp_godzina
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10350  .bss:0000000000000003 autosync_czas_aktywny
                             *COM*:0000000000000011 numer_telefonu_odebranego_smsa
                             *COM*:0000000000000021 numer_telefonu_wysylanego_smsa
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10228  .progmem.data:0000000000000222 __c.3133
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10224  .progmem.data:000000000000021a __c.3136
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10220  .progmem.data:0000000000000216 __c.3138
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10216  .progmem.data:0000000000000211 __c.3140
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10212  .progmem.data:000000000000020c __c.3142
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10208  .progmem.data:0000000000000208 __c.3144
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10204  .progmem.data:0000000000000203 __c.3146
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10200  .progmem.data:00000000000001fe __c.3148
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10196  .progmem.data:00000000000001f9 __c.3150
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10192  .progmem.data:00000000000001cf __c.3152
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10228  .progmem.data:0000000000000222 __c.3133
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10224  .progmem.data:000000000000021a __c.3136
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10220  .progmem.data:0000000000000216 __c.3138
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10216  .progmem.data:0000000000000211 __c.3140
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10212  .progmem.data:000000000000020c __c.3142
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10208  .progmem.data:0000000000000208 __c.3144
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10204  .progmem.data:0000000000000203 __c.3146
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10200  .progmem.data:00000000000001fe __c.3148
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10196  .progmem.data:00000000000001f9 __c.3150
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10192  .progmem.data:00000000000001cf __c.3152
                             *COM*:0000000000000021 numer_telefonu_do_ktorego_dzwonic
                             *COM*:0000000000000001 numer_skopiowanego_telefonu_do_raportu_uzytkownikow_brama
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:2659   .text:0000000000000ca0 steruj_wejsciem_reset_100ms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10179  .bss:000000000000004a licznik_reset.3173
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:2730   .text:0000000000000ce8 sprawdz_przychodzaca_rozmowe
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:2659   .text:0000000000000ca0 steruj_wejsciem_reset_100ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10179  .bss:000000000000004a licznik_reset.3173
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:2730   .text:0000000000000ce8 sprawdz_przychodzaca_rozmowe
                             *COM*:0000000000000011 numer_telefonu_ktory_dzwoni
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:2867   .text:0000000000000d8c zakonczono_rozmowe_telefoniczna
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10590  .bss:0000000000000039 opoznienie_SIM900_100MS
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10551  .bss:0000000000000031 licznik_bezpieczenstwa_wykonywana_rozmowa
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10516  .bss:000000000000002b ustaw_maksymalny_czas_dzwonienia
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10521  .bss:000000000000002c maksymalny_czas_dzwonienia
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10475  .bss:0000000000000020 blokada_clip
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:2897   .text:0000000000000da8 zakonczono_wysylanie_smsa
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10306  .bss:0000000000000000 wysylanie_smsa_clipa
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:2920   .text:0000000000000db4 problem_z_wyslaniem_powiadomienia
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10574  .bss:0000000000000035 licznik_wysylane_polecenie_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:2952   .text:0000000000000ddc wyzerowanie_danych_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:2867   .text:0000000000000d8c zakonczono_rozmowe_telefoniczna
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10590  .bss:0000000000000039 opoznienie_SIM900_100MS
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10551  .bss:0000000000000031 licznik_bezpieczenstwa_wykonywana_rozmowa
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10516  .bss:000000000000002b ustaw_maksymalny_czas_dzwonienia
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10521  .bss:000000000000002c maksymalny_czas_dzwonienia
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10475  .bss:0000000000000020 blokada_clip
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:2897   .text:0000000000000da8 zakonczono_wysylanie_smsa
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10306  .bss:0000000000000000 wysylanie_smsa_clipa
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:2920   .text:0000000000000db4 problem_z_wyslaniem_powiadomienia
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10574  .bss:0000000000000035 licznik_wysylane_polecenie_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:2952   .text:0000000000000ddc wyzerowanie_danych_SIM900
                             *COM*:0000000000000001 licznik_oczekiwanie_na_potwierdzenie_wyslania_znakow
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10556  .bss:0000000000000033 trwa_rozmowa_przychodzaca_od_uzytkownika
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10539  .bss:000000000000002f flaga_odczytywanie_smsa
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:2991   .text:0000000000000e0a reset_modulu_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10501  .bss:0000000000000027 licznik_blad_stanu_karty_SIM
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10496  .bss:0000000000000026 licznik_blad_zalogowania_u_operatora
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10556  .bss:0000000000000033 trwa_rozmowa_przychodzaca_od_uzytkownika
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10539  .bss:000000000000002f flaga_odczytywanie_smsa
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:2991   .text:0000000000000e0a reset_modulu_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10501  .bss:0000000000000027 licznik_blad_stanu_karty_SIM
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10496  .bss:0000000000000026 licznik_blad_zalogowania_u_operatora
                             *COM*:000000000000000b nazwa_operatora
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10491  .bss:0000000000000024 licznik_ogolny_blad_zalogowania
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10569  .bss:0000000000000034 nastepne_wysylane_polecenie_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:3055   .text:0000000000000e64 obsluga_wysylania_sms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10528  .bss:000000000000002d liczba_prob_wyslania_smsa
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:3267   .text:0000000000000f6e odpowiedz_na_polecenie
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10491  .bss:0000000000000024 licznik_ogolny_blad_zalogowania
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10569  .bss:0000000000000034 nastepne_wysylane_polecenie_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:3055   .text:0000000000000e64 obsluga_wysylania_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10528  .bss:000000000000002d liczba_prob_wyslania_smsa
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:3267   .text:0000000000000f6e odpowiedz_na_polecenie
                             *COM*:0000000000000001 liczba_wykonanych_komend_identycznego_polecenia
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10172  .progmem.data:00000000000001ae urc.3248
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10160  .progmem.data:000000000000019e __c.3311
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10480  .bss:0000000000000021 max_oczekiwanie_na_odpowiedz_at
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10186  .progmem.data:00000000000001c8 polecenie_zegar.3227
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10182  .progmem.data:00000000000001bb polecenie_pin_ready.3238
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10081  .bss:0000000000000049 nr_zapytania_o_pin.3239
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10176  .progmem.data:00000000000001b5 urc.3245
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10168  .progmem.data:00000000000001a7 polecenie_operator.3253
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10411  .bss:0000000000000013 licznik_timeout_rozmowy_100ms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10164  .progmem.data:00000000000001a0 __c.3282
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10545  .bss:0000000000000030 dlugosc_pdu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10172  .progmem.data:00000000000001ae urc.3248
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10160  .progmem.data:000000000000019e __c.3311
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10480  .bss:0000000000000021 max_oczekiwanie_na_odpowiedz_at
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10186  .progmem.data:00000000000001c8 polecenie_zegar.3227
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10182  .progmem.data:00000000000001bb polecenie_pin_ready.3238
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10081  .bss:0000000000000049 nr_zapytania_o_pin.3239
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10176  .progmem.data:00000000000001b5 urc.3245
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10168  .progmem.data:00000000000001a7 polecenie_operator.3253
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10411  .bss:0000000000000013 licznik_timeout_rozmowy_100ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10164  .progmem.data:00000000000001a0 __c.3282
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10545  .bss:0000000000000030 dlugosc_pdu
                             *COM*:00000000000000c8 bufor_pdu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:4422   .text:00000000000015ea obsluga_komendy_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10585  .bss:0000000000000038 oproznij_bufor_SIM900_po_bledzie
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10156  .progmem.data:0000000000000197 __c.3324
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10152  .progmem.data:0000000000000190 __c.3329
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:4422   .text:00000000000015ea obsluga_komendy_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10585  .bss:0000000000000038 oproznij_bufor_SIM900_po_bledzie
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10156  .progmem.data:0000000000000197 __c.3324
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10152  .progmem.data:0000000000000190 __c.3329
                             *COM*:0000000000000001 licznik_100ms_dioda_led
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10148  .progmem.data:0000000000000189 __c.3336
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:4898   .text:0000000000001890 wyslanie_polecenia_ROM
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:4941   .text:00000000000018b8 wyslij_sms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10144  .progmem.data:0000000000000182 instrukcja_wyslij_smsa.3356
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10562  .data:0000000000000004 max_oczekiwanie_na_odpowiedz
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:5117   .text:00000000000019b2 wykonanie_komend_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10148  .progmem.data:0000000000000189 __c.3336
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:4898   .text:0000000000001890 wyslanie_polecenia_ROM
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:4941   .text:00000000000018b8 wyslij_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10144  .progmem.data:0000000000000182 instrukcja_wyslij_smsa.3356
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10562  .data:0000000000000004 max_oczekiwanie_na_odpowiedz
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:5117   .text:00000000000019b2 wykonanie_komend_SIM900
                             *COM*:0000000000000001 opoznienie_zatrzymaj_odpytywanie_urzadzenia
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10039  .progmem.data:0000000000000063 nastepna_komenda.3475
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10052  .progmem.data:000000000000006d instrukcje.3474
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10140  .progmem.data:000000000000017b instrukcja_odczytaj_smsa.3388
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10039  .progmem.data:0000000000000063 nastepna_komenda.3475
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10052  .progmem.data:000000000000006d instrukcje.3474
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10140  .progmem.data:000000000000017b instrukcja_odczytaj_smsa.3388
                             *COM*:0000000000000001 nie_wysylaj_echa_z_powodu_nietypowego_smsa
                             *COM*:0000000000000002 ptr_start_pdu_z_wiadomoscia
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10136  .progmem.data:0000000000000174 instrukcja_usun_smsa.3421
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10132  .progmem.data:000000000000016d __c.3425
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10128  .progmem.data:000000000000016b instrukcja_odrzuc_rozmowe.3428
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10124  .progmem.data:0000000000000169 instrukcja_odbierz_rozmowe.3430
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10120  .progmem.data:0000000000000162 instrukcja_vts.3432
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10116  .progmem.data:000000000000015d instrukcja_poziom_sieci.3436
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10112  .progmem.data:0000000000000156 instrukcja_creg.3438
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10108  .progmem.data:000000000000014d instrukcja_odczyt_ksiazki.3440
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10104  .progmem.data:0000000000000146 instrukcja_sprawdz_operatora.3442
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10100  .progmem.data:000000000000013f instrukcja_cclk.3444
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10096  .progmem.data:0000000000000138 instrukcja_ustawienie_pamieci.3446
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10092  .progmem.data:0000000000000123 instrukcja_ustawienie_pamieci.3448
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10088  .progmem.data:000000000000011a instrukcja_at.3451
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10084  .progmem.data:000000000000010d instrukcja_podaj_pin.3454
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10036  .bss:0000000000000048 drugi_raz.3456
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10078  .progmem.data:0000000000000104 instrukcja_usun_wszystkie_smsy.3457
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10074  .progmem.data:00000000000000f9 instrukcja.3460
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:6521   .text:0000000000002260 steruj_SIM900_100MS
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10355  .bss:0000000000000004 opoznienie_wysylania_clipow_100MS
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10034  .bss:0000000000000047 licznik_cyklu_8_sek.3484
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10506  .bss:0000000000000028 licznik_awaria_brak_zasiegu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10365  .bss:0000000000000007 licznik_reset_modulu_SIM900
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:6820   .text:0000000000002438 steruj_SIM900_10MS
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10032  .bss:0000000000000045 licznik_bezpieczenstwa.3488
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10030  .bss:0000000000000044 poprzednia_komenda.3489
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10028  .bss:0000000000000042 licznik_poprzednia_komenda.3490
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10009  .bss:0000000000000040 licznik_odebranych_znakow.3491
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:7123   .text:00000000000025f8 wykonanie_komend_powiadomien
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:7399   .text:0000000000002764 test_sms_clip_100ms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:7415   .text:0000000000002766 steruj_wejscia_wyjscia_100ms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:7437   .text:0000000000002772 zapis_w_eeprom_stanu_wyjsc
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:7533   .text:00000000000027ee steruj_urzadzeniem_100MS
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10007  .bss:000000000000003f autosync_sms_wyslany.3741
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10000  .bss:000000000000003d autosync_timer_100ms.3742
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10323  .bss:0000000000000056 ostatnia_pierwsza_komenda
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10321  .bss:0000000000000054 licznik_kolejka_stoi_100ms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10315  .bss:000000000000004e licznik_watchdog_wysylanie_smsa_100ms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10004  .progmem.data:0000000000000000 __c.3743
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10317  .bss:0000000000000050 licznik_awaryjnych_resetow_kolejki
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10301  .bss:000000000000004d liczba_kolejnych_watchdogow_wysylania
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10459  .bss:000000000000001c watchdog_sms_trwa_reset
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10454  .bss:000000000000001a watchdog_sms_safe_mode_100ms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:9998   .bss:000000000000003c licznik_dioda_led_poziom_sieci.3747
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:7943   .text:0000000000002a98 steruj_urzadzeniem_10MS
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:7965   .text:0000000000002aa4 wolne_zdarzenie_timer
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10380  .bss:000000000000000a wykonac_watki
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:9996   .bss:000000000000003b licznik_wybuc_watki_100MS.3754
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:8149   .text:0000000000002b82 ustaw_parametry_dla_bezpieczenstwa
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:8187   .text:0000000000002ba2 inicjalizuj_parametry_modulu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10136  .progmem.data:0000000000000174 instrukcja_usun_smsa.3421
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10132  .progmem.data:000000000000016d __c.3425
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10128  .progmem.data:000000000000016b instrukcja_odrzuc_rozmowe.3428
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10124  .progmem.data:0000000000000169 instrukcja_odbierz_rozmowe.3430
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10120  .progmem.data:0000000000000162 instrukcja_vts.3432
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10116  .progmem.data:000000000000015d instrukcja_poziom_sieci.3436
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10112  .progmem.data:0000000000000156 instrukcja_creg.3438
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10108  .progmem.data:000000000000014d instrukcja_odczyt_ksiazki.3440
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10104  .progmem.data:0000000000000146 instrukcja_sprawdz_operatora.3442
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10100  .progmem.data:000000000000013f instrukcja_cclk.3444
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10096  .progmem.data:0000000000000138 instrukcja_ustawienie_pamieci.3446
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10092  .progmem.data:0000000000000123 instrukcja_ustawienie_pamieci.3448
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10088  .progmem.data:000000000000011a instrukcja_at.3451
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10084  .progmem.data:000000000000010d instrukcja_podaj_pin.3454
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10036  .bss:0000000000000048 drugi_raz.3456
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10078  .progmem.data:0000000000000104 instrukcja_usun_wszystkie_smsy.3457
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10074  .progmem.data:00000000000000f9 instrukcja.3460
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:6521   .text:0000000000002260 steruj_SIM900_100MS
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10355  .bss:0000000000000004 opoznienie_wysylania_clipow_100MS
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10034  .bss:0000000000000047 licznik_cyklu_8_sek.3484
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10506  .bss:0000000000000028 licznik_awaria_brak_zasiegu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10365  .bss:0000000000000007 licznik_reset_modulu_SIM900
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:6820   .text:0000000000002438 steruj_SIM900_10MS
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10032  .bss:0000000000000045 licznik_bezpieczenstwa.3488
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10030  .bss:0000000000000044 poprzednia_komenda.3489
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10028  .bss:0000000000000042 licznik_poprzednia_komenda.3490
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10009  .bss:0000000000000040 licznik_odebranych_znakow.3491
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:7123   .text:00000000000025f8 wykonanie_komend_powiadomien
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:7399   .text:0000000000002764 test_sms_clip_100ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:7415   .text:0000000000002766 steruj_wejscia_wyjscia_100ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:7437   .text:0000000000002772 zapis_w_eeprom_stanu_wyjsc
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:7533   .text:00000000000027ee steruj_urzadzeniem_100MS
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10007  .bss:000000000000003f autosync_sms_wyslany.3741
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10000  .bss:000000000000003d autosync_timer_100ms.3742
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10323  .bss:0000000000000056 ostatnia_pierwsza_komenda
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10321  .bss:0000000000000054 licznik_kolejka_stoi_100ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10315  .bss:000000000000004e licznik_watchdog_wysylanie_smsa_100ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10004  .progmem.data:0000000000000000 __c.3743
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10317  .bss:0000000000000050 licznik_awaryjnych_resetow_kolejki
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10301  .bss:000000000000004d liczba_kolejnych_watchdogow_wysylania
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10459  .bss:000000000000001c watchdog_sms_trwa_reset
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10454  .bss:000000000000001a watchdog_sms_safe_mode_100ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:9998   .bss:000000000000003c licznik_dioda_led_poziom_sieci.3747
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:7959   .text:0000000000002ab8 steruj_urzadzeniem_10MS
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:7981   .text:0000000000002ac4 wolne_zdarzenie_timer
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10380  .bss:000000000000000a wykonac_watki
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:9996   .bss:000000000000003b licznik_wybuc_watki_100MS.3754
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:8165   .text:0000000000002ba2 ustaw_parametry_dla_bezpieczenstwa
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:8203   .text:0000000000002bc2 inicjalizuj_parametry_modulu
                             *COM*:0000000000000004 kod_modulu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10422  .data:0000000000000002 skryba_limit
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10422  .data:0000000000000002 skryba_limit
                              .bss:000000000000003a licznik_resetow.3798
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:8633   .text:0000000000002e44 wykonanie_komend_ukladow
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10020  .progmem.data:000000000000005d tab_eeprom_fabryczny.3646
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:8633   .text:0000000000002e44 wykonanie_komend_ukladow
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10020  .progmem.data:000000000000005d tab_eeprom_fabryczny.3646
                             *COM*:0000000000000014 numer_telefonu_skryba
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10016  .progmem.data:000000000000003f __c.3697
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10012  .progmem.data:0000000000000015 __c.3705
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:9827   .text:00000000000034cc wykonanie_komend
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:9858   .text.startup:0000000000000000 main
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10312  .bss:0000000000000001 wysylanie_echa_przez_pdu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10360  .bss:0000000000000006 licznik_reset_urzadzenia
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10406  .bss:000000000000000f g_czas_systemowy_100ms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10486  .bss:0000000000000022 licznik_bezpieczenstwa_opoznienie_wysylania_sms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccTd73OI.s:10511  .bss:000000000000002a liczba_smsow_ech_do_wyslania
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10016  .progmem.data:000000000000003f __c.3697
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10012  .progmem.data:0000000000000015 __c.3705
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:9827   .text:00000000000034cc wykonanie_komend
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:9858   .text.startup:0000000000000000 main
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10312  .bss:0000000000000001 wysylanie_echa_przez_pdu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10360  .bss:0000000000000006 licznik_reset_urzadzenia
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10406  .bss:000000000000000f g_czas_systemowy_100ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10486  .bss:0000000000000022 licznik_bezpieczenstwa_opoznienie_wysylania_sms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//cc985fW1.s:10511  .bss:000000000000002a liczba_smsow_ech_do_wyslania
 
 UNDEFINED SYMBOLS
 bufor_eeprom

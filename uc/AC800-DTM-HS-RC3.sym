@@ -268,10 +268,10 @@
 00002df4 T steruj_wejscia_wyjscia_100ms
 00002e00 T zapis_w_eeprom_stanu_wyjsc
 00002e7c T steruj_urzadzeniem_100MS
-00003126 T steruj_urzadzeniem_10MS
-00003132 T wolne_zdarzenie_timer
-00003210 T ustaw_parametry_dla_bezpieczenstwa
-00003230 T inicjalizuj_parametry_modulu
+00003146 T steruj_urzadzeniem_10MS
+00003152 T wolne_zdarzenie_timer
+00003230 T ustaw_parametry_dla_bezpieczenstwa
+00003250 T inicjalizuj_parametry_modulu
 000034d2 T wykonanie_komend_ukladow
 00003b5a T wykonanie_komend
 00003b72 T aktualny_stan_logiczny_na_wejsciu

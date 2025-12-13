@@ -562,15 +562,15 @@
  399               		.file 7 "zapiseeprom.h"
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 wewy.c
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccL0ZAZb.s:2      *ABS*:000000000000003e __SP_H__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccL0ZAZb.s:3      *ABS*:000000000000003d __SP_L__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccL0ZAZb.s:4      *ABS*:000000000000003f __SREG__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccL0ZAZb.s:5      *ABS*:000000000000003b __RAMPZ__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccL0ZAZb.s:6      *ABS*:0000000000000000 __tmp_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccL0ZAZb.s:7      *ABS*:0000000000000001 __zero_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccL0ZAZb.s:13     .text:0000000000000000 aktualny_stan_logiczny_na_wejsciu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccF7ppgd.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccF7ppgd.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccF7ppgd.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccF7ppgd.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccF7ppgd.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccF7ppgd.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccF7ppgd.s:13     .text:0000000000000000 aktualny_stan_logiczny_na_wejsciu
                             *COM*:0000000000000001 licznik_wejscie
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccL0ZAZb.s:49     .text:0000000000000014 aktualizuj_stan_wyzwolenia_wejsc_100ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccF7ppgd.s:49     .text:0000000000000014 aktualizuj_stan_wyzwolenia_wejsc_100ms
                             *COM*:0000000000000001 stan_logiczny_na_wejsciu
                             *COM*:0000000000000004 czas_trwania_impulsu
                             *COM*:0000000000000004 czas_trwania_impulsu_na_wejsciu
@@ -578,12 +578,12 @@ DEFINED SYMBOLS
                             *COM*:0000000000000001 licznik_wstrzymanie_alarmow_po_inicjalizacji_100ms
                             *COM*:0000000000000004 czas_trwania_impulsu_off
                             *COM*:0000000000000004 czas_trwania_impulsu_off_na_wejsciu
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccL0ZAZb.s:225    .text:0000000000000152 steruj_wejscia_10ms
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccL0ZAZb.s:259    .text:0000000000000166 steruj_wyjscia_100ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccF7ppgd.s:225    .text:0000000000000152 steruj_wejscia_10ms
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccF7ppgd.s:259    .text:0000000000000166 steruj_wyjscia_100ms
                             *COM*:0000000000000004 licznik_przelacznik_wyjscia
                             *COM*:0000000000000001 stan_wyjscie
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccL0ZAZb.s:324    .text:00000000000001c4 kopiuj_parametry_we_wy_z_eeprom
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccL0ZAZb.s:353    .text:00000000000001ee inicjalizuj_parametry_we_wy
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccF7ppgd.s:324    .text:00000000000001c4 kopiuj_parametry_we_wy_z_eeprom
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccF7ppgd.s:353    .text:00000000000001ee inicjalizuj_parametry_we_wy
 
 UNDEFINED SYMBOLS
 __do_clear_bss

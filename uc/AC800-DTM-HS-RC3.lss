@@ -6016,10 +6016,10 @@ void zapis_w_eeprom_stanu_wyjsc(void) {
     2ec6:	80 91 e0 01 	lds	r24, 0x01E0	; 0x8001e0 <modul_zalogowany_w_sieci>
     2eca:	88 23       	and	r24, r24
     2ecc:	69 f0       	breq	.+26     	; 0x2ee8 <steruj_urzadzeniem_100MS+0x6c>
-    if (autosync_timer_100ms < 30) {
+    if (autosync_timer_100ms < 250) {
     2ece:	80 91 15 02 	lds	r24, 0x0215	; 0x800215 <autosync_timer_100ms.3742>
     2ed2:	90 91 16 02 	lds	r25, 0x0216	; 0x800216 <autosync_timer_100ms.3742+0x1>
-    2ed6:	8e 31       	cpi	r24, 0x1E	; 30
+    2ed6:	8a 3f       	cpi	r24, 0xFA	; 250
     2ed8:	91 05       	cpc	r25, r1
     2eda:	08 f0       	brcs	.+2      	; 0x2ede <steruj_urzadzeniem_100MS+0x62>
     2edc:	6d c0       	rjmp	.+218    	; 0x2fb8 <steruj_urzadzeniem_100MS+0x13c>
@@ -6041,24 +6041,24 @@ void zapis_w_eeprom_stanu_wyjsc(void) {
   if (pierwsza_komenda != KOMENDA_KOLEJKI_BRAK_KOMENDY) {
     2f00:	88 23       	and	r24, r24
     2f02:	09 f4       	brne	.+2      	; 0x2f06 <steruj_urzadzeniem_100MS+0x8a>
-    2f04:	9e c0       	rjmp	.+316    	; 0x3042 <steruj_urzadzeniem_100MS+0x1c6>
+    2f04:	ae c0       	rjmp	.+348    	; 0x3062 <steruj_urzadzeniem_100MS+0x1e6>
     if (pierwsza_komenda >= KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT &&
     2f06:	9d e2       	ldi	r25, 0x2D	; 45
     2f08:	98 0f       	add	r25, r24
     2f0a:	92 30       	cpi	r25, 0x02	; 2
     2f0c:	08 f0       	brcs	.+2      	; 0x2f10 <steruj_urzadzeniem_100MS+0x94>
-    2f0e:	92 c0       	rjmp	.+292    	; 0x3034 <steruj_urzadzeniem_100MS+0x1b8>
+    2f0e:	a2 c0       	rjmp	.+324    	; 0x3054 <steruj_urzadzeniem_100MS+0x1d8>
       if (pierwsza_komenda == ostatnia_pierwsza_komenda) {
     2f10:	90 91 2e 02 	lds	r25, 0x022E	; 0x80022e <ostatnia_pierwsza_komenda>
     2f14:	98 13       	cpse	r25, r24
-    2f16:	8e c0       	rjmp	.+284    	; 0x3034 <steruj_urzadzeniem_100MS+0x1b8>
+    2f16:	9e c0       	rjmp	.+316    	; 0x3054 <steruj_urzadzeniem_100MS+0x1d8>
         if (licznik_kolejka_stoi_100ms < MAX_CZAS_KOLEJKA_STOI_100MS)
     2f18:	80 91 2c 02 	lds	r24, 0x022C	; 0x80022c <licznik_kolejka_stoi_100ms>
     2f1c:	90 91 2d 02 	lds	r25, 0x022D	; 0x80022d <licznik_kolejka_stoi_100ms+0x1>
     2f20:	86 39       	cpi	r24, 0x96	; 150
     2f22:	91 05       	cpc	r25, r1
     2f24:	08 f0       	brcs	.+2      	; 0x2f28 <steruj_urzadzeniem_100MS+0xac>
-    2f26:	64 c0       	rjmp	.+200    	; 0x2ff0 <steruj_urzadzeniem_100MS+0x174>
+    2f26:	74 c0       	rjmp	.+232    	; 0x3010 <steruj_urzadzeniem_100MS+0x194>
           ++licznik_kolejka_stoi_100ms;
     2f28:	01 96       	adiw	r24, 0x01	; 1
     2f2a:	90 93 2d 02 	sts	0x022D, r25	; 0x80022d <licznik_kolejka_stoi_100ms+0x1>
@@ -6067,7 +6067,7 @@ void zapis_w_eeprom_stanu_wyjsc(void) {
     2f32:	80 91 06 02 	lds	r24, 0x0206	; 0x800206 <flaga_wysylanie_smsa>
     2f36:	88 23       	and	r24, r24
     2f38:	09 f4       	brne	.+2      	; 0x2f3c <steruj_urzadzeniem_100MS+0xc0>
-    2f3a:	a5 c0       	rjmp	.+330    	; 0x3086 <steruj_urzadzeniem_100MS+0x20a>
+    2f3a:	b5 c0       	rjmp	.+362    	; 0x30a6 <steruj_urzadzeniem_100MS+0x22a>
     if (licznik_watchdog_wysylanie_smsa_100ms < WATCHDOG_WYSYLANIA_SMS_100MS) {
     2f3c:	80 91 26 02 	lds	r24, 0x0226	; 0x800226 <licznik_watchdog_wysylanie_smsa_100ms>
     2f40:	90 91 27 02 	lds	r25, 0x0227	; 0x800227 <licznik_watchdog_wysylanie_smsa_100ms+0x1>
@@ -6075,7 +6075,7 @@ void zapis_w_eeprom_stanu_wyjsc(void) {
     2f46:	21 e0       	ldi	r18, 0x01	; 1
     2f48:	92 07       	cpc	r25, r18
     2f4a:	08 f0       	brcs	.+2      	; 0x2f4e <steruj_urzadzeniem_100MS+0xd2>
-    2f4c:	7d c0       	rjmp	.+250    	; 0x3048 <steruj_urzadzeniem_100MS+0x1cc>
+    2f4c:	8d c0       	rjmp	.+282    	; 0x3068 <steruj_urzadzeniem_100MS+0x1ec>
       ++licznik_watchdog_wysylanie_smsa_100ms;
     2f4e:	01 96       	adiw	r24, 0x01	; 1
     2f50:	90 93 27 02 	sts	0x0227, r25	; 0x800227 <licznik_watchdog_wysylanie_smsa_100ms+0x1>
@@ -6084,14 +6084,14 @@ void zapis_w_eeprom_stanu_wyjsc(void) {
     2f58:	80 91 f7 01 	lds	r24, 0x01F7	; 0x8001f7 <watchdog_sms_aktywny>
     2f5c:	88 23       	and	r24, r24
     2f5e:	09 f4       	brne	.+2      	; 0x2f62 <steruj_urzadzeniem_100MS+0xe6>
-    2f60:	a8 c0       	rjmp	.+336    	; 0x30b2 <steruj_urzadzeniem_100MS+0x236>
+    2f60:	b8 c0       	rjmp	.+368    	; 0x30d2 <steruj_urzadzeniem_100MS+0x256>
     if (watchdog_sms_licznik_100ms < WATCHDOG_SMS_TIMEOUT_100MS)
     2f62:	80 91 f5 01 	lds	r24, 0x01F5	; 0x8001f5 <watchdog_sms_licznik_100ms>
     2f66:	90 91 f6 01 	lds	r25, 0x01F6	; 0x8001f6 <watchdog_sms_licznik_100ms+0x1>
     2f6a:	84 36       	cpi	r24, 0x64	; 100
     2f6c:	91 05       	cpc	r25, r1
     2f6e:	08 f0       	brcs	.+2      	; 0x2f72 <steruj_urzadzeniem_100MS+0xf6>
-    2f70:	91 c0       	rjmp	.+290    	; 0x3094 <steruj_urzadzeniem_100MS+0x218>
+    2f70:	a1 c0       	rjmp	.+322    	; 0x30b4 <steruj_urzadzeniem_100MS+0x238>
       ++watchdog_sms_licznik_100ms;
     2f72:	80 91 f5 01 	lds	r24, 0x01F5	; 0x8001f5 <watchdog_sms_licznik_100ms>
     2f76:	90 91 f6 01 	lds	r25, 0x01F6	; 0x8001f6 <watchdog_sms_licznik_100ms+0x1>
@@ -6102,7 +6102,7 @@ void zapis_w_eeprom_stanu_wyjsc(void) {
     2f84:	80 91 e6 01 	lds	r24, 0x01E6	; 0x8001e6 <liczba_blyskow_led>
     2f88:	88 23       	and	r24, r24
     2f8a:	09 f4       	brne	.+2      	; 0x2f8e <steruj_urzadzeniem_100MS+0x112>
-    2f8c:	a5 c0       	rjmp	.+330    	; 0x30d8 <steruj_urzadzeniem_100MS+0x25c>
+    2f8c:	b5 c0       	rjmp	.+362    	; 0x30f8 <steruj_urzadzeniem_100MS+0x27c>
     ++stan_cyklu_blysku;
     2f8e:	90 91 e5 01 	lds	r25, 0x01E5	; 0x8001e5 <stan_cyklu_blysku>
     2f92:	9f 5f       	subi	r25, 0xFF	; 255
@@ -6119,628 +6119,628 @@ void zapis_w_eeprom_stanu_wyjsc(void) {
     2fa6:	80 91 e5 01 	lds	r24, 0x01E5	; 0x8001e5 <stan_cyklu_blysku>
     2faa:	82 30       	cpi	r24, 0x02	; 2
     2fac:	08 f4       	brcc	.+2      	; 0x2fb0 <steruj_urzadzeniem_100MS+0x134>
-    2fae:	92 c0       	rjmp	.+292    	; 0x30d4 <steruj_urzadzeniem_100MS+0x258>
+    2fae:	a2 c0       	rjmp	.+324    	; 0x30f4 <steruj_urzadzeniem_100MS+0x278>
     2fb0:	40 9a       	sbi	0x08, 0	; 8
     2fb2:	08 95       	ret
       ustaw_stan_led(TRUE);
     2fb4:	40 98       	cbi	0x08, 0	; 8
     2fb6:	70 cf       	rjmp	.-288    	; 0x2e98 <steruj_urzadzeniem_100MS+0x1c>
-      if (moj_numer_telefonu[0] != 0xFF && moj_numer_telefonu[0] != 0 &&
-    2fb8:	80 91 36 03 	lds	r24, 0x0336	; 0x800336 <moj_numer_telefonu>
-    2fbc:	81 50       	subi	r24, 0x01	; 1
-    2fbe:	8e 3f       	cpi	r24, 0xFE	; 254
-    2fc0:	98 f4       	brcc	.+38     	; 0x2fe8 <steruj_urzadzeniem_100MS+0x16c>
-    2fc2:	80 91 06 02 	lds	r24, 0x0206	; 0x800206 <flaga_wysylanie_smsa>
-    2fc6:	81 11       	cpse	r24, r1
-    2fc8:	0f c0       	rjmp	.+30     	; 0x2fe8 <steruj_urzadzeniem_100MS+0x16c>
-        strcpy((char *)numer_telefonu_wysylanego_smsa,
-    2fca:	66 e3       	ldi	r22, 0x36	; 54
-    2fcc:	73 e0       	ldi	r23, 0x03	; 3
-    2fce:	8c e4       	ldi	r24, 0x4C	; 76
-    2fd0:	92 e0       	ldi	r25, 0x02	; 2
-    2fd2:	0e 94 40 30 	call	0x6080	; 0x6080 <strcpy>
-        strcpy_P((char *)tekst_wysylanego_smsa, PSTR("Synchronizacja Czasu"));
-    2fd6:	6c e8       	ldi	r22, 0x8C	; 140
-    2fd8:	70 e0       	ldi	r23, 0x00	; 0
-    2fda:	86 e7       	ldi	r24, 0x76	; 118
-    2fdc:	95 e0       	ldi	r25, 0x05	; 5
-    2fde:	0e 94 c6 2f 	call	0x5f8c	; 0x5f8c <strcpy_P>
-        dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
-    2fe2:	83 ed       	ldi	r24, 0xD3	; 211
-    2fe4:	0e 94 31 28 	call	0x5062	; 0x5062 <dodaj_komende>
-        autosync_sms_wyslany = TRUE; // Nie próbuj ponownie
-    2fe8:	8f ef       	ldi	r24, 0xFF	; 255
-    2fea:	80 93 17 02 	sts	0x0217, r24	; 0x800217 <autosync_sms_wyslany.3741>
-    2fee:	7c cf       	rjmp	.-264    	; 0x2ee8 <steruj_urzadzeniem_100MS+0x6c>
+      if (rtc_czas[0] == '0' && rtc_czas[1] == '0' && rtc_czas[3] == '0' &&
+    2fb8:	80 91 0b 01 	lds	r24, 0x010B	; 0x80010b <rtc_czas>
+    2fbc:	80 33       	cpi	r24, 0x30	; 48
+    2fbe:	21 f5       	brne	.+72     	; 0x3008 <steruj_urzadzeniem_100MS+0x18c>
+    2fc0:	80 91 0c 01 	lds	r24, 0x010C	; 0x80010c <rtc_czas+0x1>
+    2fc4:	80 33       	cpi	r24, 0x30	; 48
+    2fc6:	01 f5       	brne	.+64     	; 0x3008 <steruj_urzadzeniem_100MS+0x18c>
+    2fc8:	80 91 0e 01 	lds	r24, 0x010E	; 0x80010e <rtc_czas+0x3>
+    2fcc:	80 33       	cpi	r24, 0x30	; 48
+    2fce:	e1 f4       	brne	.+56     	; 0x3008 <steruj_urzadzeniem_100MS+0x18c>
+    2fd0:	80 91 0f 01 	lds	r24, 0x010F	; 0x80010f <rtc_czas+0x4>
+    2fd4:	80 33       	cpi	r24, 0x30	; 48
+    2fd6:	c1 f4       	brne	.+48     	; 0x3008 <steruj_urzadzeniem_100MS+0x18c>
+        if (moj_numer_telefonu[0] != 0xFF && moj_numer_telefonu[0] != 0 &&
+    2fd8:	80 91 36 03 	lds	r24, 0x0336	; 0x800336 <moj_numer_telefonu>
+    2fdc:	81 50       	subi	r24, 0x01	; 1
+    2fde:	8e 3f       	cpi	r24, 0xFE	; 254
+    2fe0:	98 f4       	brcc	.+38     	; 0x3008 <steruj_urzadzeniem_100MS+0x18c>
+    2fe2:	80 91 06 02 	lds	r24, 0x0206	; 0x800206 <flaga_wysylanie_smsa>
+    2fe6:	81 11       	cpse	r24, r1
+    2fe8:	0f c0       	rjmp	.+30     	; 0x3008 <steruj_urzadzeniem_100MS+0x18c>
+          strcpy((char *)numer_telefonu_wysylanego_smsa,
+    2fea:	66 e3       	ldi	r22, 0x36	; 54
+    2fec:	73 e0       	ldi	r23, 0x03	; 3
+    2fee:	8c e4       	ldi	r24, 0x4C	; 76
+    2ff0:	92 e0       	ldi	r25, 0x02	; 2
+    2ff2:	0e 94 40 30 	call	0x6080	; 0x6080 <strcpy>
+          strcpy_P((char *)tekst_wysylanego_smsa, PSTR("Synchronizacja Czasu"));
+    2ff6:	6c e8       	ldi	r22, 0x8C	; 140
+    2ff8:	70 e0       	ldi	r23, 0x00	; 0
+    2ffa:	86 e7       	ldi	r24, 0x76	; 118
+    2ffc:	95 e0       	ldi	r25, 0x05	; 5
+    2ffe:	0e 94 c6 2f 	call	0x5f8c	; 0x5f8c <strcpy_P>
+          dodaj_komende(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT);
+    3002:	83 ed       	ldi	r24, 0xD3	; 211
+    3004:	0e 94 31 28 	call	0x5062	; 0x5062 <dodaj_komende>
+      autosync_sms_wyslany = TRUE;
+    3008:	8f ef       	ldi	r24, 0xFF	; 255
+    300a:	80 93 17 02 	sts	0x0217, r24	; 0x800217 <autosync_sms_wyslany.3741>
+    300e:	6c cf       	rjmp	.-296    	; 0x2ee8 <steruj_urzadzeniem_100MS+0x6c>
           filtruj_komendy_z_przedzialu(KOMENDA_KOLEJKI_WYSLIJ_SMSA_TEXT,
-    2ff0:	64 ed       	ldi	r22, 0xD4	; 212
-    2ff2:	83 ed       	ldi	r24, 0xD3	; 211
-    2ff4:	0e 94 57 28 	call	0x50ae	; 0x50ae <filtruj_komendy_z_przedzialu>
+    3010:	64 ed       	ldi	r22, 0xD4	; 212
+    3012:	83 ed       	ldi	r24, 0xD3	; 211
+    3014:	0e 94 57 28 	call	0x50ae	; 0x50ae <filtruj_komendy_z_przedzialu>
           if (licznik_awaryjnych_resetow_kolejki < 0xFFFF)
-    2ff8:	80 91 28 02 	lds	r24, 0x0228	; 0x800228 <licznik_awaryjnych_resetow_kolejki>
-    2ffc:	90 91 29 02 	lds	r25, 0x0229	; 0x800229 <licznik_awaryjnych_resetow_kolejki+0x1>
-    3000:	8f 3f       	cpi	r24, 0xFF	; 255
-    3002:	98 07       	cpc	r25, r24
-    3004:	29 f0       	breq	.+10     	; 0x3010 <steruj_urzadzeniem_100MS+0x194>
+    3018:	80 91 28 02 	lds	r24, 0x0228	; 0x800228 <licznik_awaryjnych_resetow_kolejki>
+    301c:	90 91 29 02 	lds	r25, 0x0229	; 0x800229 <licznik_awaryjnych_resetow_kolejki+0x1>
+    3020:	8f 3f       	cpi	r24, 0xFF	; 255
+    3022:	98 07       	cpc	r25, r24
+    3024:	29 f0       	breq	.+10     	; 0x3030 <steruj_urzadzeniem_100MS+0x1b4>
             ++licznik_awaryjnych_resetow_kolejki;
-    3006:	01 96       	adiw	r24, 0x01	; 1
-    3008:	90 93 29 02 	sts	0x0229, r25	; 0x800229 <licznik_awaryjnych_resetow_kolejki+0x1>
-    300c:	80 93 28 02 	sts	0x0228, r24	; 0x800228 <licznik_awaryjnych_resetow_kolejki>
+    3026:	01 96       	adiw	r24, 0x01	; 1
+    3028:	90 93 29 02 	sts	0x0229, r25	; 0x800229 <licznik_awaryjnych_resetow_kolejki+0x1>
+    302c:	80 93 28 02 	sts	0x0228, r24	; 0x800228 <licznik_awaryjnych_resetow_kolejki>
           filtruj_i_dodaj_komende(KOMENDA_KOLEJKI_USUN_WSZYSTKIE_SMSY);
-    3010:	82 e9       	ldi	r24, 0x92	; 146
-    3012:	0e 94 43 28 	call	0x5086	; 0x5086 <filtruj_i_dodaj_komende>
+    3030:	82 e9       	ldi	r24, 0x92	; 146
+    3032:	0e 94 43 28 	call	0x5086	; 0x5086 <filtruj_i_dodaj_komende>
           licznik_report_user = 0;
-    3016:	10 92 31 02 	sts	0x0231, r1	; 0x800231 <licznik_report_user>
+    3036:	10 92 31 02 	sts	0x0231, r1	; 0x800231 <licznik_report_user>
           timer_report_user_100ms = 0;
-    301a:	10 92 30 02 	sts	0x0230, r1	; 0x800230 <timer_report_user_100ms+0x1>
-    301e:	10 92 2f 02 	sts	0x022F, r1	; 0x80022f <timer_report_user_100ms>
+    303a:	10 92 30 02 	sts	0x0230, r1	; 0x800230 <timer_report_user_100ms+0x1>
+    303e:	10 92 2f 02 	sts	0x022F, r1	; 0x80022f <timer_report_user_100ms>
           licznik_kolejka_stoi_100ms = 0;
-    3022:	10 92 2d 02 	sts	0x022D, r1	; 0x80022d <licznik_kolejka_stoi_100ms+0x1>
-    3026:	10 92 2c 02 	sts	0x022C, r1	; 0x80022c <licznik_kolejka_stoi_100ms>
+    3042:	10 92 2d 02 	sts	0x022D, r1	; 0x80022d <licznik_kolejka_stoi_100ms+0x1>
+    3046:	10 92 2c 02 	sts	0x022C, r1	; 0x80022c <licznik_kolejka_stoi_100ms>
           ostatnia_pierwsza_komenda = KOMENDA_KOLEJKI_BRAK_KOMENDY;
-    302a:	10 92 2e 02 	sts	0x022E, r1	; 0x80022e <ostatnia_pierwsza_komenda>
+    304a:	10 92 2e 02 	sts	0x022E, r1	; 0x80022e <ostatnia_pierwsza_komenda>
           flaga_wysylanie_smsa = 0;
-    302e:	10 92 06 02 	sts	0x0206, r1	; 0x800206 <flaga_wysylanie_smsa>
-    3032:	7f cf       	rjmp	.-258    	; 0x2f32 <steruj_urzadzeniem_100MS+0xb6>
+    304e:	10 92 06 02 	sts	0x0206, r1	; 0x800206 <flaga_wysylanie_smsa>
+    3052:	6f cf       	rjmp	.-290    	; 0x2f32 <steruj_urzadzeniem_100MS+0xb6>
       ostatnia_pierwsza_komenda = pierwsza_komenda;
-    3034:	80 93 2e 02 	sts	0x022E, r24	; 0x80022e <ostatnia_pierwsza_komenda>
+    3054:	80 93 2e 02 	sts	0x022E, r24	; 0x80022e <ostatnia_pierwsza_komenda>
     licznik_kolejka_stoi_100ms = 0;
-    3038:	10 92 2d 02 	sts	0x022D, r1	; 0x80022d <licznik_kolejka_stoi_100ms+0x1>
-    303c:	10 92 2c 02 	sts	0x022C, r1	; 0x80022c <licznik_kolejka_stoi_100ms>
-    3040:	78 cf       	rjmp	.-272    	; 0x2f32 <steruj_urzadzeniem_100MS+0xb6>
+    3058:	10 92 2d 02 	sts	0x022D, r1	; 0x80022d <licznik_kolejka_stoi_100ms+0x1>
+    305c:	10 92 2c 02 	sts	0x022C, r1	; 0x80022c <licznik_kolejka_stoi_100ms>
+    3060:	68 cf       	rjmp	.-304    	; 0x2f32 <steruj_urzadzeniem_100MS+0xb6>
     ostatnia_pierwsza_komenda = KOMENDA_KOLEJKI_BRAK_KOMENDY;
-    3042:	10 92 2e 02 	sts	0x022E, r1	; 0x80022e <ostatnia_pierwsza_komenda>
-    3046:	f8 cf       	rjmp	.-16     	; 0x3038 <steruj_urzadzeniem_100MS+0x1bc>
+    3062:	10 92 2e 02 	sts	0x022E, r1	; 0x80022e <ostatnia_pierwsza_komenda>
+    3066:	f8 cf       	rjmp	.-16     	; 0x3058 <steruj_urzadzeniem_100MS+0x1dc>
       licznik_watchdog_wysylanie_smsa_100ms = 0;
-    3048:	10 92 27 02 	sts	0x0227, r1	; 0x800227 <licznik_watchdog_wysylanie_smsa_100ms+0x1>
-    304c:	10 92 26 02 	sts	0x0226, r1	; 0x800226 <licznik_watchdog_wysylanie_smsa_100ms>
+    3068:	10 92 27 02 	sts	0x0227, r1	; 0x800227 <licznik_watchdog_wysylanie_smsa_100ms+0x1>
+    306c:	10 92 26 02 	sts	0x0226, r1	; 0x800226 <licznik_watchdog_wysylanie_smsa_100ms>
       watchdog_sms_disarm();
-    3050:	0e 94 47 03 	call	0x68e	; 0x68e <watchdog_sms_disarm>
+    3070:	0e 94 47 03 	call	0x68e	; 0x68e <watchdog_sms_disarm>
       flaga_wysylanie_smsa = 0;
-    3054:	10 92 06 02 	sts	0x0206, r1	; 0x800206 <flaga_wysylanie_smsa>
+    3074:	10 92 06 02 	sts	0x0206, r1	; 0x800206 <flaga_wysylanie_smsa>
       liczba_prob_wyslania_smsa = 0;
-    3058:	10 92 05 02 	sts	0x0205, r1	; 0x800205 <liczba_prob_wyslania_smsa>
+    3078:	10 92 05 02 	sts	0x0205, r1	; 0x800205 <liczba_prob_wyslania_smsa>
       czekanie_na_odebranie_zachety = FALSE;
-    305c:	10 92 59 05 	sts	0x0559, r1	; 0x800559 <czekanie_na_odebranie_zachety>
+    307c:	10 92 59 05 	sts	0x0559, r1	; 0x800559 <czekanie_na_odebranie_zachety>
       wysylanie_smsa_clipa = WYSYLANIE_SMSA_CLIPA_BRAK;
-    3060:	10 92 d8 01 	sts	0x01D8, r1	; 0x8001d8 <wysylanie_smsa_clipa>
+    3080:	10 92 d8 01 	sts	0x01D8, r1	; 0x8001d8 <wysylanie_smsa_clipa>
       if (liczba_kolejnych_watchdogow_wysylania < 255)
-    3064:	80 91 25 02 	lds	r24, 0x0225	; 0x800225 <liczba_kolejnych_watchdogow_wysylania>
-    3068:	8f 3f       	cpi	r24, 0xFF	; 255
-    306a:	19 f0       	breq	.+6      	; 0x3072 <steruj_urzadzeniem_100MS+0x1f6>
+    3084:	80 91 25 02 	lds	r24, 0x0225	; 0x800225 <liczba_kolejnych_watchdogow_wysylania>
+    3088:	8f 3f       	cpi	r24, 0xFF	; 255
+    308a:	19 f0       	breq	.+6      	; 0x3092 <steruj_urzadzeniem_100MS+0x216>
         ++liczba_kolejnych_watchdogow_wysylania;
-    306c:	8f 5f       	subi	r24, 0xFF	; 255
-    306e:	80 93 25 02 	sts	0x0225, r24	; 0x800225 <liczba_kolejnych_watchdogow_wysylania>
+    308c:	8f 5f       	subi	r24, 0xFF	; 255
+    308e:	80 93 25 02 	sts	0x0225, r24	; 0x800225 <liczba_kolejnych_watchdogow_wysylania>
       if (liczba_kolejnych_watchdogow_wysylania >= 3) {
-    3072:	80 91 25 02 	lds	r24, 0x0225	; 0x800225 <liczba_kolejnych_watchdogow_wysylania>
-    3076:	83 30       	cpi	r24, 0x03	; 3
-    3078:	08 f4       	brcc	.+2      	; 0x307c <steruj_urzadzeniem_100MS+0x200>
-    307a:	6e cf       	rjmp	.-292    	; 0x2f58 <steruj_urzadzeniem_100MS+0xdc>
+    3092:	80 91 25 02 	lds	r24, 0x0225	; 0x800225 <liczba_kolejnych_watchdogow_wysylania>
+    3096:	83 30       	cpi	r24, 0x03	; 3
+    3098:	08 f4       	brcc	.+2      	; 0x309c <steruj_urzadzeniem_100MS+0x220>
+    309a:	5e cf       	rjmp	.-324    	; 0x2f58 <steruj_urzadzeniem_100MS+0xdc>
         liczba_kolejnych_watchdogow_wysylania = 0;
-    307c:	10 92 25 02 	sts	0x0225, r1	; 0x800225 <liczba_kolejnych_watchdogow_wysylania>
+    309c:	10 92 25 02 	sts	0x0225, r1	; 0x800225 <liczba_kolejnych_watchdogow_wysylania>
         reset_modulu_SIM900();
-    3080:	0e 94 4c 0a 	call	0x1498	; 0x1498 <reset_modulu_SIM900>
-    3084:	69 cf       	rjmp	.-302    	; 0x2f58 <steruj_urzadzeniem_100MS+0xdc>
+    30a0:	0e 94 4c 0a 	call	0x1498	; 0x1498 <reset_modulu_SIM900>
+    30a4:	59 cf       	rjmp	.-334    	; 0x2f58 <steruj_urzadzeniem_100MS+0xdc>
     licznik_watchdog_wysylanie_smsa_100ms = 0;
-    3086:	10 92 27 02 	sts	0x0227, r1	; 0x800227 <licznik_watchdog_wysylanie_smsa_100ms+0x1>
-    308a:	10 92 26 02 	sts	0x0226, r1	; 0x800226 <licznik_watchdog_wysylanie_smsa_100ms>
+    30a6:	10 92 27 02 	sts	0x0227, r1	; 0x800227 <licznik_watchdog_wysylanie_smsa_100ms+0x1>
+    30aa:	10 92 26 02 	sts	0x0226, r1	; 0x800226 <licznik_watchdog_wysylanie_smsa_100ms>
     liczba_kolejnych_watchdogow_wysylania = 0;
-    308e:	10 92 25 02 	sts	0x0225, r1	; 0x800225 <liczba_kolejnych_watchdogow_wysylania>
-    3092:	62 cf       	rjmp	.-316    	; 0x2f58 <steruj_urzadzeniem_100MS+0xdc>
+    30ae:	10 92 25 02 	sts	0x0225, r1	; 0x800225 <liczba_kolejnych_watchdogow_wysylania>
+    30b2:	52 cf       	rjmp	.-348    	; 0x2f58 <steruj_urzadzeniem_100MS+0xdc>
       watchdog_sms_trwa_reset = TRUE;
-    3094:	8f ef       	ldi	r24, 0xFF	; 255
-    3096:	80 93 f4 01 	sts	0x01F4, r24	; 0x8001f4 <watchdog_sms_trwa_reset>
+    30b4:	8f ef       	ldi	r24, 0xFF	; 255
+    30b6:	80 93 f4 01 	sts	0x01F4, r24	; 0x8001f4 <watchdog_sms_trwa_reset>
       cli();
-    309a:	f8 94       	cli
+    30ba:	f8 94       	cli
 				: "r0"
 		);
 	}
 	else
 	{
 		__asm__ __volatile__ (
-    309c:	88 e1       	ldi	r24, 0x18	; 24
-    309e:	98 e0       	ldi	r25, 0x08	; 8
-    30a0:	0f b6       	in	r0, 0x3f	; 63
-    30a2:	f8 94       	cli
-    30a4:	a8 95       	wdr
-    30a6:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
-    30aa:	0f be       	out	0x3f, r0	; 63
-    30ac:	90 93 60 00 	sts	0x0060, r25	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
-    30b0:	ff cf       	rjmp	.-2      	; 0x30b0 <steruj_urzadzeniem_100MS+0x234>
+    30bc:	88 e1       	ldi	r24, 0x18	; 24
+    30be:	98 e0       	ldi	r25, 0x08	; 8
+    30c0:	0f b6       	in	r0, 0x3f	; 63
+    30c2:	f8 94       	cli
+    30c4:	a8 95       	wdr
+    30c6:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
+    30ca:	0f be       	out	0x3f, r0	; 63
+    30cc:	90 93 60 00 	sts	0x0060, r25	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
+    30d0:	ff cf       	rjmp	.-2      	; 0x30d0 <steruj_urzadzeniem_100MS+0x254>
   } else if (watchdog_sms_safe_mode_100ms) {
-    30b2:	80 91 f2 01 	lds	r24, 0x01F2	; 0x8001f2 <watchdog_sms_safe_mode_100ms>
-    30b6:	90 91 f3 01 	lds	r25, 0x01F3	; 0x8001f3 <watchdog_sms_safe_mode_100ms+0x1>
-    30ba:	89 2b       	or	r24, r25
-    30bc:	09 f4       	brne	.+2      	; 0x30c0 <steruj_urzadzeniem_100MS+0x244>
-    30be:	62 cf       	rjmp	.-316    	; 0x2f84 <steruj_urzadzeniem_100MS+0x108>
+    30d2:	80 91 f2 01 	lds	r24, 0x01F2	; 0x8001f2 <watchdog_sms_safe_mode_100ms>
+    30d6:	90 91 f3 01 	lds	r25, 0x01F3	; 0x8001f3 <watchdog_sms_safe_mode_100ms+0x1>
+    30da:	89 2b       	or	r24, r25
+    30dc:	09 f4       	brne	.+2      	; 0x30e0 <steruj_urzadzeniem_100MS+0x264>
+    30de:	52 cf       	rjmp	.-348    	; 0x2f84 <steruj_urzadzeniem_100MS+0x108>
     --watchdog_sms_safe_mode_100ms;
-    30c0:	80 91 f2 01 	lds	r24, 0x01F2	; 0x8001f2 <watchdog_sms_safe_mode_100ms>
-    30c4:	90 91 f3 01 	lds	r25, 0x01F3	; 0x8001f3 <watchdog_sms_safe_mode_100ms+0x1>
-    30c8:	01 97       	sbiw	r24, 0x01	; 1
-    30ca:	90 93 f3 01 	sts	0x01F3, r25	; 0x8001f3 <watchdog_sms_safe_mode_100ms+0x1>
-    30ce:	80 93 f2 01 	sts	0x01F2, r24	; 0x8001f2 <watchdog_sms_safe_mode_100ms>
-    30d2:	58 cf       	rjmp	.-336    	; 0x2f84 <steruj_urzadzeniem_100MS+0x108>
+    30e0:	80 91 f2 01 	lds	r24, 0x01F2	; 0x8001f2 <watchdog_sms_safe_mode_100ms>
+    30e4:	90 91 f3 01 	lds	r25, 0x01F3	; 0x8001f3 <watchdog_sms_safe_mode_100ms+0x1>
+    30e8:	01 97       	sbiw	r24, 0x01	; 1
+    30ea:	90 93 f3 01 	sts	0x01F3, r25	; 0x8001f3 <watchdog_sms_safe_mode_100ms+0x1>
+    30ee:	80 93 f2 01 	sts	0x01F2, r24	; 0x8001f2 <watchdog_sms_safe_mode_100ms>
+    30f2:	48 cf       	rjmp	.-368    	; 0x2f84 <steruj_urzadzeniem_100MS+0x108>
     ustaw_stan_led(stan_cyklu_blysku < 2);
-    30d4:	40 98       	cbi	0x08, 0	; 8
+    30f4:	40 98       	cbi	0x08, 0	; 8
 }
-    30d6:	08 95       	ret
+    30f6:	08 95       	ret
   if (!modul_zalogowany_w_sieci) {
-    30d8:	80 91 e0 01 	lds	r24, 0x01E0	; 0x8001e0 <modul_zalogowany_w_sieci>
-    30dc:	81 11       	cpse	r24, r1
-    30de:	02 c0       	rjmp	.+4      	; 0x30e4 <steruj_urzadzeniem_100MS+0x268>
+    30f8:	80 91 e0 01 	lds	r24, 0x01E0	; 0x8001e0 <modul_zalogowany_w_sieci>
+    30fc:	81 11       	cpse	r24, r1
+    30fe:	02 c0       	rjmp	.+4      	; 0x3104 <steruj_urzadzeniem_100MS+0x288>
       ustaw_stan_led(licznik_dioda_led_poziom_sieci == 40 ||
-    30e0:	40 98       	cbi	0x08, 0	; 8
-    30e2:	1c c0       	rjmp	.+56     	; 0x311c <steruj_urzadzeniem_100MS+0x2a0>
+    3100:	40 98       	cbi	0x08, 0	; 8
+    3102:	1c c0       	rjmp	.+56     	; 0x313c <steruj_urzadzeniem_100MS+0x2c0>
     if (licznik_100ms_dioda_led) {
-    30e4:	80 91 7b 03 	lds	r24, 0x037B	; 0x80037b <licznik_100ms_dioda_led>
-    30e8:	81 11       	cpse	r24, r1
-    30ea:	fa cf       	rjmp	.-12     	; 0x30e0 <steruj_urzadzeniem_100MS+0x264>
+    3104:	80 91 7b 03 	lds	r24, 0x037B	; 0x80037b <licznik_100ms_dioda_led>
+    3108:	81 11       	cpse	r24, r1
+    310a:	fa cf       	rjmp	.-12     	; 0x3100 <steruj_urzadzeniem_100MS+0x284>
       if (poziom_sieci_gsm < 16) {
-    30ec:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <poziom_sieci_gsm>
-    30f0:	80 31       	cpi	r24, 0x10	; 16
-    30f2:	b0 f4       	brcc	.+44     	; 0x3120 <steruj_urzadzeniem_100MS+0x2a4>
+    310c:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <poziom_sieci_gsm>
+    3110:	80 31       	cpi	r24, 0x10	; 16
+    3112:	b0 f4       	brcc	.+44     	; 0x3140 <steruj_urzadzeniem_100MS+0x2c4>
         if (++licznik_dioda_led_poziom_sieci >= 50)
-    30f4:	80 91 14 02 	lds	r24, 0x0214	; 0x800214 <licznik_dioda_led_poziom_sieci.3747>
-    30f8:	8f 5f       	subi	r24, 0xFF	; 255
-    30fa:	80 93 14 02 	sts	0x0214, r24	; 0x800214 <licznik_dioda_led_poziom_sieci.3747>
-    30fe:	82 33       	cpi	r24, 0x32	; 50
-    3100:	18 f0       	brcs	.+6      	; 0x3108 <steruj_urzadzeniem_100MS+0x28c>
+    3114:	80 91 14 02 	lds	r24, 0x0214	; 0x800214 <licznik_dioda_led_poziom_sieci.3747>
+    3118:	8f 5f       	subi	r24, 0xFF	; 255
+    311a:	80 93 14 02 	sts	0x0214, r24	; 0x800214 <licznik_dioda_led_poziom_sieci.3747>
+    311e:	82 33       	cpi	r24, 0x32	; 50
+    3120:	18 f0       	brcs	.+6      	; 0x3128 <steruj_urzadzeniem_100MS+0x2ac>
           licznik_dioda_led_poziom_sieci = 1;
-    3102:	81 e0       	ldi	r24, 0x01	; 1
-    3104:	80 93 14 02 	sts	0x0214, r24	; 0x800214 <licznik_dioda_led_poziom_sieci.3747>
+    3122:	81 e0       	ldi	r24, 0x01	; 1
+    3124:	80 93 14 02 	sts	0x0214, r24	; 0x800214 <licznik_dioda_led_poziom_sieci.3747>
       ustaw_stan_led(licznik_dioda_led_poziom_sieci == 40 ||
-    3108:	80 91 14 02 	lds	r24, 0x0214	; 0x800214 <licznik_dioda_led_poziom_sieci.3747>
-    310c:	88 32       	cpi	r24, 0x28	; 40
-    310e:	41 f3       	breq	.-48     	; 0x30e0 <steruj_urzadzeniem_100MS+0x264>
-    3110:	8b 32       	cpi	r24, 0x2B	; 43
-    3112:	31 f3       	breq	.-52     	; 0x30e0 <steruj_urzadzeniem_100MS+0x264>
-    3114:	8e 52       	subi	r24, 0x2E	; 46
-    3116:	84 30       	cpi	r24, 0x04	; 4
-    3118:	18 f3       	brcs	.-58     	; 0x30e0 <steruj_urzadzeniem_100MS+0x264>
-    311a:	40 9a       	sbi	0x08, 0	; 8
+    3128:	80 91 14 02 	lds	r24, 0x0214	; 0x800214 <licznik_dioda_led_poziom_sieci.3747>
+    312c:	88 32       	cpi	r24, 0x28	; 40
+    312e:	41 f3       	breq	.-48     	; 0x3100 <steruj_urzadzeniem_100MS+0x284>
+    3130:	8b 32       	cpi	r24, 0x2B	; 43
+    3132:	31 f3       	breq	.-52     	; 0x3100 <steruj_urzadzeniem_100MS+0x284>
+    3134:	8e 52       	subi	r24, 0x2E	; 46
+    3136:	84 30       	cpi	r24, 0x04	; 4
+    3138:	18 f3       	brcs	.-58     	; 0x3100 <steruj_urzadzeniem_100MS+0x284>
+    313a:	40 9a       	sbi	0x08, 0	; 8
   zapis_w_eeprom_stanu_wyjsc();
-    311c:	0c 94 00 17 	jmp	0x2e00	; 0x2e00 <zapis_w_eeprom_stanu_wyjsc>
+    313c:	0c 94 00 17 	jmp	0x2e00	; 0x2e00 <zapis_w_eeprom_stanu_wyjsc>
         licznik_dioda_led_poziom_sieci = 0;
-    3120:	10 92 14 02 	sts	0x0214, r1	; 0x800214 <licznik_dioda_led_poziom_sieci.3747>
-    3124:	f1 cf       	rjmp	.-30     	; 0x3108 <steruj_urzadzeniem_100MS+0x28c>
+    3140:	10 92 14 02 	sts	0x0214, r1	; 0x800214 <licznik_dioda_led_poziom_sieci.3747>
+    3144:	f1 cf       	rjmp	.-30     	; 0x3128 <steruj_urzadzeniem_100MS+0x2ac>
 
-00003126 <steruj_urzadzeniem_10MS>:
+00003146 <steruj_urzadzeniem_10MS>:
   steruj_wejscia_10ms();
-    3126:	0e 94 62 1e 	call	0x3cc4	; 0x3cc4 <steruj_wejscia_10ms>
+    3146:	0e 94 62 1e 	call	0x3cc4	; 0x3cc4 <steruj_wejscia_10ms>
   steruj_SIM900_10MS();
-    312a:	0e 94 63 15 	call	0x2ac6	; 0x2ac6 <steruj_SIM900_10MS>
+    314a:	0e 94 63 15 	call	0x2ac6	; 0x2ac6 <steruj_SIM900_10MS>
   zapisz_bajt_w_EEPROM();
-    312e:	0c 94 df 29 	jmp	0x53be	; 0x53be <zapisz_bajt_w_EEPROM>
+    314e:	0c 94 df 29 	jmp	0x53be	; 0x53be <zapisz_bajt_w_EEPROM>
 
-00003132 <wolne_zdarzenie_timer>:
+00003152 <wolne_zdarzenie_timer>:
   WYKONAJ_CLI_SEI(WYLACZ_PRZERWANIE_TIMER());
-    3132:	f8 94       	cli
-    3134:	80 91 6e 00 	lds	r24, 0x006E	; 0x80006e <__TEXT_REGION_LENGTH__+0x7e006e>
-    3138:	8d 7f       	andi	r24, 0xFD	; 253
-    313a:	80 93 6e 00 	sts	0x006E, r24	; 0x80006e <__TEXT_REGION_LENGTH__+0x7e006e>
-    313e:	78 94       	sei
-    3140:	00 00       	nop
+    3152:	f8 94       	cli
+    3154:	80 91 6e 00 	lds	r24, 0x006E	; 0x80006e <__TEXT_REGION_LENGTH__+0x7e006e>
+    3158:	8d 7f       	andi	r24, 0xFD	; 253
+    315a:	80 93 6e 00 	sts	0x006E, r24	; 0x80006e <__TEXT_REGION_LENGTH__+0x7e006e>
+    315e:	78 94       	sei
+    3160:	00 00       	nop
   if (!CZY_WYKONAC_ZDARZENIE_TIMER()) {
-    3142:	80 91 e4 01 	lds	r24, 0x01E4	; 0x8001e4 <wykonaj_zdarzenie_timer>
-    3146:	81 11       	cpse	r24, r1
-    3148:	09 c0       	rjmp	.+18     	; 0x315c <wolne_zdarzenie_timer+0x2a>
+    3162:	80 91 e4 01 	lds	r24, 0x01E4	; 0x8001e4 <wykonaj_zdarzenie_timer>
+    3166:	81 11       	cpse	r24, r1
+    3168:	09 c0       	rjmp	.+18     	; 0x317c <wolne_zdarzenie_timer+0x2a>
     WYKONAJ_CLI_SEI(WLACZ_PRZERWANIE_TIMER());
-    314a:	f8 94       	cli
-    314c:	80 91 6e 00 	lds	r24, 0x006E	; 0x80006e <__TEXT_REGION_LENGTH__+0x7e006e>
-    3150:	82 60       	ori	r24, 0x02	; 2
-    3152:	80 93 6e 00 	sts	0x006E, r24	; 0x80006e <__TEXT_REGION_LENGTH__+0x7e006e>
-    3156:	78 94       	sei
-    3158:	00 00       	nop
+    316a:	f8 94       	cli
+    316c:	80 91 6e 00 	lds	r24, 0x006E	; 0x80006e <__TEXT_REGION_LENGTH__+0x7e006e>
+    3170:	82 60       	ori	r24, 0x02	; 2
+    3172:	80 93 6e 00 	sts	0x006E, r24	; 0x80006e <__TEXT_REGION_LENGTH__+0x7e006e>
+    3176:	78 94       	sei
+    3178:	00 00       	nop
     return;
-    315a:	08 95       	ret
+    317a:	08 95       	ret
   wykonaj_zdarzenie_timer = FALSE;
-    315c:	10 92 e4 01 	sts	0x01E4, r1	; 0x8001e4 <wykonaj_zdarzenie_timer>
+    317c:	10 92 e4 01 	sts	0x01E4, r1	; 0x8001e4 <wykonaj_zdarzenie_timer>
   if (wykonac_watki_10MS) {
-    3160:	80 91 e3 01 	lds	r24, 0x01E3	; 0x8001e3 <wykonac_watki_10MS>
-    3164:	88 23       	and	r24, r24
-    3166:	29 f0       	breq	.+10     	; 0x3172 <wolne_zdarzenie_timer+0x40>
+    3180:	80 91 e3 01 	lds	r24, 0x01E3	; 0x8001e3 <wykonac_watki_10MS>
+    3184:	88 23       	and	r24, r24
+    3186:	29 f0       	breq	.+10     	; 0x3192 <wolne_zdarzenie_timer+0x40>
     wykonac_watki = WYKONAJ_WATKI_10MS;
-    3168:	81 e0       	ldi	r24, 0x01	; 1
-    316a:	80 93 e2 01 	sts	0x01E2, r24	; 0x8001e2 <wykonac_watki>
+    3188:	81 e0       	ldi	r24, 0x01	; 1
+    318a:	80 93 e2 01 	sts	0x01E2, r24	; 0x8001e2 <wykonac_watki>
     wykonac_watki_10MS = FALSE;
-    316e:	10 92 e3 01 	sts	0x01E3, r1	; 0x8001e3 <wykonac_watki_10MS>
+    318e:	10 92 e3 01 	sts	0x01E3, r1	; 0x8001e3 <wykonac_watki_10MS>
   WYKONAJ_CLI_SEI(WLACZ_PRZERWANIE_TIMER());
-    3172:	f8 94       	cli
-    3174:	80 91 6e 00 	lds	r24, 0x006E	; 0x80006e <__TEXT_REGION_LENGTH__+0x7e006e>
-    3178:	82 60       	ori	r24, 0x02	; 2
-    317a:	80 93 6e 00 	sts	0x006E, r24	; 0x80006e <__TEXT_REGION_LENGTH__+0x7e006e>
-    317e:	78 94       	sei
-    3180:	00 00       	nop
+    3192:	f8 94       	cli
+    3194:	80 91 6e 00 	lds	r24, 0x006E	; 0x80006e <__TEXT_REGION_LENGTH__+0x7e006e>
+    3198:	82 60       	ori	r24, 0x02	; 2
+    319a:	80 93 6e 00 	sts	0x006E, r24	; 0x80006e <__TEXT_REGION_LENGTH__+0x7e006e>
+    319e:	78 94       	sei
+    31a0:	00 00       	nop
   if (CZY_WYKONAC_WATKI_10MS()) {
-    3182:	80 91 e2 01 	lds	r24, 0x01E2	; 0x8001e2 <wykonac_watki>
-    3186:	80 ff       	sbrs	r24, 0
-    3188:	33 c0       	rjmp	.+102    	; 0x31f0 <wolne_zdarzenie_timer+0xbe>
+    31a2:	80 91 e2 01 	lds	r24, 0x01E2	; 0x8001e2 <wykonac_watki>
+    31a6:	80 ff       	sbrs	r24, 0
+    31a8:	33 c0       	rjmp	.+102    	; 0x3210 <wolne_zdarzenie_timer+0xbe>
     if (++licznik_wybuc_watki_100MS == OPOZNIENIE_100_MS) {
-    318a:	80 91 13 02 	lds	r24, 0x0213	; 0x800213 <licznik_wybuc_watki_100MS.3754>
-    318e:	8f 5f       	subi	r24, 0xFF	; 255
-    3190:	8a 30       	cpi	r24, 0x0A	; 10
-    3192:	79 f1       	breq	.+94     	; 0x31f2 <wolne_zdarzenie_timer+0xc0>
-    3194:	80 93 13 02 	sts	0x0213, r24	; 0x800213 <licznik_wybuc_watki_100MS.3754>
+    31aa:	80 91 13 02 	lds	r24, 0x0213	; 0x800213 <licznik_wybuc_watki_100MS.3754>
+    31ae:	8f 5f       	subi	r24, 0xFF	; 255
+    31b0:	8a 30       	cpi	r24, 0x0A	; 10
+    31b2:	79 f1       	breq	.+94     	; 0x3212 <wolne_zdarzenie_timer+0xc0>
+    31b4:	80 93 13 02 	sts	0x0213, r24	; 0x800213 <licznik_wybuc_watki_100MS.3754>
     NOP();
-    3198:	00 00       	nop
+    31b8:	00 00       	nop
     cli();
-    319a:	f8 94       	cli
+    31ba:	f8 94       	cli
     if (CZY_ODBIERANIE_DANYCH_SIM900()) {
-    319c:	00 b6       	in	r0, 0x30	; 48
-    319e:	01 fe       	sbrs	r0, 1
-    31a0:	26 c0       	rjmp	.+76     	; 0x31ee <wolne_zdarzenie_timer+0xbc>
+    31bc:	00 b6       	in	r0, 0x30	; 48
+    31be:	01 fe       	sbrs	r0, 1
+    31c0:	26 c0       	rjmp	.+76     	; 0x320e <wolne_zdarzenie_timer+0xbc>
       WYLACZ_PRZERWANIE_ODBIORU_DANYCH_SIM900();
-    31a2:	80 91 c1 00 	lds	r24, 0x00C1	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
-    31a6:	8f 77       	andi	r24, 0x7F	; 127
-    31a8:	80 93 c1 00 	sts	0x00C1, r24	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
+    31c2:	80 91 c1 00 	lds	r24, 0x00C1	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
+    31c6:	8f 77       	andi	r24, 0x7F	; 127
+    31c8:	80 93 c1 00 	sts	0x00C1, r24	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
       sei();
-    31ac:	78 94       	sei
+    31cc:	78 94       	sei
       if (liczba_odebranych_znakow_SIM900 != 0 &&
-    31ae:	80 91 5a 05 	lds	r24, 0x055A	; 0x80055a <liczba_odebranych_znakow_SIM900>
-    31b2:	90 91 5b 05 	lds	r25, 0x055B	; 0x80055b <liczba_odebranych_znakow_SIM900+0x1>
-    31b6:	89 2b       	or	r24, r25
-    31b8:	11 f1       	breq	.+68     	; 0x31fe <wolne_zdarzenie_timer+0xcc>
+    31ce:	80 91 5a 05 	lds	r24, 0x055A	; 0x80055a <liczba_odebranych_znakow_SIM900>
+    31d2:	90 91 5b 05 	lds	r25, 0x055B	; 0x80055b <liczba_odebranych_znakow_SIM900+0x1>
+    31d6:	89 2b       	or	r24, r25
+    31d8:	11 f1       	breq	.+68     	; 0x321e <wolne_zdarzenie_timer+0xcc>
           ++licznik_opoznienie_oczekiwania_na_bajt_SIM900 >
-    31ba:	80 91 6a 05 	lds	r24, 0x056A	; 0x80056a <licznik_opoznienie_oczekiwania_na_bajt_SIM900>
-    31be:	8f 5f       	subi	r24, 0xFF	; 255
+    31da:	80 91 6a 05 	lds	r24, 0x056A	; 0x80056a <licznik_opoznienie_oczekiwania_na_bajt_SIM900>
+    31de:	8f 5f       	subi	r24, 0xFF	; 255
       if (liczba_odebranych_znakow_SIM900 != 0 &&
-    31c0:	80 93 6a 05 	sts	0x056A, r24	; 0x80056a <licznik_opoznienie_oczekiwania_na_bajt_SIM900>
-    31c4:	83 33       	cpi	r24, 0x33	; 51
-    31c6:	d8 f0       	brcs	.+54     	; 0x31fe <wolne_zdarzenie_timer+0xcc>
+    31e0:	80 93 6a 05 	sts	0x056A, r24	; 0x80056a <licznik_opoznienie_oczekiwania_na_bajt_SIM900>
+    31e4:	83 33       	cpi	r24, 0x33	; 51
+    31e6:	d8 f0       	brcs	.+54     	; 0x321e <wolne_zdarzenie_timer+0xcc>
         resetuj_odbior_SIM900_po_bledzie();
-    31c8:	45 9a       	sbi	0x08, 5	; 8
-    31ca:	80 91 c1 00 	lds	r24, 0x00C1	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
-    31ce:	8f 77       	andi	r24, 0x7F	; 127
-    31d0:	80 93 c1 00 	sts	0x00C1, r24	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
-    31d4:	80 b7       	in	r24, 0x30	; 48
-    31d6:	8d 7f       	andi	r24, 0xFD	; 253
-    31d8:	80 bf       	out	0x30, r24	; 48
-    31da:	10 92 c3 03 	sts	0x03C3, r1	; 0x8003c3 <poczatek_polecenia_SIM900+0x1>
-    31de:	10 92 c2 03 	sts	0x03C2, r1	; 0x8003c2 <poczatek_polecenia_SIM900>
-    31e2:	10 92 58 05 	sts	0x0558, r1	; 0x800558 <zakonczenie_polecenia_SIM900+0x1>
-    31e6:	10 92 57 05 	sts	0x0557, r1	; 0x800557 <zakonczenie_polecenia_SIM900>
-    31ea:	10 92 bf 03 	sts	0x03BF, r1	; 0x8003bf <czy_jest_nowe_polecenie_SIM900>
+    31e8:	45 9a       	sbi	0x08, 5	; 8
+    31ea:	80 91 c1 00 	lds	r24, 0x00C1	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
+    31ee:	8f 77       	andi	r24, 0x7F	; 127
+    31f0:	80 93 c1 00 	sts	0x00C1, r24	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
+    31f4:	80 b7       	in	r24, 0x30	; 48
+    31f6:	8d 7f       	andi	r24, 0xFD	; 253
+    31f8:	80 bf       	out	0x30, r24	; 48
+    31fa:	10 92 c3 03 	sts	0x03C3, r1	; 0x8003c3 <poczatek_polecenia_SIM900+0x1>
+    31fe:	10 92 c2 03 	sts	0x03C2, r1	; 0x8003c2 <poczatek_polecenia_SIM900>
+    3202:	10 92 58 05 	sts	0x0558, r1	; 0x800558 <zakonczenie_polecenia_SIM900+0x1>
+    3206:	10 92 57 05 	sts	0x0557, r1	; 0x800557 <zakonczenie_polecenia_SIM900>
+    320a:	10 92 bf 03 	sts	0x03BF, r1	; 0x8003bf <czy_jest_nowe_polecenie_SIM900>
     sei();
-    31ee:	78 94       	sei
+    320e:	78 94       	sei
 }
-    31f0:	08 95       	ret
+    3210:	08 95       	ret
       licznik_wybuc_watki_100MS = 0;
-    31f2:	10 92 13 02 	sts	0x0213, r1	; 0x800213 <licznik_wybuc_watki_100MS.3754>
+    3212:	10 92 13 02 	sts	0x0213, r1	; 0x800213 <licznik_wybuc_watki_100MS.3754>
       wykonac_watki = WYKONAJ_WATKI_100MS | WYKONAJ_WATKI_10MS;
-    31f6:	83 e0       	ldi	r24, 0x03	; 3
-    31f8:	80 93 e2 01 	sts	0x01E2, r24	; 0x8001e2 <wykonac_watki>
-    31fc:	cd cf       	rjmp	.-102    	; 0x3198 <wolne_zdarzenie_timer+0x66>
-        WYKONAJ_CLI_SEI(WLACZ_PRZERWANIE_ODBIORU_DANYCH_SIM900());
-    31fe:	f8 94       	cli
-    3200:	80 91 c1 00 	lds	r24, 0x00C1	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
-    3204:	80 68       	ori	r24, 0x80	; 128
-    3206:	80 93 c1 00 	sts	0x00C1, r24	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
-    320a:	78 94       	sei
-    320c:	00 00       	nop
-    320e:	ef cf       	rjmp	.-34     	; 0x31ee <wolne_zdarzenie_timer+0xbc>
-
-00003210 <ustaw_parametry_dla_bezpieczenstwa>:
-  wdt_reset();
-    3210:	a8 95       	wdr
-  ustaw_parametry_dla_bezpieczenstwa_rejestry();
-    3212:	82 e0       	ldi	r24, 0x02	; 2
-    3214:	84 bd       	out	0x24, r24	; 36
     3216:	83 e0       	ldi	r24, 0x03	; 3
-    3218:	85 bd       	out	0x25, r24	; 37
-    321a:	8f e3       	ldi	r24, 0x3F	; 63
-    321c:	87 bd       	out	0x27, r24	; 39
-    321e:	ee e6       	ldi	r30, 0x6E	; 110
-    3220:	f0 e0       	ldi	r31, 0x00	; 0
-    3222:	80 81       	ld	r24, Z
-    3224:	82 60       	ori	r24, 0x02	; 2
-    3226:	80 83       	st	Z, r24
-  set_sleep_mode(SLEEP_MODE_IDLE);
-    3228:	83 b7       	in	r24, 0x33	; 51
-    322a:	81 7f       	andi	r24, 0xF1	; 241
-    322c:	83 bf       	out	0x33, r24	; 51
-}
-    322e:	08 95       	ret
+    3218:	80 93 e2 01 	sts	0x01E2, r24	; 0x8001e2 <wykonac_watki>
+    321c:	cd cf       	rjmp	.-102    	; 0x31b8 <wolne_zdarzenie_timer+0x66>
+        WYKONAJ_CLI_SEI(WLACZ_PRZERWANIE_ODBIORU_DANYCH_SIM900());
+    321e:	f8 94       	cli
+    3220:	80 91 c1 00 	lds	r24, 0x00C1	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
+    3224:	80 68       	ori	r24, 0x80	; 128
+    3226:	80 93 c1 00 	sts	0x00C1, r24	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
+    322a:	78 94       	sei
+    322c:	00 00       	nop
+    322e:	ef cf       	rjmp	.-34     	; 0x320e <wolne_zdarzenie_timer+0xbc>
 
-00003230 <inicjalizuj_parametry_modulu>:
+00003230 <ustaw_parametry_dla_bezpieczenstwa>:
+  wdt_reset();
+    3230:	a8 95       	wdr
+  ustaw_parametry_dla_bezpieczenstwa_rejestry();
+    3232:	82 e0       	ldi	r24, 0x02	; 2
+    3234:	84 bd       	out	0x24, r24	; 36
+    3236:	83 e0       	ldi	r24, 0x03	; 3
+    3238:	85 bd       	out	0x25, r24	; 37
+    323a:	8f e3       	ldi	r24, 0x3F	; 63
+    323c:	87 bd       	out	0x27, r24	; 39
+    323e:	ee e6       	ldi	r30, 0x6E	; 110
+    3240:	f0 e0       	ldi	r31, 0x00	; 0
+    3242:	80 81       	ld	r24, Z
+    3244:	82 60       	ori	r24, 0x02	; 2
+    3246:	80 83       	st	Z, r24
+  set_sleep_mode(SLEEP_MODE_IDLE);
+    3248:	83 b7       	in	r24, 0x33	; 51
+    324a:	81 7f       	andi	r24, 0xF1	; 241
+    324c:	83 bf       	out	0x33, r24	; 51
+}
+    324e:	08 95       	ret
+
+00003250 <inicjalizuj_parametry_modulu>:
 void inicjalizuj_parametry_modulu(void) {
-    3230:	cf 93       	push	r28
-    3232:	df 93       	push	r29
+    3250:	cf 93       	push	r28
+    3252:	df 93       	push	r29
   memcpy_E(kod_modulu, ADRES_EEPROM_KOD_DOSTEPU, LICZBA_BAJTOW_KODU_DOSTEPU);
-    3234:	44 e0       	ldi	r20, 0x04	; 4
-    3236:	50 e0       	ldi	r21, 0x00	; 0
-    3238:	61 e0       	ldi	r22, 0x01	; 1
-    323a:	70 e0       	ldi	r23, 0x00	; 0
-    323c:	8c e7       	ldi	r24, 0x7C	; 124
-    323e:	93 e0       	ldi	r25, 0x03	; 3
-    3240:	0e 94 4b 33 	call	0x6696	; 0x6696 <eeprom_read_block>
+    3254:	44 e0       	ldi	r20, 0x04	; 4
+    3256:	50 e0       	ldi	r21, 0x00	; 0
+    3258:	61 e0       	ldi	r22, 0x01	; 1
+    325a:	70 e0       	ldi	r23, 0x00	; 0
+    325c:	8c e7       	ldi	r24, 0x7C	; 124
+    325e:	93 e0       	ldi	r25, 0x03	; 3
+    3260:	0e 94 4b 33 	call	0x6696	; 0x6696 <eeprom_read_block>
   if (kod_modulu[0] == 0xFF || kod_modulu[0] == 0x00) {
-    3244:	80 91 7c 03 	lds	r24, 0x037C	; 0x80037c <kod_modulu>
-    3248:	81 50       	subi	r24, 0x01	; 1
-    324a:	8e 3f       	cpi	r24, 0xFE	; 254
-    324c:	f0 f0       	brcs	.+60     	; 0x328a <inicjalizuj_parametry_modulu+0x5a>
+    3264:	80 91 7c 03 	lds	r24, 0x037C	; 0x80037c <kod_modulu>
+    3268:	81 50       	subi	r24, 0x01	; 1
+    326a:	8e 3f       	cpi	r24, 0xFE	; 254
+    326c:	f0 f0       	brcs	.+60     	; 0x32aa <inicjalizuj_parametry_modulu+0x5a>
     kod_modulu[0] = bufor_eeprom[0] = 'A';
-    324e:	81 e4       	ldi	r24, 0x41	; 65
-    3250:	80 93 ea 07 	sts	0x07EA, r24	; 0x8007ea <bufor_eeprom>
-    3254:	80 93 7c 03 	sts	0x037C, r24	; 0x80037c <kod_modulu>
+    326e:	81 e4       	ldi	r24, 0x41	; 65
+    3270:	80 93 ea 07 	sts	0x07EA, r24	; 0x8007ea <bufor_eeprom>
+    3274:	80 93 7c 03 	sts	0x037C, r24	; 0x80037c <kod_modulu>
     kod_modulu[1] = bufor_eeprom[1] = 'B';
-    3258:	82 e4       	ldi	r24, 0x42	; 66
-    325a:	80 93 eb 07 	sts	0x07EB, r24	; 0x8007eb <bufor_eeprom+0x1>
-    325e:	80 93 7d 03 	sts	0x037D, r24	; 0x80037d <kod_modulu+0x1>
+    3278:	82 e4       	ldi	r24, 0x42	; 66
+    327a:	80 93 eb 07 	sts	0x07EB, r24	; 0x8007eb <bufor_eeprom+0x1>
+    327e:	80 93 7d 03 	sts	0x037D, r24	; 0x80037d <kod_modulu+0x1>
     kod_modulu[2] = bufor_eeprom[2] = 'C';
-    3262:	83 e4       	ldi	r24, 0x43	; 67
-    3264:	80 93 ec 07 	sts	0x07EC, r24	; 0x8007ec <bufor_eeprom+0x2>
-    3268:	80 93 7e 03 	sts	0x037E, r24	; 0x80037e <kod_modulu+0x2>
+    3282:	83 e4       	ldi	r24, 0x43	; 67
+    3284:	80 93 ec 07 	sts	0x07EC, r24	; 0x8007ec <bufor_eeprom+0x2>
+    3288:	80 93 7e 03 	sts	0x037E, r24	; 0x80037e <kod_modulu+0x2>
     kod_modulu[3] = bufor_eeprom[3] = 'D';
-    326c:	84 e4       	ldi	r24, 0x44	; 68
-    326e:	80 93 ed 07 	sts	0x07ED, r24	; 0x8007ed <bufor_eeprom+0x3>
-    3272:	80 93 7f 03 	sts	0x037F, r24	; 0x80037f <kod_modulu+0x3>
+    328c:	84 e4       	ldi	r24, 0x44	; 68
+    328e:	80 93 ed 07 	sts	0x07ED, r24	; 0x8007ed <bufor_eeprom+0x3>
+    3292:	80 93 7f 03 	sts	0x037F, r24	; 0x80037f <kod_modulu+0x3>
     while (!eeprom_is_ready())
-    3276:	f9 99       	sbic	0x1f, 1	; 31
-    3278:	fe cf       	rjmp	.-4      	; 0x3276 <inicjalizuj_parametry_modulu+0x46>
+    3296:	f9 99       	sbic	0x1f, 1	; 31
+    3298:	fe cf       	rjmp	.-4      	; 0x3296 <inicjalizuj_parametry_modulu+0x46>
     eeprom_update_block(kod_modulu, (void *)ADRES_EEPROM_KOD_DOSTEPU,
-    327a:	44 e0       	ldi	r20, 0x04	; 4
-    327c:	50 e0       	ldi	r21, 0x00	; 0
-    327e:	61 e0       	ldi	r22, 0x01	; 1
-    3280:	70 e0       	ldi	r23, 0x00	; 0
-    3282:	8c e7       	ldi	r24, 0x7C	; 124
-    3284:	93 e0       	ldi	r25, 0x03	; 3
-    3286:	0e 94 63 33 	call	0x66c6	; 0x66c6 <eeprom_update_block>
+    329a:	44 e0       	ldi	r20, 0x04	; 4
+    329c:	50 e0       	ldi	r21, 0x00	; 0
+    329e:	61 e0       	ldi	r22, 0x01	; 1
+    32a0:	70 e0       	ldi	r23, 0x00	; 0
+    32a2:	8c e7       	ldi	r24, 0x7C	; 124
+    32a4:	93 e0       	ldi	r25, 0x03	; 3
+    32a6:	0e 94 63 33 	call	0x66c6	; 0x66c6 <eeprom_update_block>
   tryb_pracy = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_TRYB_PRACY);
-    328a:	8e ef       	ldi	r24, 0xFE	; 254
-    328c:	9f e0       	ldi	r25, 0x0F	; 15
-    328e:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
+    32aa:	8e ef       	ldi	r24, 0xFE	; 254
+    32ac:	9f e0       	ldi	r25, 0x0F	; 15
+    32ae:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
   if (tryb_pracy == 0xFF) {
-    3292:	8f 3f       	cpi	r24, 0xFF	; 255
-    3294:	09 f4       	brne	.+2      	; 0x3298 <inicjalizuj_parametry_modulu+0x68>
-    3296:	f5 c0       	rjmp	.+490    	; 0x3482 <inicjalizuj_parametry_modulu+0x252>
+    32b2:	8f 3f       	cpi	r24, 0xFF	; 255
+    32b4:	09 f4       	brne	.+2      	; 0x32b8 <inicjalizuj_parametry_modulu+0x68>
+    32b6:	e5 c0       	rjmp	.+458    	; 0x3482 <inicjalizuj_parametry_modulu+0x232>
   tryb_pracy = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_TRYB_PRACY);
-    3298:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <tryb_pracy>
+    32b8:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <tryb_pracy>
   tryb_clip = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_TRYB_CLIP_DTMF);
-    329c:	8f ef       	ldi	r24, 0xFF	; 255
-    329e:	9f e0       	ldi	r25, 0x0F	; 15
-    32a0:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
+    32bc:	8f ef       	ldi	r24, 0xFF	; 255
+    32be:	9f e0       	ldi	r25, 0x0F	; 15
+    32c0:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
   if (tryb_clip == 0xFF) {
-    32a4:	8f 3f       	cpi	r24, 0xFF	; 255
-    32a6:	09 f4       	brne	.+2      	; 0x32aa <inicjalizuj_parametry_modulu+0x7a>
-    32a8:	f7 c0       	rjmp	.+494    	; 0x3498 <inicjalizuj_parametry_modulu+0x268>
+    32c4:	8f 3f       	cpi	r24, 0xFF	; 255
+    32c6:	09 f4       	brne	.+2      	; 0x32ca <inicjalizuj_parametry_modulu+0x7a>
+    32c8:	e7 c0       	rjmp	.+462    	; 0x3498 <inicjalizuj_parametry_modulu+0x248>
   tryb_clip = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_TRYB_CLIP_DTMF);
-    32aa:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <tryb_clip>
+    32ca:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <tryb_clip>
   czas_start_h = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_START_H);
-    32ae:	8a ef       	ldi	r24, 0xFA	; 250
-    32b0:	9f e0       	ldi	r25, 0x0F	; 15
-    32b2:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
-    32b6:	80 93 0a 01 	sts	0x010A, r24	; 0x80010a <czas_start_h>
+    32ce:	8a ef       	ldi	r24, 0xFA	; 250
+    32d0:	9f e0       	ldi	r25, 0x0F	; 15
+    32d2:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
+    32d6:	80 93 0a 01 	sts	0x010A, r24	; 0x80010a <czas_start_h>
   czas_start_m = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_START_M);
-    32ba:	8b ef       	ldi	r24, 0xFB	; 251
-    32bc:	9f e0       	ldi	r25, 0x0F	; 15
-    32be:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
-    32c2:	80 93 09 01 	sts	0x0109, r24	; 0x800109 <czas_start_m>
+    32da:	8b ef       	ldi	r24, 0xFB	; 251
+    32dc:	9f e0       	ldi	r25, 0x0F	; 15
+    32de:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
+    32e2:	80 93 09 01 	sts	0x0109, r24	; 0x800109 <czas_start_m>
   czas_stop_h = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_STOP_H);
-    32c6:	8c ef       	ldi	r24, 0xFC	; 252
-    32c8:	9f e0       	ldi	r25, 0x0F	; 15
-    32ca:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
-    32ce:	80 93 08 01 	sts	0x0108, r24	; 0x800108 <czas_stop_h>
+    32e6:	8c ef       	ldi	r24, 0xFC	; 252
+    32e8:	9f e0       	ldi	r25, 0x0F	; 15
+    32ea:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
+    32ee:	80 93 08 01 	sts	0x0108, r24	; 0x800108 <czas_stop_h>
   czas_stop_m = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_CZAS_STOP_M);
-    32d2:	8d ef       	ldi	r24, 0xFD	; 253
-    32d4:	9f e0       	ldi	r25, 0x0F	; 15
-    32d6:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
-    32da:	80 93 07 01 	sts	0x0107, r24	; 0x800107 <czas_stop_m>
+    32f2:	8d ef       	ldi	r24, 0xFD	; 253
+    32f4:	9f e0       	ldi	r25, 0x0F	; 15
+    32f6:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
+    32fa:	80 93 07 01 	sts	0x0107, r24	; 0x800107 <czas_stop_m>
   skryba_wlaczona = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA);
-    32de:	89 ef       	ldi	r24, 0xF9	; 249
-    32e0:	9f e0       	ldi	r25, 0x0F	; 15
-    32e2:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
+    32fe:	89 ef       	ldi	r24, 0xF9	; 249
+    3300:	9f e0       	ldi	r25, 0x0F	; 15
+    3302:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
   if (skryba_wlaczona == 0xFF)
-    32e6:	8f 3f       	cpi	r24, 0xFF	; 255
-    32e8:	09 f4       	brne	.+2      	; 0x32ec <inicjalizuj_parametry_modulu+0xbc>
-    32ea:	e1 c0       	rjmp	.+450    	; 0x34ae <inicjalizuj_parametry_modulu+0x27e>
+    3306:	8f 3f       	cpi	r24, 0xFF	; 255
+    3308:	09 f4       	brne	.+2      	; 0x330c <inicjalizuj_parametry_modulu+0xbc>
+    330a:	d1 c0       	rjmp	.+418    	; 0x34ae <inicjalizuj_parametry_modulu+0x25e>
   skryba_wlaczona = eeprom_read_byte((const uint8_t *)ADRES_EEPROM_SKRYBA);
-    32ec:	80 93 ed 01 	sts	0x01ED, r24	; 0x8001ed <skryba_wlaczona>
+    330c:	80 93 ed 01 	sts	0x01ED, r24	; 0x8001ed <skryba_wlaczona>
   uchar limit_l =
-    32f0:	85 ef       	ldi	r24, 0xF5	; 245
-    32f2:	9f e0       	ldi	r25, 0x0F	; 15
-    32f4:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
-    32f8:	c8 2f       	mov	r28, r24
+    3310:	85 ef       	ldi	r24, 0xF5	; 245
+    3312:	9f e0       	ldi	r25, 0x0F	; 15
+    3314:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
+    3318:	c8 2f       	mov	r28, r24
   uchar limit_h =
-    32fa:	86 ef       	ldi	r24, 0xF6	; 246
-    32fc:	9f e0       	ldi	r25, 0x0F	; 15
-    32fe:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
+    331a:	86 ef       	ldi	r24, 0xF6	; 246
+    331c:	9f e0       	ldi	r25, 0x0F	; 15
+    331e:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
   if (limit_l == 0xFF && limit_h == 0xFF) {
-    3302:	cf 3f       	cpi	r28, 0xFF	; 255
-    3304:	09 f0       	breq	.+2      	; 0x3308 <inicjalizuj_parametry_modulu+0xd8>
-    3306:	d6 c0       	rjmp	.+428    	; 0x34b4 <inicjalizuj_parametry_modulu+0x284>
-    3308:	8f 3f       	cpi	r24, 0xFF	; 255
-    330a:	09 f0       	breq	.+2      	; 0x330e <inicjalizuj_parametry_modulu+0xde>
-    330c:	d3 c0       	rjmp	.+422    	; 0x34b4 <inicjalizuj_parametry_modulu+0x284>
+    3322:	cf 3f       	cpi	r28, 0xFF	; 255
+    3324:	09 f0       	breq	.+2      	; 0x3328 <inicjalizuj_parametry_modulu+0xd8>
+    3326:	c6 c0       	rjmp	.+396    	; 0x34b4 <inicjalizuj_parametry_modulu+0x264>
+    3328:	8f 3f       	cpi	r24, 0xFF	; 255
+    332a:	09 f0       	breq	.+2      	; 0x332e <inicjalizuj_parametry_modulu+0xde>
+    332c:	c3 c0       	rjmp	.+390    	; 0x34b4 <inicjalizuj_parametry_modulu+0x264>
     skryba_limit = 800;
-    330e:	80 e2       	ldi	r24, 0x20	; 32
-    3310:	93 e0       	ldi	r25, 0x03	; 3
-    3312:	90 93 03 01 	sts	0x0103, r25	; 0x800103 <skryba_limit+0x1>
-    3316:	80 93 02 01 	sts	0x0102, r24	; 0x800102 <skryba_limit>
+    332e:	80 e2       	ldi	r24, 0x20	; 32
+    3330:	93 e0       	ldi	r25, 0x03	; 3
+    3332:	90 93 03 01 	sts	0x0103, r25	; 0x800103 <skryba_limit+0x1>
+    3336:	80 93 02 01 	sts	0x0102, r24	; 0x800102 <skryba_limit>
   zapisz_debug_do_eeprom(skryba_wlaczona ? 1 : 0, (uchar)(skryba_limit & 0xFF));
-    331a:	81 e0       	ldi	r24, 0x01	; 1
-    331c:	90 91 ed 01 	lds	r25, 0x01ED	; 0x8001ed <skryba_wlaczona>
-    3320:	91 11       	cpse	r25, r1
-    3322:	01 c0       	rjmp	.+2      	; 0x3326 <inicjalizuj_parametry_modulu+0xf6>
-    3324:	80 e0       	ldi	r24, 0x00	; 0
-    3326:	60 91 02 01 	lds	r22, 0x0102	; 0x800102 <skryba_limit>
-    332a:	0e 94 b3 03 	call	0x766	; 0x766 <zapisz_debug_do_eeprom>
+    333a:	81 e0       	ldi	r24, 0x01	; 1
+    333c:	90 91 ed 01 	lds	r25, 0x01ED	; 0x8001ed <skryba_wlaczona>
+    3340:	91 11       	cpse	r25, r1
+    3342:	01 c0       	rjmp	.+2      	; 0x3346 <inicjalizuj_parametry_modulu+0xf6>
+    3344:	80 e0       	ldi	r24, 0x00	; 0
+    3346:	60 91 02 01 	lds	r22, 0x0102	; 0x800102 <skryba_limit>
+    334a:	0e 94 b3 03 	call	0x766	; 0x766 <zapisz_debug_do_eeprom>
   if ((czas_start_h > 23 && czas_start_h != 0xFF) ||
-    332e:	80 91 0a 01 	lds	r24, 0x010A	; 0x80010a <czas_start_h>
-    3332:	88 51       	subi	r24, 0x18	; 24
-    3334:	87 3e       	cpi	r24, 0xE7	; 231
-    3336:	78 f0       	brcs	.+30     	; 0x3356 <inicjalizuj_parametry_modulu+0x126>
+    334e:	80 91 0a 01 	lds	r24, 0x010A	; 0x80010a <czas_start_h>
+    3352:	88 51       	subi	r24, 0x18	; 24
+    3354:	87 3e       	cpi	r24, 0xE7	; 231
+    3356:	78 f0       	brcs	.+30     	; 0x3376 <inicjalizuj_parametry_modulu+0x126>
       (czas_start_m > 59 && czas_start_m != 0xFF) ||
-    3338:	80 91 09 01 	lds	r24, 0x0109	; 0x800109 <czas_start_m>
-    333c:	8c 53       	subi	r24, 0x3C	; 60
+    3358:	80 91 09 01 	lds	r24, 0x0109	; 0x800109 <czas_start_m>
+    335c:	8c 53       	subi	r24, 0x3C	; 60
   if ((czas_start_h > 23 && czas_start_h != 0xFF) ||
-    333e:	83 3c       	cpi	r24, 0xC3	; 195
-    3340:	50 f0       	brcs	.+20     	; 0x3356 <inicjalizuj_parametry_modulu+0x126>
+    335e:	83 3c       	cpi	r24, 0xC3	; 195
+    3360:	50 f0       	brcs	.+20     	; 0x3376 <inicjalizuj_parametry_modulu+0x126>
       (czas_stop_h > 23 && czas_stop_h != 0xFF) ||
-    3342:	80 91 08 01 	lds	r24, 0x0108	; 0x800108 <czas_stop_h>
-    3346:	88 51       	subi	r24, 0x18	; 24
+    3362:	80 91 08 01 	lds	r24, 0x0108	; 0x800108 <czas_stop_h>
+    3366:	88 51       	subi	r24, 0x18	; 24
       (czas_start_m > 59 && czas_start_m != 0xFF) ||
-    3348:	87 3e       	cpi	r24, 0xE7	; 231
-    334a:	28 f0       	brcs	.+10     	; 0x3356 <inicjalizuj_parametry_modulu+0x126>
+    3368:	87 3e       	cpi	r24, 0xE7	; 231
+    336a:	28 f0       	brcs	.+10     	; 0x3376 <inicjalizuj_parametry_modulu+0x126>
       (czas_stop_m > 59 && czas_stop_m != 0xFF)) {
-    334c:	80 91 07 01 	lds	r24, 0x0107	; 0x800107 <czas_stop_m>
-    3350:	8c 53       	subi	r24, 0x3C	; 60
+    336c:	80 91 07 01 	lds	r24, 0x0107	; 0x800107 <czas_stop_m>
+    3370:	8c 53       	subi	r24, 0x3C	; 60
       (czas_stop_h > 23 && czas_stop_h != 0xFF) ||
-    3352:	83 3c       	cpi	r24, 0xC3	; 195
-    3354:	28 f5       	brcc	.+74     	; 0x33a0 <inicjalizuj_parametry_modulu+0x170>
+    3372:	83 3c       	cpi	r24, 0xC3	; 195
+    3374:	28 f5       	brcc	.+74     	; 0x33c0 <inicjalizuj_parametry_modulu+0x170>
     while (!eeprom_is_ready())
-    3356:	f9 99       	sbic	0x1f, 1	; 31
-    3358:	fe cf       	rjmp	.-4      	; 0x3356 <inicjalizuj_parametry_modulu+0x126>
+    3376:	f9 99       	sbic	0x1f, 1	; 31
+    3378:	fe cf       	rjmp	.-4      	; 0x3376 <inicjalizuj_parametry_modulu+0x126>
     eeprom_update_byte((uint8_t *)ADRES_EEPROM_CZAS_START_H, 0xFF);
-    335a:	6f ef       	ldi	r22, 0xFF	; 255
-    335c:	8a ef       	ldi	r24, 0xFA	; 250
-    335e:	9f e0       	ldi	r25, 0x0F	; 15
-    3360:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
+    337a:	6f ef       	ldi	r22, 0xFF	; 255
+    337c:	8a ef       	ldi	r24, 0xFA	; 250
+    337e:	9f e0       	ldi	r25, 0x0F	; 15
+    3380:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
     while (!eeprom_is_ready())
-    3364:	f9 99       	sbic	0x1f, 1	; 31
-    3366:	fe cf       	rjmp	.-4      	; 0x3364 <inicjalizuj_parametry_modulu+0x134>
+    3384:	f9 99       	sbic	0x1f, 1	; 31
+    3386:	fe cf       	rjmp	.-4      	; 0x3384 <inicjalizuj_parametry_modulu+0x134>
     eeprom_update_byte((uint8_t *)ADRES_EEPROM_CZAS_START_M, 0xFF);
-    3368:	6f ef       	ldi	r22, 0xFF	; 255
-    336a:	8b ef       	ldi	r24, 0xFB	; 251
-    336c:	9f e0       	ldi	r25, 0x0F	; 15
-    336e:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
+    3388:	6f ef       	ldi	r22, 0xFF	; 255
+    338a:	8b ef       	ldi	r24, 0xFB	; 251
+    338c:	9f e0       	ldi	r25, 0x0F	; 15
+    338e:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
     while (!eeprom_is_ready())
-    3372:	f9 99       	sbic	0x1f, 1	; 31
-    3374:	fe cf       	rjmp	.-4      	; 0x3372 <inicjalizuj_parametry_modulu+0x142>
+    3392:	f9 99       	sbic	0x1f, 1	; 31
+    3394:	fe cf       	rjmp	.-4      	; 0x3392 <inicjalizuj_parametry_modulu+0x142>
     eeprom_update_byte((uint8_t *)ADRES_EEPROM_CZAS_STOP_H, 0xFF);
-    3376:	6f ef       	ldi	r22, 0xFF	; 255
-    3378:	8c ef       	ldi	r24, 0xFC	; 252
-    337a:	9f e0       	ldi	r25, 0x0F	; 15
-    337c:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
+    3396:	6f ef       	ldi	r22, 0xFF	; 255
+    3398:	8c ef       	ldi	r24, 0xFC	; 252
+    339a:	9f e0       	ldi	r25, 0x0F	; 15
+    339c:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
     while (!eeprom_is_ready())
-    3380:	f9 99       	sbic	0x1f, 1	; 31
-    3382:	fe cf       	rjmp	.-4      	; 0x3380 <inicjalizuj_parametry_modulu+0x150>
+    33a0:	f9 99       	sbic	0x1f, 1	; 31
+    33a2:	fe cf       	rjmp	.-4      	; 0x33a0 <inicjalizuj_parametry_modulu+0x150>
     eeprom_update_byte((uint8_t *)ADRES_EEPROM_CZAS_STOP_M, 0xFF);
-    3384:	6f ef       	ldi	r22, 0xFF	; 255
-    3386:	8d ef       	ldi	r24, 0xFD	; 253
-    3388:	9f e0       	ldi	r25, 0x0F	; 15
-    338a:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
+    33a4:	6f ef       	ldi	r22, 0xFF	; 255
+    33a6:	8d ef       	ldi	r24, 0xFD	; 253
+    33a8:	9f e0       	ldi	r25, 0x0F	; 15
+    33aa:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
     czas_start_h = 0xFF;
-    338e:	8f ef       	ldi	r24, 0xFF	; 255
-    3390:	80 93 0a 01 	sts	0x010A, r24	; 0x80010a <czas_start_h>
+    33ae:	8f ef       	ldi	r24, 0xFF	; 255
+    33b0:	80 93 0a 01 	sts	0x010A, r24	; 0x80010a <czas_start_h>
     czas_start_m = 0xFF;
-    3394:	80 93 09 01 	sts	0x0109, r24	; 0x800109 <czas_start_m>
+    33b4:	80 93 09 01 	sts	0x0109, r24	; 0x800109 <czas_start_m>
     czas_stop_h = 0xFF;
-    3398:	80 93 08 01 	sts	0x0108, r24	; 0x800108 <czas_stop_h>
+    33b8:	80 93 08 01 	sts	0x0108, r24	; 0x800108 <czas_stop_h>
     czas_stop_m = 0xFF;
-    339c:	80 93 07 01 	sts	0x0107, r24	; 0x800107 <czas_stop_m>
+    33bc:	80 93 07 01 	sts	0x0107, r24	; 0x800107 <czas_stop_m>
   blokada_sterowania_czasowa =
-    33a0:	10 92 3b 02 	sts	0x023B, r1	; 0x80023b <blokada_sterowania_czasowa>
+    33c0:	10 92 3b 02 	sts	0x023B, r1	; 0x80023b <blokada_sterowania_czasowa>
       eeprom_read_byte((const uint8_t *)ADRES_EEPROM_BLOKADA_SYSTEMU);
-    33a4:	87 ef       	ldi	r24, 0xF7	; 247
-    33a6:	9f e0       	ldi	r25, 0x0F	; 15
-    33a8:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
+    33c4:	87 ef       	ldi	r24, 0xF7	; 247
+    33c6:	9f e0       	ldi	r25, 0x0F	; 15
+    33c8:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
   if (blokada_systemu == 0xFF) {
-    33ac:	8f 3f       	cpi	r24, 0xFF	; 255
-    33ae:	09 f4       	brne	.+2      	; 0x33b2 <inicjalizuj_parametry_modulu+0x182>
-    33b0:	8d c0       	rjmp	.+282    	; 0x34cc <inicjalizuj_parametry_modulu+0x29c>
+    33cc:	8f 3f       	cpi	r24, 0xFF	; 255
+    33ce:	09 f4       	brne	.+2      	; 0x33d2 <inicjalizuj_parametry_modulu+0x182>
+    33d0:	7d c0       	rjmp	.+250    	; 0x34cc <inicjalizuj_parametry_modulu+0x27c>
   blokada_systemu =
-    33b2:	80 93 da 01 	sts	0x01DA, r24	; 0x8001da <blokada_systemu>
+    33d2:	80 93 da 01 	sts	0x01DA, r24	; 0x8001da <blokada_systemu>
 void inicjalizuj_parametry_modulu(void) {
-    33b6:	c0 ef       	ldi	r28, 0xF0	; 240
-    33b8:	df e0       	ldi	r29, 0x0F	; 15
+    33d6:	c0 ef       	ldi	r28, 0xF0	; 240
+    33d8:	df e0       	ldi	r29, 0x0F	; 15
     if (eeprom_read_byte((const uint8_t *)addr) == 0xFF) {
-    33ba:	ce 01       	movw	r24, r28
-    33bc:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
-    33c0:	8f 3f       	cpi	r24, 0xFF	; 255
-    33c2:	31 f4       	brne	.+12     	; 0x33d0 <inicjalizuj_parametry_modulu+0x1a0>
+    33da:	ce 01       	movw	r24, r28
+    33dc:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
+    33e0:	8f 3f       	cpi	r24, 0xFF	; 255
+    33e2:	31 f4       	brne	.+12     	; 0x33f0 <inicjalizuj_parametry_modulu+0x1a0>
       while (!eeprom_is_ready())
-    33c4:	f9 99       	sbic	0x1f, 1	; 31
-    33c6:	fe cf       	rjmp	.-4      	; 0x33c4 <inicjalizuj_parametry_modulu+0x194>
+    33e4:	f9 99       	sbic	0x1f, 1	; 31
+    33e6:	fe cf       	rjmp	.-4      	; 0x33e4 <inicjalizuj_parametry_modulu+0x194>
       eeprom_update_byte((uint8_t *)addr, 0);
-    33c8:	60 e0       	ldi	r22, 0x00	; 0
-    33ca:	ce 01       	movw	r24, r28
-    33cc:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
+    33e8:	60 e0       	ldi	r22, 0x00	; 0
+    33ea:	ce 01       	movw	r24, r28
+    33ec:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
        addr <= ADRES_EEPROM_DEBUG_SKRYBA_5; ++addr) {
-    33d0:	21 96       	adiw	r28, 0x01	; 1
+    33f0:	21 96       	adiw	r28, 0x01	; 1
   for (uint16_t addr = ADRES_EEPROM_DEBUG_SKRYBA_1;
-    33d2:	c5 3f       	cpi	r28, 0xF5	; 245
-    33d4:	8f e0       	ldi	r24, 0x0F	; 15
-    33d6:	d8 07       	cpc	r29, r24
-    33d8:	81 f7       	brne	.-32     	; 0x33ba <inicjalizuj_parametry_modulu+0x18a>
+    33f2:	c5 3f       	cpi	r28, 0xF5	; 245
+    33f4:	8f e0       	ldi	r24, 0x0F	; 15
+    33f6:	d8 07       	cpc	r29, r24
+    33f8:	81 f7       	brne	.-32     	; 0x33da <inicjalizuj_parametry_modulu+0x18a>
   for (uint16_t addr = ADRES_EEPROM_DEBUG_USER_1;
-    33da:	c6 ee       	ldi	r28, 0xE6	; 230
-    33dc:	df e0       	ldi	r29, 0x0F	; 15
+    33fa:	c6 ee       	ldi	r28, 0xE6	; 230
+    33fc:	df e0       	ldi	r29, 0x0F	; 15
     if (eeprom_read_byte((const uint8_t *)addr) == 0xFF) {
-    33de:	ce 01       	movw	r24, r28
-    33e0:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
-    33e4:	8f 3f       	cpi	r24, 0xFF	; 255
-    33e6:	31 f4       	brne	.+12     	; 0x33f4 <inicjalizuj_parametry_modulu+0x1c4>
+    33fe:	ce 01       	movw	r24, r28
+    3400:	0e 94 5b 33 	call	0x66b6	; 0x66b6 <eeprom_read_byte>
+    3404:	8f 3f       	cpi	r24, 0xFF	; 255
+    3406:	31 f4       	brne	.+12     	; 0x3414 <inicjalizuj_parametry_modulu+0x1c4>
       while (!eeprom_is_ready())
-    33e8:	f9 99       	sbic	0x1f, 1	; 31
-    33ea:	fe cf       	rjmp	.-4      	; 0x33e8 <inicjalizuj_parametry_modulu+0x1b8>
+    3408:	f9 99       	sbic	0x1f, 1	; 31
+    340a:	fe cf       	rjmp	.-4      	; 0x3408 <inicjalizuj_parametry_modulu+0x1b8>
       eeprom_update_byte((uint8_t *)addr, 0);
-    33ec:	60 e0       	ldi	r22, 0x00	; 0
-    33ee:	ce 01       	movw	r24, r28
-    33f0:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
+    340c:	60 e0       	ldi	r22, 0x00	; 0
+    340e:	ce 01       	movw	r24, r28
+    3410:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
        addr <= ADRES_EEPROM_DEBUG_USER_7; ++addr) {
-    33f4:	21 96       	adiw	r28, 0x01	; 1
+    3414:	21 96       	adiw	r28, 0x01	; 1
   for (uint16_t addr = ADRES_EEPROM_DEBUG_USER_1;
-    33f6:	cd 3e       	cpi	r28, 0xED	; 237
-    33f8:	2f e0       	ldi	r18, 0x0F	; 15
-    33fa:	d2 07       	cpc	r29, r18
-    33fc:	81 f7       	brne	.-32     	; 0x33de <inicjalizuj_parametry_modulu+0x1ae>
+    3416:	cd 3e       	cpi	r28, 0xED	; 237
+    3418:	2f e0       	ldi	r18, 0x0F	; 15
+    341a:	d2 07       	cpc	r29, r18
+    341c:	81 f7       	brne	.-32     	; 0x33fe <inicjalizuj_parametry_modulu+0x1ae>
   licznik_report_user = 0;
-    33fe:	10 92 31 02 	sts	0x0231, r1	; 0x800231 <licznik_report_user>
+    341e:	10 92 31 02 	sts	0x0231, r1	; 0x800231 <licznik_report_user>
   timer_report_user_100ms = 0;
-    3402:	10 92 30 02 	sts	0x0230, r1	; 0x800230 <timer_report_user_100ms+0x1>
-    3406:	10 92 2f 02 	sts	0x022F, r1	; 0x80022f <timer_report_user_100ms>
+    3422:	10 92 30 02 	sts	0x0230, r1	; 0x800230 <timer_report_user_100ms+0x1>
+    3426:	10 92 2f 02 	sts	0x022F, r1	; 0x80022f <timer_report_user_100ms>
   flaga_wysylanie_smsa = 0;
-    340a:	10 92 06 02 	sts	0x0206, r1	; 0x800206 <flaga_wysylanie_smsa>
+    342a:	10 92 06 02 	sts	0x0206, r1	; 0x800206 <flaga_wysylanie_smsa>
   if (licznik_resetow < 255)
-    340e:	80 91 12 02 	lds	r24, 0x0212	; 0x800212 <licznik_resetow.3798>
-    3412:	8f 3f       	cpi	r24, 0xFF	; 255
-    3414:	19 f0       	breq	.+6      	; 0x341c <inicjalizuj_parametry_modulu+0x1ec>
+    342e:	80 91 12 02 	lds	r24, 0x0212	; 0x800212 <licznik_resetow.3798>
+    3432:	8f 3f       	cpi	r24, 0xFF	; 255
+    3434:	19 f0       	breq	.+6      	; 0x343c <inicjalizuj_parametry_modulu+0x1ec>
     ++licznik_resetow;
-    3416:	8f 5f       	subi	r24, 0xFF	; 255
-    3418:	80 93 12 02 	sts	0x0212, r24	; 0x800212 <licznik_resetow.3798>
+    3436:	8f 5f       	subi	r24, 0xFF	; 255
+    3438:	80 93 12 02 	sts	0x0212, r24	; 0x800212 <licznik_resetow.3798>
   while (!eeprom_is_ready())
-    341c:	f9 99       	sbic	0x1f, 1	; 31
-    341e:	fe cf       	rjmp	.-4      	; 0x341c <inicjalizuj_parametry_modulu+0x1ec>
+    343c:	f9 99       	sbic	0x1f, 1	; 31
+    343e:	fe cf       	rjmp	.-4      	; 0x343c <inicjalizuj_parametry_modulu+0x1ec>
   eeprom_update_byte((void *)EEPROM_DEBUG_LICZNIK_RESETOW, licznik_resetow);
-    3420:	60 91 12 02 	lds	r22, 0x0212	; 0x800212 <licznik_resetow.3798>
-    3424:	8c ed       	ldi	r24, 0xDC	; 220
-    3426:	9f e0       	ldi	r25, 0x0F	; 15
-    3428:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
+    3440:	60 91 12 02 	lds	r22, 0x0212	; 0x800212 <licznik_resetow.3798>
+    3444:	8c ed       	ldi	r24, 0xDC	; 220
+    3446:	9f e0       	ldi	r25, 0x0F	; 15
+    3448:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
   while (!eeprom_is_ready())
-    342c:	f9 99       	sbic	0x1f, 1	; 31
-    342e:	fe cf       	rjmp	.-4      	; 0x342c <inicjalizuj_parametry_modulu+0x1fc>
+    344c:	f9 99       	sbic	0x1f, 1	; 31
+    344e:	fe cf       	rjmp	.-4      	; 0x344c <inicjalizuj_parametry_modulu+0x1fc>
   zapisz_debug_do_eeprom(0, 2); // Reset (komenda=0 oznacza reset)
-    3430:	62 e0       	ldi	r22, 0x02	; 2
-    3432:	80 e0       	ldi	r24, 0x00	; 0
-    3434:	0e 94 b3 03 	call	0x766	; 0x766 <zapisz_debug_do_eeprom>
+    3450:	62 e0       	ldi	r22, 0x02	; 2
+    3452:	80 e0       	ldi	r24, 0x00	; 0
+    3454:	0e 94 b3 03 	call	0x766	; 0x766 <zapisz_debug_do_eeprom>
   eeprom_read_block(moj_numer_telefonu,
-    3438:	41 e1       	ldi	r20, 0x11	; 17
-    343a:	50 e0       	ldi	r21, 0x00	; 0
-    343c:	68 ec       	ldi	r22, 0xC8	; 200
-    343e:	7f e0       	ldi	r23, 0x0F	; 15
-    3440:	86 e3       	ldi	r24, 0x36	; 54
-    3442:	93 e0       	ldi	r25, 0x03	; 3
-    3444:	0e 94 4b 33 	call	0x6696	; 0x6696 <eeprom_read_block>
+    3458:	41 e1       	ldi	r20, 0x11	; 17
+    345a:	50 e0       	ldi	r21, 0x00	; 0
+    345c:	68 ec       	ldi	r22, 0xC8	; 200
+    345e:	7f e0       	ldi	r23, 0x0F	; 15
+    3460:	86 e3       	ldi	r24, 0x36	; 54
+    3462:	93 e0       	ldi	r25, 0x03	; 3
+    3464:	0e 94 4b 33 	call	0x6696	; 0x6696 <eeprom_read_block>
   moj_numer_telefonu[MAX_LICZBA_ZNAKOW_TELEFON] = 0; // Ensure null termination
-    3448:	10 92 46 03 	sts	0x0346, r1	; 0x800346 <moj_numer_telefonu+0x10>
-  if (rtc_czas[0] == '0' && rtc_czas[1] == '0' && rtc_czas[3] == '0' &&
-    344c:	80 91 0b 01 	lds	r24, 0x010B	; 0x80010b <rtc_czas>
-    3450:	80 33       	cpi	r24, 0x30	; 48
-    3452:	a1 f4       	brne	.+40     	; 0x347c <inicjalizuj_parametry_modulu+0x24c>
-    3454:	80 91 0c 01 	lds	r24, 0x010C	; 0x80010c <rtc_czas+0x1>
-    3458:	80 33       	cpi	r24, 0x30	; 48
-    345a:	81 f4       	brne	.+32     	; 0x347c <inicjalizuj_parametry_modulu+0x24c>
-    345c:	80 91 0e 01 	lds	r24, 0x010E	; 0x80010e <rtc_czas+0x3>
-    3460:	80 33       	cpi	r24, 0x30	; 48
-    3462:	61 f4       	brne	.+24     	; 0x347c <inicjalizuj_parametry_modulu+0x24c>
-    3464:	80 91 0f 01 	lds	r24, 0x010F	; 0x80010f <rtc_czas+0x4>
-    3468:	80 33       	cpi	r24, 0x30	; 48
-    346a:	41 f4       	brne	.+16     	; 0x347c <inicjalizuj_parametry_modulu+0x24c>
-      rtc_czas[4] == '0' && moj_numer_telefonu[0] != 0xFF &&
+    3468:	10 92 46 03 	sts	0x0346, r1	; 0x800346 <moj_numer_telefonu+0x10>
+  if (moj_numer_telefonu[0] != 0xFF && moj_numer_telefonu[0] != 0) {
     346c:	80 91 36 03 	lds	r24, 0x0336	; 0x800336 <moj_numer_telefonu>
     3470:	81 50       	subi	r24, 0x01	; 1
     3472:	8e 3f       	cpi	r24, 0xFE	; 254
-    3474:	18 f4       	brcc	.+6      	; 0x347c <inicjalizuj_parametry_modulu+0x24c>
+    3474:	18 f4       	brcc	.+6      	; 0x347c <inicjalizuj_parametry_modulu+0x22c>
     autosync_czas_aktywny = TRUE;
     3476:	8f ef       	ldi	r24, 0xFF	; 255
     3478:	80 93 db 01 	sts	0x01DB, r24	; 0x8001db <autosync_czas_aktywny>
@@ -6753,28 +6753,28 @@ void inicjalizuj_parametry_modulu(void) {
     3484:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <tryb_pracy>
     while (!eeprom_is_ready())
     3488:	f9 99       	sbic	0x1f, 1	; 31
-    348a:	fe cf       	rjmp	.-4      	; 0x3488 <inicjalizuj_parametry_modulu+0x258>
+    348a:	fe cf       	rjmp	.-4      	; 0x3488 <inicjalizuj_parametry_modulu+0x238>
     eeprom_update_byte((uint8_t *)ADRES_EEPROM_TRYB_PRACY, 1);
     348c:	61 e0       	ldi	r22, 0x01	; 1
     348e:	8e ef       	ldi	r24, 0xFE	; 254
     3490:	9f e0       	ldi	r25, 0x0F	; 15
     3492:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
-    3496:	02 cf       	rjmp	.-508    	; 0x329c <inicjalizuj_parametry_modulu+0x6c>
+    3496:	12 cf       	rjmp	.-476    	; 0x32bc <inicjalizuj_parametry_modulu+0x6c>
     tryb_clip = 1; // Domyślnie CLIP (1)
     3498:	81 e0       	ldi	r24, 0x01	; 1
     349a:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <tryb_clip>
     while (!eeprom_is_ready())
     349e:	f9 99       	sbic	0x1f, 1	; 31
-    34a0:	fe cf       	rjmp	.-4      	; 0x349e <inicjalizuj_parametry_modulu+0x26e>
+    34a0:	fe cf       	rjmp	.-4      	; 0x349e <inicjalizuj_parametry_modulu+0x24e>
     eeprom_update_byte((uint8_t *)ADRES_EEPROM_TRYB_CLIP_DTMF, 1);
     34a2:	61 e0       	ldi	r22, 0x01	; 1
     34a4:	8f ef       	ldi	r24, 0xFF	; 255
     34a6:	9f e0       	ldi	r25, 0x0F	; 15
     34a8:	0e 94 73 33 	call	0x66e6	; 0x66e6 <eeprom_update_byte>
-    34ac:	00 cf       	rjmp	.-512    	; 0x32ae <inicjalizuj_parametry_modulu+0x7e>
+    34ac:	10 cf       	rjmp	.-480    	; 0x32ce <inicjalizuj_parametry_modulu+0x7e>
     skryba_wlaczona = FALSE;
     34ae:	10 92 ed 01 	sts	0x01ED, r1	; 0x8001ed <skryba_wlaczona>
-    34b2:	1e cf       	rjmp	.-452    	; 0x32f0 <inicjalizuj_parametry_modulu+0xc0>
+    34b2:	2e cf       	rjmp	.-420    	; 0x3310 <inicjalizuj_parametry_modulu+0xc0>
     skryba_limit = limit_l | (limit_h << 8);
     34b4:	98 2f       	mov	r25, r24
     34b6:	8c 2f       	mov	r24, r28
@@ -6784,12 +6784,12 @@ void inicjalizuj_parametry_modulu(void) {
     34c0:	01 97       	sbiw	r24, 0x01	; 1
     34c2:	80 32       	cpi	r24, 0x20	; 32
     34c4:	93 40       	sbci	r25, 0x03	; 3
-    34c6:	08 f0       	brcs	.+2      	; 0x34ca <inicjalizuj_parametry_modulu+0x29a>
-    34c8:	22 cf       	rjmp	.-444    	; 0x330e <inicjalizuj_parametry_modulu+0xde>
-    34ca:	27 cf       	rjmp	.-434    	; 0x331a <inicjalizuj_parametry_modulu+0xea>
+    34c6:	08 f0       	brcs	.+2      	; 0x34ca <inicjalizuj_parametry_modulu+0x27a>
+    34c8:	32 cf       	rjmp	.-412    	; 0x332e <inicjalizuj_parametry_modulu+0xde>
+    34ca:	37 cf       	rjmp	.-402    	; 0x333a <inicjalizuj_parametry_modulu+0xea>
     blokada_systemu = FALSE; // Domyślnie odblokowany
     34cc:	10 92 da 01 	sts	0x01DA, r1	; 0x8001da <blokada_systemu>
-    34d0:	72 cf       	rjmp	.-284    	; 0x33b6 <inicjalizuj_parametry_modulu+0x186>
+    34d0:	82 cf       	rjmp	.-252    	; 0x33d6 <inicjalizuj_parametry_modulu+0x186>
 
 000034d2 <wykonanie_komend_ukladow>:
 uchar wykonanie_komend_ukladow(void) {
@@ -7035,7 +7035,7 @@ uchar wykonanie_komend_ukladow(void) {
     36b4:	83 e0       	ldi	r24, 0x03	; 3
     36b6:	56 cf       	rjmp	.-340    	; 0x3564 <wykonanie_komend_ukladow+0x92>
     inicjalizuj_parametry_modulu();
-    36b8:	0e 94 18 19 	call	0x3230	; 0x3230 <inicjalizuj_parametry_modulu>
+    36b8:	0e 94 28 19 	call	0x3250	; 0x3250 <inicjalizuj_parametry_modulu>
     ustaw_stan_led(FALSE); // Wylacz diode po zakonczeniu resetu
     36bc:	40 9a       	sbi	0x08, 0	; 8
     36be:	71 cf       	rjmp	.-286    	; 0x35a2 <wykonanie_komend_ukladow+0xd0>
@@ -12619,14 +12619,14 @@ int main(void) {
     5a1c:	80 e2       	ldi	r24, 0x20	; 32
     5a1e:	8a b9       	out	0x0a, r24	; 10
     inicjalizuj_parametry_modulu();
-    5a20:	0e 94 18 19 	call	0x3230	; 0x3230 <inicjalizuj_parametry_modulu>
+    5a20:	0e 94 28 19 	call	0x3250	; 0x3250 <inicjalizuj_parametry_modulu>
     inicjalizacja_SIM900();
     5a24:	0e 94 6d 20 	call	0x40da	; 0x40da <inicjalizacja_SIM900>
 #ifdef DEBUG
     debug_main();
 #endif
     ustaw_parametry_dla_bezpieczenstwa();
-    5a28:	0e 94 08 19 	call	0x3210	; 0x3210 <ustaw_parametry_dla_bezpieczenstwa>
+    5a28:	0e 94 18 19 	call	0x3230	; 0x3230 <ustaw_parametry_dla_bezpieczenstwa>
   }
 
   sei();
@@ -12638,7 +12638,7 @@ int main(void) {
     5a2e:	80 91 e2 01 	lds	r24, 0x01E2	; 0x8001e2 <wykonac_watki>
     5a32:	80 fd       	sbrc	r24, 0
       ustaw_parametry_dla_bezpieczenstwa();
-    5a34:	0e 94 08 19 	call	0x3210	; 0x3210 <ustaw_parametry_dla_bezpieczenstwa>
+    5a34:	0e 94 18 19 	call	0x3230	; 0x3230 <ustaw_parametry_dla_bezpieczenstwa>
     if (CZY_WYKONAC_WATKI_100MS()) {
     5a38:	80 91 e2 01 	lds	r24, 0x01E2	; 0x8001e2 <wykonac_watki>
     5a3c:	81 fd       	sbrc	r24, 1
@@ -12653,7 +12653,7 @@ int main(void) {
     5a46:	80 ff       	sbrs	r24, 0
     5a48:	06 c0       	rjmp	.+12     	; 0x5a56 <main+0x64>
       steruj_urzadzeniem_10MS();
-    5a4a:	0e 94 93 18 	call	0x3126	; 0x3126 <steruj_urzadzeniem_10MS>
+    5a4a:	0e 94 a3 18 	call	0x3146	; 0x3146 <steruj_urzadzeniem_10MS>
       wykonanie_komend();
     5a4e:	0e 94 ad 1d 	call	0x3b5a	; 0x3b5a <wykonanie_komend>
 
@@ -12686,7 +12686,7 @@ int main(void) {
       sei();
     5a72:	78 94       	sei
       wolne_zdarzenie_timer();
-    5a74:	0e 94 99 18 	call	0x3132	; 0x3132 <wolne_zdarzenie_timer>
+    5a74:	0e 94 a9 18 	call	0x3152	; 0x3152 <wolne_zdarzenie_timer>
     if (CZY_WYKONAC_WATKI_10MS())
     5a78:	da cf       	rjmp	.-76     	; 0x5a2e <main+0x3c>
 

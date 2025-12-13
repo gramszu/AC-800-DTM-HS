@@ -748,25 +748,25 @@
  517               		.file 8 "<built-in>"
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 zapiseeprom.c
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:2      *ABS*:000000000000003e __SP_H__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:3      *ABS*:000000000000003d __SP_L__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:4      *ABS*:000000000000003f __SREG__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:5      *ABS*:000000000000003b __RAMPZ__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:6      *ABS*:0000000000000000 __tmp_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:7      *ABS*:0000000000000001 __zero_reg__
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:12     .text:0000000000000000 zapisz_znaki_w_eeprom_bez_kopiowania.part.0
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:5      *ABS*:000000000000003b __RAMPZ__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:12     .text:0000000000000000 zapisz_znaki_w_eeprom_bez_kopiowania.part.0
                             *COM*:0000000000000002 pozycja_w_eeprom
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:501    .bss:0000000000000000 nr_zapisanego_znaku
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:506    .bss:0000000000000001 liczba_znakow_do_zapisu
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:501    .bss:0000000000000000 nr_zapisanego_znaku
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:506    .bss:0000000000000001 liczba_znakow_do_zapisu
                             *COM*:0000000000000032 bufor_eeprom
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:65     .text:000000000000002c zapisz_bajt_w_EEPROM
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:65     .text:000000000000002c zapisz_bajt_w_EEPROM
                             *COM*:0000000000000001 bufor_pomoc_liczba_znakow_do_zapisu
                             *COM*:0000000000000001 czy_zajety_bufor_eeprom
                             *COM*:0000000000000002 bufor_pomoc_adres_eeprom
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:245    .text:00000000000000f4 zapisz_znaki_w_eeprom
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:326    .text:0000000000000142 zapisz_znaki_w_eeprom_bez_kopiowania
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:348    .text:000000000000014a zapisz_znak_w_eeprom
-/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccD5lMwB.s:413    .text:0000000000000178 eeprom_read_3char
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:245    .text:00000000000000f4 zapisz_znaki_w_eeprom
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:326    .text:0000000000000142 zapisz_znaki_w_eeprom_bez_kopiowania
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:348    .text:000000000000014a zapisz_znak_w_eeprom
+/var/folders/6z/r258d_ld7nl6hm6r8km5x35c0000gn/T//ccuTlv6M.s:413    .text:0000000000000178 eeprom_read_3char
 
 UNDEFINED SYMBOLS
 memcpy
