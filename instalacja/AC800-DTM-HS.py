@@ -45,7 +45,7 @@ class AppConfig:
             "EEPROM_SIZE": 4096,
             "NUM_ENTRIES": 800,
             "RANGE_START": 0x08,
-            "DESCRIPTION": "Bramster AC800-DTM-HS",
+            "DESCRIPTION": "Bramster AC800-TS",
             # Adresy specyficzne dla M1284
             "ADDR_SKRYBA": 4089,
             "ADDR_SKRYBA_LIMIT_L": 4085,
@@ -55,8 +55,8 @@ class AppConfig:
             "ADDR_TIME_STOP_H": 4092,
             "ADDR_TIME_STOP_M": 4093,
             "ADDR_MODE": 4094,
-            "ADDR_CLIP_DTMF": 4095,  # 0=DTMF, 1=CLIP (NOWY!)
-            "ADDR_STATUS": 4087,  
+            "ADDR_STATUS": 4087,
+            "ADDR_MYNUM": 4040,  # Własny numer telefonu (10 bajtów)
         }
 
         # Aktywna konfiguracja - tylko M1284
@@ -77,7 +77,7 @@ class AppConfig:
         self.AVRDUDE_CONF = resource_path("tools/avrdude.conf")
 
         # Ustawienia interfejsu
-        self.WINDOW_TITLE = "Bramster AC800-DTM-HS"
+        self.WINDOW_TITLE = "Bramster AC800-TS"
         self.WINDOW_SIZE = "605x950" # Zwiekszone dla Time Control
         self.WEBSITE_URL = "https://www.sonfy.pl"
 
@@ -109,9 +109,6 @@ class AppConfig:
             "status_blocked": "Blokada",
             "mode_private": "Prywatny",
             "mode_public": "Publiczny",
-            "clip_dtmf_mode": "Tryb sterowania",  # NOWY!
-            "mode_clip": "CLIP",  # NOWY!
-            "mode_dtmf": "DTMF",  # NOWY!
             "control_mode": "Funkcja Skryba", # Zmienione z Sterowanie
             "control_clip": "Włączona",      # Zmienione z CLIP
             "control_dtmf": "Wyłączona",     # Zmienione z DTMF
@@ -150,7 +147,7 @@ class AppConfig:
         self.update_addresses()
 
         self.ABOUT_INFO = """
-Bramster AC800-DTM-HS
+Bramster AC800-TS
 firmware 2.0
 
 Autor: Robert Gramsz
@@ -164,11 +161,11 @@ www.sonfy.pl
         self.EEPROM_ADDR_SKRYBA_LIMIT_H = self.ACTIVE_CONFIG["ADDR_SKRYBA_LIMIT_H"]
         self.EEPROM_ADDR_STATUS = self.ACTIVE_CONFIG["ADDR_STATUS"]
         self.EEPROM_ADDR_MODE = self.ACTIVE_CONFIG["ADDR_MODE"]
-        self.EEPROM_ADDR_CLIP_DTMF = self.ACTIVE_CONFIG["ADDR_CLIP_DTMF"]
         self.EEPROM_ADDR_TIME_START_H = self.ACTIVE_CONFIG["ADDR_TIME_START_H"]
         self.EEPROM_ADDR_TIME_START_M = self.ACTIVE_CONFIG["ADDR_TIME_START_M"]
         self.EEPROM_ADDR_TIME_STOP_H = self.ACTIVE_CONFIG["ADDR_TIME_STOP_H"]
         self.EEPROM_ADDR_TIME_STOP_M = self.ACTIVE_CONFIG["ADDR_TIME_STOP_M"]
+        self.EEPROM_ADDR_MYNUM = self.ACTIVE_CONFIG["ADDR_MYNUM"]
 
 
 
@@ -306,16 +303,16 @@ class BramsterApp:
         self.about_logo: Optional[tk.PhotoImage] = None
         self.icon_photo: Optional[tk.PhotoImage] = None
         self.ascii_var = tk.StringVar()
+        self.mynum_var = tk.StringVar()  # Własny numer telefonu dla auto-sync
         self.com_port_var = tk.StringVar(value=self.config.PORT)
 
         # Zmienne dla statusu, trybu i sterowania (zgodne z C)
         self.status_var = tk.IntVar(value=0)  # 0 = Aktywny, 1 = Blokada
         self.mode_var = tk.IntVar(value=1)    # 0 = Prywatny, 1 = Publiczny
-        self.clip_dtmf_var = tk.IntVar(value=1)  # 0 = DTMF, 1 = CLIP (adres 4095)
-        self.skryba_var = tk.IntVar(value=0)  # 0 = Wylaczona, 1 = Wlaczona (adres 4089)
+        self.skryba_var = tk.IntVar(value=0)  # 0 = Wylaczona, 1 = Wlaczona (dawniej CLIP/DTMF)
         self.skryba_var.trace_add("write", self.on_skryba_change)
         self.backup_mode = None  # Do przywracania trybu po wyłączeniu Skryby
-        self.skryba_limit_var = tk.IntVar(value=795)  # Limit użytkowników dla Skryby (1-795, pozycje 796-800 dla Super Userów)
+        self.skryba_limit_var = tk.IntVar(value=800)  # Limit użytkowników dla Skryby (1-800)
 
         # Zmienne dla Time Control
         self.time_enabled_var = tk.IntVar(value=0)  # 0 = Wyłączony, 1 = Włączony
@@ -394,15 +391,6 @@ class BramsterApp:
             return False
         return 0 <= int(new_value) <= 59
 
-    def validate_skryba_limit(self, new_value: str) -> bool:
-        """Walidacja dla limitu Skryba (1-795)."""
-        if new_value == "":
-            return True
-        if not new_value.isdigit():
-            return False
-        val = int(new_value)
-        return 1 <= val <= 795
-
     def generate_hex_configs(self) -> None:
         """Generuje dynamiczną konfigurację dla aktywnej liczby numerów."""
         self.hex_configs = []
@@ -464,29 +452,15 @@ class BramsterApp:
     def get_mode_text(self, mode_var_value: int) -> str:
         return self.config.LABELS["mode_private"] if mode_var_value == 0 else self.config.LABELS["mode_public"]
 
-    def get_clip_dtmf_text(self, clip_dtmf_var_value: int) -> str:
-        return self.config.LABELS["mode_clip"] if clip_dtmf_var_value == 1 else self.config.LABELS["mode_dtmf"]
-
     def get_skryba_text(self, skryba_var_value: int) -> str:
         return self.config.LABELS["control_clip"] if skryba_var_value == 1 else self.config.LABELS["control_dtmf"]
 
     def read_status_and_mode_from_eeprom(self, data: bytes) -> None:
-        """Odczytuje status, tryb pracy, Skryba, CLIP/DTMF i Time Control z EEPROM i aktualizuje GUI."""
-        # CLIP/DTMF (adres 4095: 0=DTMF, 1=CLIP)
-        if self.config.EEPROM_ADDR_CLIP_DTMF and len(data) > self.config.EEPROM_ADDR_CLIP_DTMF:
-            clip_dtmf_byte = data[self.config.EEPROM_ADDR_CLIP_DTMF]
-            if clip_dtmf_byte == 0xFF:
-                self.clip_dtmf_var.set(1)  # Domyślnie CLIP
-            else:
-                self.clip_dtmf_var.set(1 if clip_dtmf_byte == 0x01 else 0)
-        
-        # Skryba (adres 4089: 1=ON, 0=OFF)
+        """Odczytuje status, tryb pracy, Skryba i Time Control z EEPROM i aktualizuje GUI."""
+        # Skryba (M1284: 1=ON, 0=OFF)
         if self.config.EEPROM_ADDR_SKRYBA and len(data) > self.config.EEPROM_ADDR_SKRYBA:
             skryba_byte = data[self.config.EEPROM_ADDR_SKRYBA]
-            if skryba_byte == 0xFF:
-                self.skryba_var.set(0)  # Domyślnie wyłączona
-            else:
-                self.skryba_var.set(1 if skryba_byte == 0x01 else 0)
+            self.skryba_var.set(1 if skryba_byte == 0x01 else 0)
         
         # Skryba Limit (2 bajty: L i H)
         if (self.config.EEPROM_ADDR_SKRYBA_LIMIT_L and 
@@ -494,15 +468,15 @@ class BramsterApp:
             limit_l = data[self.config.EEPROM_ADDR_SKRYBA_LIMIT_L]
             limit_h = data[self.config.EEPROM_ADDR_SKRYBA_LIMIT_H]
             if limit_l == 0xFF and limit_h == 0xFF:
-                # Nie ustawiono - domyślnie 795 (pozycje 796-800 dla Super Userów)
-                self.skryba_limit_var.set(795)
+                # Nie ustawiono - domyślnie 800
+                self.skryba_limit_var.set(800)
             else:
                 limit_value = limit_l | (limit_h << 8)
-                # Walidacja zakresu (max 795, pozycje 796-800 dla Super Userów)
-                if 1 <= limit_value <= 795:
+                # Walidacja zakresu
+                if 1 <= limit_value <= 800:
                     self.skryba_limit_var.set(limit_value)
                 else:
-                    self.skryba_limit_var.set(795)
+                    self.skryba_limit_var.set(800)
 
         # Status
         if self.config.EEPROM_ADDR_STATUS and len(data) > self.config.EEPROM_ADDR_STATUS:
@@ -541,20 +515,27 @@ class BramsterApp:
                     if len(data) > self.config.EEPROM_ADDR_TIME_STOP_M:
                         self.time_stop_m_var.set(f"{data[self.config.EEPROM_ADDR_TIME_STOP_M]:02d}")
 
+        # MYNUM (własny numer telefonu)
+        if self.config.EEPROM_ADDR_MYNUM and len(data) > self.config.EEPROM_ADDR_MYNUM + 9:
+            # Odczytaj 10 bajtów (maksymalnie 9 cyfr + null terminator)
+            mynum_bytes = data[self.config.EEPROM_ADDR_MYNUM:self.config.EEPROM_ADDR_MYNUM + 10]
+            # Konwertuj na string, zatrzymaj się na 0x00 lub 0xFF
+            mynum_str = ""
+            for b in mynum_bytes:
+                if b == 0x00 or b == 0xFF:
+                    break
+                if 48 <= b <= 57:  # ASCII cyfry 0-9
+                    mynum_str += chr(b)
+            self.mynum_var.set(mynum_str)
+
         logging.info(
             f"Read from EEPROM - Status: {self.status_var.get()}, "
-            f"Mode: {self.mode_var.get()}, CLIP/DTMF: {self.clip_dtmf_var.get()}, "
-            f"Skryba: {self.skryba_var.get()}"
+            f"Mode: {self.mode_var.get()}, Skryba: {self.skryba_var.get()}"
         )
 
     def write_status_and_mode_to_eeprom(self, data: bytearray) -> None:
-        """Zapisuje status, tryb pracy, CLIP/DTMF, Skryba i Time Control do EEPROM."""
-        # CLIP/DTMF (adres 4095: 0=DTMF, 1=CLIP)
-        if self.config.EEPROM_ADDR_CLIP_DTMF:
-            val = 0x01 if self.clip_dtmf_var.get() == 1 else 0x00
-            data[self.config.EEPROM_ADDR_CLIP_DTMF] = val
-        
-        # Skryba (adres 4089: 1=ON, 0=OFF)
+        """Zapisuje status, tryb pracy, Skryba i Time Control do EEPROM."""
+        # Skryba (M1284: 1=ON, 0=OFF)
         if self.config.EEPROM_ADDR_SKRYBA:
             val = 0x01 if self.skryba_var.get() == 1 else 0x00
             data[self.config.EEPROM_ADDR_SKRYBA] = val
@@ -592,10 +573,25 @@ class BramsterApp:
                 except ValueError:
                     logging.error("Invalid time values")
 
+        # MYNUM (własny numer telefonu)
+        if self.config.EEPROM_ADDR_MYNUM:
+            mynum_str = self.mynum_var.get().strip()
+            # Walidacja: tylko cyfry, 3-9 znaków
+            if mynum_str and mynum_str.isdigit() and 3 <= len(mynum_str) <= 9:
+                # Zapisz numer jako ASCII
+                for i, char in enumerate(mynum_str):
+                    data[self.config.EEPROM_ADDR_MYNUM + i] = ord(char)
+                # Dodaj null terminator
+                if len(mynum_str) < 10:
+                    data[self.config.EEPROM_ADDR_MYNUM + len(mynum_str)] = 0x00
+            else:
+                # Wyczyść (ustaw na 0xFF)
+                for i in range(10):
+                    data[self.config.EEPROM_ADDR_MYNUM + i] = 0xFF
+
         logging.info(
             f"Write to EEPROM - Status: {self.status_var.get()}, "
-            f"Mode: {self.mode_var.get()}, CLIP/DTMF: {self.clip_dtmf_var.get()}, "
-            f"Skryba: {self.skryba_var.get()}"
+            f"Mode: {self.mode_var.get()}, Skryba: {self.skryba_var.get()}"
         )
 
     def check_system_requirements(self) -> bool:
@@ -856,7 +852,6 @@ class BramsterApp:
         self.update_numbers_text(data)
         self.status_var.set(0)
         self.mode_var.set(1)
-        self.clip_dtmf_var.set(1)  # Domyślnie CLIP
         self.skryba_var.set(1)
 
     def sync_from_numbers_list(self) -> bool:
@@ -1205,7 +1200,6 @@ class BramsterApp:
                 kod_dostepu_text: Optional[str] = None
                 status_text: Optional[str] = None
                 mode_text: Optional[str] = None
-                clip_dtmf_text: Optional[str] = None
                 skryba_text: Optional[str] = None
                 time_text: Optional[str] = None
 
@@ -1225,8 +1219,6 @@ class BramsterApp:
                                 status_text = val
                             elif key == "Tryb":
                                 mode_text = val
-                            elif key == "Tryb sterowania":
-                                clip_dtmf_text = val
                             elif key == "Funkcja Skryba":
                                 skryba_text = val
                             elif key == "Kontrola Czasu":
@@ -1273,12 +1265,6 @@ class BramsterApp:
                         self.mode_var.set(0)
                     elif mode_text == self.config.LABELS["mode_public"]:
                         self.mode_var.set(1)
-
-                if clip_dtmf_text:
-                    if clip_dtmf_text == self.config.LABELS["mode_clip"] or clip_dtmf_text == "CLIP":
-                        self.clip_dtmf_var.set(1)
-                    elif clip_dtmf_text == self.config.LABELS["mode_dtmf"] or clip_dtmf_text == "DTMF":
-                        self.clip_dtmf_var.set(0)
 
                 if skryba_text:
                     # Kompatybilnosc: CLIP/Wlaczona -> 1, DTMF/Wylaczona -> 0
@@ -1403,7 +1389,6 @@ class BramsterApp:
                     kod_dostepu_text = self.ascii_var.get()
                     status_text = self.get_status_text(self.status_var.get())
                     mode_text = self.get_mode_text(self.mode_var.get())
-                    clip_dtmf_text = self.get_clip_dtmf_text(self.clip_dtmf_var.get())
                     skryba_text = self.get_skryba_text(self.skryba_var.get())
                     
                     # Format czasu: HH:MM - HH:MM lub "Wylaczony"
@@ -1415,7 +1400,6 @@ class BramsterApp:
                     writer.writerow(["Kod dostępu", kod_dostepu_text])
                     writer.writerow(["Status", status_text])
                     writer.writerow(["Tryb", mode_text])
-                    writer.writerow(["Tryb sterowania", clip_dtmf_text])
                     writer.writerow(["Funkcja Skryba", skryba_text])
                     writer.writerow(["Kontrola Czasu", time_text])
                     writer.writerow([])
@@ -1542,17 +1526,12 @@ class BramsterApp:
 
         # Processor selection removed - only AC800 supported
 
-        # RZĄD 1: Status i Tryb pracy
-        frame_status_mode_row1 = tk.Frame(self.root)
-        frame_status_mode_row1.pack(fill="x", padx=10, pady=8)
-        
-        # Konfiguracja kolumn - równa szerokość
-        frame_status_mode_row1.grid_columnconfigure(0, weight=1, uniform="group1")
-        frame_status_mode_row1.grid_columnconfigure(1, weight=1, uniform="group1")
+        frame_status_mode = tk.Frame(self.root)
+        frame_status_mode.pack(fill="x", padx=10, pady=8)
 
         # Zapisujemy referencje do ramki statusu
-        self.frame_status = tk.LabelFrame(frame_status_mode_row1, text=self.config.LABELS["status_control"])
-        self.frame_status.grid(row=0, column=0, padx=(0, 5), sticky="ew")
+        self.frame_status = tk.LabelFrame(frame_status_mode, text=self.config.LABELS["status_control"])
+        self.frame_status.pack(side="left", padx=(0, 5), expand=True, fill="x")
 
         self.check_status_active = tk.Radiobutton(
             self.frame_status,
@@ -1571,8 +1550,8 @@ class BramsterApp:
         self.check_status_blocked.pack(side="left", padx=8, pady=8)
 
         # Zapisujemy referencje do ramki trybu
-        self.frame_mode = tk.LabelFrame(frame_status_mode_row1, text=self.config.LABELS["mode_control"])
-        self.frame_mode.grid(row=0, column=1, padx=(5, 0), sticky="ew")
+        self.frame_mode = tk.LabelFrame(frame_status_mode, text=self.config.LABELS["mode_control"])
+        self.frame_mode.pack(side="left", padx=(5, 5), expand=True, fill="x")
 
         self.check_mode_private = tk.Radiobutton(
             self.frame_mode,
@@ -1590,37 +1569,9 @@ class BramsterApp:
         )
         self.check_mode_public.pack(side="left", padx=8, pady=8)
 
-        # RZĄD 2: Tryb sterowania (CLIP/DTMF) i Funkcja Skryba
-        frame_status_mode_row2 = tk.Frame(self.root)
-        frame_status_mode_row2.pack(fill="x", padx=10, pady=8)
-        
-        # Konfiguracja kolumn - równa szerokość
-        frame_status_mode_row2.grid_columnconfigure(0, weight=1, uniform="group1")
-        frame_status_mode_row2.grid_columnconfigure(1, weight=1, uniform="group1")
-
-        # Ramka dla CLIP/DTMF
-        self.frame_clip_dtmf = tk.LabelFrame(frame_status_mode_row2, text=self.config.LABELS["clip_dtmf_mode"])
-        self.frame_clip_dtmf.grid(row=0, column=0, padx=(0, 5), sticky="ew")
-
-        self.check_clip = tk.Radiobutton(
-            self.frame_clip_dtmf,
-            text=self.config.LABELS["mode_clip"],
-            variable=self.clip_dtmf_var,
-            value=1
-        )
-        self.check_clip.pack(side="left", padx=8, pady=8)
-
-        self.check_dtmf = tk.Radiobutton(
-            self.frame_clip_dtmf,
-            text=self.config.LABELS["mode_dtmf"],
-            variable=self.clip_dtmf_var,
-            value=0
-        )
-        self.check_dtmf.pack(side="left", padx=8, pady=8)
-
         # Zapisujemy referencje do ramki i przycisków, aby zmieniać ich tekst
-        self.frame_clip = tk.LabelFrame(frame_status_mode_row2, text=self.config.LABELS["control_mode"])
-        self.frame_clip.grid(row=0, column=1, padx=(5, 0), sticky="ew")
+        self.frame_clip = tk.LabelFrame(frame_status_mode, text=self.config.LABELS["control_mode"])
+        self.frame_clip.pack(side="left", padx=(5, 0), expand=True, fill="x")
 
         self.check_skryba_on = tk.Radiobutton(
             self.frame_clip,
@@ -1637,6 +1588,21 @@ class BramsterApp:
             value=0
         )
         self.check_skryba_off.pack(side="left", padx=8, pady=8)
+        
+        # Spinbox dla limitu użytkowników Skryby
+        limit_label = tk.Label(self.frame_clip, text="Limit:")
+        limit_label.pack(side="left", padx=(15, 3))
+        
+        self.spin_skryba_limit = tk.Spinbox(
+            self.frame_clip,
+            from_=1,
+            to=800,
+            increment=1,
+            textvariable=self.skryba_limit_var,
+            width=5,
+            state="readonly"
+        )
+        self.spin_skryba_limit.pack(side="left", padx=3)
 
         # --- Time Control Frame ---
         # Zapisujemy referencje, aby móc ukrywać/pokazywać
@@ -1754,7 +1720,7 @@ class BramsterApp:
         self.entry_ascii = tk.Entry(
             frame_ascii,
             textvariable=self.ascii_var,
-            width=40
+            width=20
         )
         self.entry_ascii.grid(row=0, column=0, padx=8, pady=8)
 
@@ -1764,6 +1730,15 @@ class BramsterApp:
             command=self.sync_ascii_into_textarea
         )
         self.btn_apply_ascii.grid(row=0, column=1, padx=8, pady=8)
+
+        # Pole MYNUM (własny numer)
+        tk.Label(frame_ascii, text="Mój numer:").grid(row=0, column=2, padx=(20, 5), pady=8)
+        self.entry_mynum = tk.Entry(
+            frame_ascii,
+            textvariable=self.mynum_var,
+            width=15
+        )
+        self.entry_mynum.grid(row=0, column=3, padx=5, pady=8)
 
         label_hex = tk.Label(
             self.root,
