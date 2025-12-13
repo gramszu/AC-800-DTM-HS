@@ -696,13 +696,25 @@ Wyślij SMS na numer sterownika:
 ABCD MYNUM 600123456
 ```
 
+**Przykłady:**
+```
+ABCD MYNUM 123456789    → Zapisze: 123456789
+ABCD MYNUM +48600123456 → Zapisze: 600123456 (pomija +48)
+ABCD MYNUM 600 123 456  → Zapisze: 600123456 (pomija spacje)
+```
+
 > **📝 Uwaga:** Numer może mieć od 3 do 9 cyfr. Znaki specjalne (+, #, *, spacje) są automatycznie pomijane.
+
+**Odpowiedź sterownika:**
+```
+MYNUM zapisany
+```
 
 ### Automatyczna Synchronizacja Czasu
 
 Jeśli sterownik wykryje nieprawidłowy czas po restarcie (00:00:xx), automatycznie:
 
-1. ⏱️ Czeka 10 sekund po zalogowaniu do sieci
+1. ⏱️ Czeka 25 sekund po zalogowaniu do sieci
 2. 🔍 Sprawdza czas w module GSM
 3. 📱 Jeśli czas to 00:00:xx - wysyła SMS do siebie
 4. ⏰ Synchronizuje czas z otrzymanego SMS-a
