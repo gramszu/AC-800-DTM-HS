@@ -1651,21 +1651,6 @@ class BramsterApp:
             value=0
         )
         self.check_skryba_off.pack(side="left", padx=8, pady=8)
-        
-        # Spinbox dla limitu użytkowników Skryby
-        limit_label = tk.Label(self.frame_clip, text="Limit:")
-        limit_label.pack(side="left", padx=(15, 3))
-        
-        self.spin_skryba_limit = tk.Spinbox(
-            self.frame_clip,
-            from_=1,
-            to=800,
-            increment=1,
-            textvariable=self.skryba_limit_var,
-            width=5,
-            state="readonly"
-        )
-        self.spin_skryba_limit.pack(side="left", padx=3)
 
         # --- Time Control Frame ---
         # Zapisujemy referencje, aby móc ukrywać/pokazywać
