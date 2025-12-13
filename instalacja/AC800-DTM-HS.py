@@ -1919,7 +1919,7 @@ class BramsterApp:
             text=self.config.LABELS["numbers_list"],
             font=("Arial", 10, "bold")
         )
-        label_hex.pack(pady=(2, 0))
+        label_hex.pack(pady=5)
 
         self.numbers_text = scrolledtext.ScrolledText(
             self.root,
