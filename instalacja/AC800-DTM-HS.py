@@ -1885,7 +1885,7 @@ class BramsterApp:
 
         # Kontener dla ramek obok siebie
         container_frames = tk.Frame(self.root)
-        container_frames.pack(fill="x", padx=10, pady=8)
+        container_frames.pack(fill="x", padx=10, pady=3)
 
         # Ramka kodu dostępu (po lewej)
         frame_ascii = tk.LabelFrame(container_frames, text=self.config.LABELS["access_code"])
@@ -1896,9 +1896,7 @@ class BramsterApp:
             textvariable=self.ascii_var,
             width=20
         )
-        self.entry_ascii.grid(row=0, column=0, padx=8, pady=8)
-
-        self.entry_ascii.grid(row=0, column=0, padx=8, pady=8, sticky="ew")
+        self.entry_ascii.grid(row=0, column=0, padx=8, pady=3, sticky="ew")
         frame_ascii.columnconfigure(0, weight=1)
 
         # Ramka numeru karty SIM (po prawej)
@@ -1914,7 +1912,7 @@ class BramsterApp:
             validate='key',
             validatecommand=vcmd_mynum
         )
-        self.entry_mynum.grid(row=0, column=0, padx=8, pady=8)
+        self.entry_mynum.grid(row=0, column=0, padx=8, pady=3)
 
         label_hex = tk.Label(
             self.root,
