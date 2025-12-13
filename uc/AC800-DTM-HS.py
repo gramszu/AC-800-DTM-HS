@@ -918,6 +918,13 @@ class BramsterApp:
 
             for line in lines:
                 if ':' not in line:
+                    # Jeśli linia zawiera tekst ale nie ma dwukropka - błąd formatu
+                    if line.strip():
+                         messagebox.showerror(
+                            self.config.MESSAGES["error"],
+                            f"Nieprawidłowy format linii:\n'{line.strip()}'\n\nOczekiwano formatu: 'Pozycja: Numer'"
+                        )
+                         return False
                     continue
                 name, value = line.split(':', 1)
                 name = name.strip()
@@ -1277,8 +1284,10 @@ class BramsterApp:
                 ]
 
                 success, output = self.run_avrdude(command_args)
+                
+                # Przekazujemy zaktualizowane dane z powrotem do głównego wątku, aby odświeżyć GUI
+                self.result_queue.put((True, self.config.MESSAGES["chip_written"] if success else output, {'data': data}))
 
-                self.result_queue.put((True, self.config.MESSAGES["chip_written"] if success else output, None))
             except Exception as e:
                 logging.error(f"Error in zapis_eeprom: {str(e)}")
                 self.result_queue.put((False, f"{self.config.MESSAGES['process_error']}: {e}", None))
