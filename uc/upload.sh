@@ -3,7 +3,6 @@
 # Jeśli skrypt nie ma uprawnień roota (potrzebne do dostępu do AVRISP2 na macOS),
 # spróbuj uruchomić go ponownie przez sudo – unikamy pętli dzięki znacznikowi.
 if [ "$EUID" -ne 0 ] && [ -z "$UPLOAD_SH_ROOT" ]; then
-    echo "Brak uprawnień do urządzenia USB – proszę o hasło administratora..."
     UPLOAD_SH_ROOT=1 exec sudo -E UPLOAD_SH_ROOT=1 "$0" "$@"
 fi
 
