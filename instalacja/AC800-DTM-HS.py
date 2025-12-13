@@ -1847,7 +1847,7 @@ class BramsterApp:
         frame_buttons.columnconfigure(2, weight=1, uniform="btns")
         frame_buttons.rowconfigure(0, weight=1, uniform="btnrows")
         frame_buttons.rowconfigure(1, weight=1, uniform="btnrows")
-        frame_buttons.rowconfigure(3, weight=1, uniform="btnrows")
+        frame_buttons.rowconfigure(1, weight=1, uniform="btnrows")
 
         btn_font = ("TkDefaultFont", 10)
         
