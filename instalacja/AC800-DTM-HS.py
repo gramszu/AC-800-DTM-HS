@@ -1792,7 +1792,7 @@ class BramsterApp:
         # --- Time Control Frame ---
         # Zapisujemy referencje, aby móc ukrywać/pokazywać
         self.frame_time = tk.LabelFrame(self.root, text=self.config.LABELS["time_control"])
-        self.frame_time.pack(fill="x", padx=10, pady=8)
+        self.frame_time.pack(fill="x", padx=10, pady=3)
          
         
         # Checkbox aktywacji harmonogramu
@@ -1919,7 +1919,7 @@ class BramsterApp:
             text=self.config.LABELS["numbers_list"],
             font=("Arial", 10, "bold")
         )
-        label_hex.pack(pady=(10, 0))
+        label_hex.pack(pady=(2, 0))
 
         self.numbers_text = scrolledtext.ScrolledText(
             self.root,
