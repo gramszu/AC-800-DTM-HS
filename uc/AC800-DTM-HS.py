@@ -545,8 +545,8 @@ class BramsterApp:
         # Status
         if self.config.EEPROM_ADDR_STATUS and len(data) > self.config.EEPROM_ADDR_STATUS:
             status_byte = data[self.config.EEPROM_ADDR_STATUS]
-            # 0x00 = Active, anything else (0x01, 0xFF) = Blocked
-            self.status_var.set(0 if status_byte == 0x00 else 1)
+            # 0x01 = Blocked, 0x00 or 0xFF = Active
+            self.status_var.set(1 if status_byte == 0x01 else 0)
 
         # Mode
         if self.config.EEPROM_ADDR_MODE and len(data) > self.config.EEPROM_ADDR_MODE:
