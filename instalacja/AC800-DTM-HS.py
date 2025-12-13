@@ -316,8 +316,10 @@ class BramsterApp:
         self.mode_var = tk.IntVar(value=1)    # 0 = Prywatny, 1 = Publiczny
         self.clip_dtmf_var = tk.IntVar(value=1)  # 0 = DTMF, 1 = CLIP (domyślnie CLIP)
         self.skryba_var = tk.IntVar(value=0)  # 0 = Wylaczona, 1 = Wlaczona
+        self._skryba_trace_enabled = True  # Flaga do blokowania trace podczas odczytu EEPROM
         self.skryba_var.trace_add("write", self.on_skryba_change)
         self.backup_mode = None  # Do przywracania trybu po wyłączeniu Skryby
+        self.backup_clip_dtmf = None  # Do przywracania trybu CLIP/DTMF
         self.skryba_limit_var = tk.IntVar(value=800)  # Limit użytkowników dla Skryby (1-800)
 
         # Zmienne dla Time Control
@@ -369,6 +371,10 @@ class BramsterApp:
 
     def on_skryba_change(self, *args) -> None:
         """Automatycznie zarządza trybem pracy przy zmianie Skryby."""
+        # Blokuj działanie podczas odczytu z EEPROM
+        if not getattr(self, '_skryba_trace_enabled', True):
+            return
+            
         val = self.skryba_var.get()
         if val == 1:
             # Włączanie Skryby: Zapisz obecne tryby i wymuś CLIP + Publiczny
@@ -385,7 +391,7 @@ class BramsterApp:
             if self.backup_mode is not None:
                 self.mode_var.set(self.backup_mode)
                 self.backup_mode = None
-            if hasattr(self, 'backup_clip_dtmf') and self.backup_clip_dtmf is not None:
+            if self.backup_clip_dtmf is not None:
                 self.clip_dtmf_var.set(self.backup_clip_dtmf)
                 self.backup_clip_dtmf = None
 
@@ -479,10 +485,16 @@ class BramsterApp:
 
     def read_status_and_mode_from_eeprom(self, data: bytes) -> None:
         """Odczytuje status, tryb pracy, Skryba i Time Control z EEPROM i aktualizuje GUI."""
+        # Wyłącz trace aby nie wywoływać automatycznego ustawiania CLIP/Publiczny przy odczycie
+        self._skryba_trace_enabled = False
+        
         # Skryba (M1284: 1=ON, 0=OFF)
         if self.config.EEPROM_ADDR_SKRYBA and len(data) > self.config.EEPROM_ADDR_SKRYBA:
             skryba_byte = data[self.config.EEPROM_ADDR_SKRYBA]
             self.skryba_var.set(1 if skryba_byte == 0x01 else 0)
+        
+        # Włącz trace z powrotem
+        self._skryba_trace_enabled = True
         
         # Skryba Limit (2 bajty: L i H)
         if (self.config.EEPROM_ADDR_SKRYBA_LIMIT_L and 
