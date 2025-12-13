@@ -391,6 +391,14 @@ class BramsterApp:
             return False
         return 0 <= int(new_value) <= 59
 
+    def validate_mynum_input(self, new_value: str) -> bool:
+        """Walidacja dla numeru karty SIM - tylko cyfry 0-9, maksymalnie 9 znaków."""
+        if new_value == "":
+            return True
+        if not new_value.isdigit():
+            return False
+        return len(new_value) <= 9
+
     def generate_hex_configs(self) -> None:
         """Generuje dynamiczną konfigurację dla aktywnej liczby numerów."""
         self.hex_configs = []
@@ -1720,7 +1728,7 @@ class BramsterApp:
         self.entry_ascii = tk.Entry(
             frame_ascii,
             textvariable=self.ascii_var,
-            width=20
+            width=40
         )
         self.entry_ascii.grid(row=0, column=0, padx=8, pady=8)
 
@@ -1731,14 +1739,20 @@ class BramsterApp:
         )
         self.btn_apply_ascii.grid(row=0, column=1, padx=8, pady=8)
 
-        # Pole MYNUM (własny numer)
-        tk.Label(frame_ascii, text="Mój numer:").grid(row=0, column=2, padx=(20, 5), pady=8)
+        # Osobna ramka dla numeru karty SIM
+        frame_mynum = tk.LabelFrame(self.root, text="Numer karty SIM w sterowniku")
+        frame_mynum.pack(fill="x", padx=10, pady=8)
+
+        # Walidacja: tylko cyfry 0-9
+        vcmd_mynum = (self.root.register(self.validate_mynum_input), '%P')
         self.entry_mynum = tk.Entry(
-            frame_ascii,
+            frame_mynum,
             textvariable=self.mynum_var,
-            width=15
+            width=40,
+            validate='key',
+            validatecommand=vcmd_mynum
         )
-        self.entry_mynum.grid(row=0, column=3, padx=5, pady=8)
+        self.entry_mynum.grid(row=0, column=0, padx=8, pady=8)
 
         label_hex = tk.Label(
             self.root,
